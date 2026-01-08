@@ -1,29 +1,85 @@
 // script.js
 import { auth } from "./firebase.js";
-import { signInWithEmailAndPassword } from
-  "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { loadUserProfile, loadAllProfiles } from "./profiles.js";
+import {
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
+// ===== ELEMENTOS =====
+const usernameInput = document.getElementById("username");
+const passwordInput = document.getElementById("password");
 const loginBtn = document.getElementById("loginBtn");
-const msg = document.getElementById("msg");
+const msgSpan = document.getElementById("msg");
+const profilesDiv = document.getElementById("profiles");
 
+// ===== LOGIN =====
 loginBtn.addEventListener("click", async () => {
-  console.log("CLIQUEI EM ENTRAR");
+  const email = usernameInput.value;
+  const password = passwordInput.value;
 
-  const username = document.getElementById("username").value.trim();
-  const password = document.getElementById("password").value;
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+  } catch (err) {
+    msgSpan.textContent = "Erro no login: " + err.message;
+  }
+});
 
-  if (!username || !password) {
-    msg.innerText = "Preencha tudo";
+// ===== LOGOUT E AUTENTICAÇÃO =====
+onAuthStateChanged(auth, async user => {
+  if (!user) {
+    // não logado
+    profilesDiv.innerHTML = "";
     return;
   }
 
-  const emailFake = `${username.toLowerCase()}@reconstituir.fun`;
+  // Carregar profile do usuário atual
+  const profile = await loadUserProfile(user);
 
-  try {
-    await signInWithEmailAndPassword(auth, emailFake, password);
-    window.location.href = "dashboard.html";
-  } catch (err) {
-    console.error(err);
-    msg.innerText = "Nome ou senha inválidos";
+  if (!profile) {
+    profilesDiv.innerHTML = "<p>Você não tem permissão para criar profile.</p>";
+  } else {
+    displayProfiles(await loadAllProfiles(), user.uid);
   }
 });
+
+// ===== EXIBIR TODOS OS PROFILES =====
+function displayProfiles(profiles, currentUid) {
+  profilesDiv.innerHTML = "";
+
+  profiles.forEach(p => {
+    const card = document.createElement("div");
+    card.className = "profile-card";
+
+    const name = document.createElement("strong");
+    name.textContent = p.displayName;
+
+    const bio = document.createElement("p");
+    bio.textContent = p.bio;
+
+    const avatar = document.createElement("img");
+    avatar.src = p.avatarURL || "https://via.placeholder.com/100";
+    avatar.style.width = "100px";
+    avatar.style.height = "100px";
+    avatar.style.borderRadius = "50%";
+    avatar.style.objectFit = "cover";
+
+    card.appendChild(avatar);
+    card.appendChild(name);
+    card.appendChild(bio);
+
+    // Se for o próprio profile, permitir editar
+    if (p.id === currentUid) {
+      const editBtn = document.createElement("button");
+      editBtn.textContent = "Editar";
+      editBtn.onclick = () => {
+        // redireciona para página de edição de profile
+        window.location.href = "perfil.html";
+      };
+      card.appendChild(editBtn);
+    }
+
+    profilesDiv.appendChild(card);
+  });
+}
