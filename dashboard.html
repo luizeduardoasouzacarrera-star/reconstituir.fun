@@ -3,16 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <title>Chat</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h2>Chat privado</h2>
+<div class="card">
+  <h2>Chat privado</h2>
 
-<div id="chat" style="height:300px; overflow:auto; border:1px solid #ccc"></div><br>
+  <div id="chat"></div>
 
-<input id="message" placeholder="Digite sua mensagem">
-<button id="sendBtn">Enviar</button>
-<button id="logoutBtn">Sair</button>
+  <input id="message" placeholder="Digite sua mensagem">
+  <button id="sendBtn">Enviar</button>
+  <button id="logoutBtn">Sair</button>
+</div>
 
 <script type="module" src="chat.js"></script>
 </body>
