@@ -6,7 +6,7 @@ const profilesContainer = document.getElementById("profiles");
 // URLs de ícones públicos (PNG/SVG)
 const socialIcons = {
   roblox: "https://devforum-uploads.s3.dualstack.us-east-2.amazonaws.com/uploads/original/4X/0/e/e/0eeeb19633422b1241f4306419a0f15f39d58de9.png",
-  instagram: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/instagram/instagram-original.svg",
+  instagram: "https://elementos.apresto.com.br/wp-content/uploads/2024/05/icon-Instagram-desenho.svg",
   tiktok: "https://w7.pngwing.com/pngs/959/454/png-transparent-tiktok-logo-thumbnail.png",
   valorant: "https://images.icon-icons.com/3660/PNG/512/valorant_logo_play_riot_games_icon_228477.png",
   steam: "https://img.icons8.com/?size=50&id=pOa8st0SGd5C&format=png"
