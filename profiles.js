@@ -1,9 +1,19 @@
-import { db } from "./firebase.js";
+import { auth, db } from "./firebase.js";
 import { collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const profilesContainer = document.getElementById("profiles");
 
-// Consulta apenas perfis públicos
+// Links das logos
+const socialIcons = {
+  roblox: "https://devforum-uploads.s3.dualstack.us-east-2.amazonaws.com/uploads/original/4X/0/e/e/0eeeb19633422b1241f4306419a0f15f39d58de9.png",
+  instagram: "https://elementos.apresto.com.br/wp-content/uploads/2024/05/icon-Instagram-desenho.svg",
+  tiktok: "https://cdn.worldvectorlogo.com/logos/tiktok-icon-2.svg",
+  valorant: "https://www.svgrepo.com/show/424912/valorant-logo-play-2.svg",
+  steam: "https://img.icons8.com/?size=50&id=pOa8st0SGd5w&format=png",
+  twitter: "https://img.freepik.com/free-vector/new-twitter-logo-x-icon-black-background_1017-45427.jpg",
+  spotify: "https://upload.wikimedia.org/wikipedia/commons/a/a1/2024_Spotify_logo_without_text_%28black%29.svg"
+};
+
 const profilesQuery = query(collection(db, "profiles"), where("public", "==", true));
 
 onSnapshot(profilesQuery, snapshot => {
@@ -15,6 +25,16 @@ onSnapshot(profilesQuery, snapshot => {
         const card = document.createElement("div");
         card.classList.add("profile-card");
         card.style.backgroundColor = data.color || "#141428";
+
+        // Status online/offline
+        const statusDiv = document.createElement("div");
+        statusDiv.classList.add("status-indicator");
+        if (data.isOnline) {
+            statusDiv.innerHTML = `<span class="status-bubble online"></span> ONLINE`;
+        } else {
+            statusDiv.innerHTML = `<span class="status-bubble offline"></span> OFFLINE`;
+        }
+        card.appendChild(statusDiv);
 
         // Banner
         if (data.bannerURL) {
@@ -44,54 +64,30 @@ onSnapshot(profilesQuery, snapshot => {
             card.appendChild(bioEl);
         }
 
+        // Música
+        if (data.music) {
+            const musicBtn = document.createElement("button");
+            musicBtn.textContent = "▶ Iniciar Música";
+            musicBtn.addEventListener("click", () => {
+                const audio = new Audio(`assets/${data.music}`);
+                audio.play();
+            });
+            card.appendChild(musicBtn);
+        }
+
         // Redes sociais
         const socialDiv = document.createElement("div");
         socialDiv.classList.add("socials");
-
-        // Mapeamento de rede social -> imagem
-        const socialImages = {
-            roblox: "https://devforum-uploads.s3.dualstack.us-east-2.amazonaws.com/uploads/original/4X/0/e/e/0eeeb19633422b1241f4306419a0f15f39d58de9.png",
-            instagram: "https://elementos.apresto.com.br/wp-content/uploads/2024/05/icon-Instagram-desenho.svg",
-            tiktok: "https://cdn.worldvectorlogo.com/logos/tiktok-icon-2.svg",
-            valorant: "https://www.svgrepo.com/show/424912/valorant-logo-play-2.svg",
-            steam: "https://img.icons8.com/?size=50&id=pOa8st0SGd5C&format=png",
-            twitter: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/1690643591twitter-x-logo-png.webp/250px-1690643591twitter-x-logo-png.webp.png",
-            spotify: "https://upload.wikimedia.org/wikipedia/commons/a/a1/2024_Spotify_logo_without_text_%28black%29.svg"
-        };
-
-        for (const [key, imgUrl] of Object.entries(socialImages)) {
+        for (const key of Object.keys(socialIcons)) {
             if (data[key]) {
                 const link = document.createElement("a");
                 link.href = data[key];
                 link.target = "_blank";
-                link.innerHTML = `<img src="${imgUrl}" alt="${key}">`;
+                link.innerHTML = `<img src="${socialIcons[key]}" alt="${key}">`;
                 socialDiv.appendChild(link);
             }
         }
-
         card.appendChild(socialDiv);
-
-        // Botão para tocar música
-        if (data.music) {
-            const musicBtn = document.createElement("button");
-            musicBtn.textContent = "Iniciar música";
-            musicBtn.style.marginTop = "10px";
-            musicBtn.style.padding = "6px 10px";
-            musicBtn.style.borderRadius = "6px";
-            musicBtn.style.border = "none";
-            musicBtn.style.cursor = "pointer";
-            musicBtn.style.backgroundColor = "#5865f2";
-            musicBtn.style.color = "#fff";
-
-            // Cria o objeto Audio apontando para a pasta assets
-            const audio = new Audio(`assets/${data.music}`);
-
-            musicBtn.addEventListener("click", () => {
-                audio.play();
-            });
-
-            card.appendChild(musicBtn);
-        }
 
         profilesContainer.appendChild(card);
     });
