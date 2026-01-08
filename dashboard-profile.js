@@ -6,6 +6,7 @@ const nameInput = document.getElementById("nameInput");
 const bioInput = document.getElementById("bioInput");
 const avatarInput = document.getElementById("avatarInput");
 const bannerInput = document.getElementById("bannerInput");
+const colorInput = document.getElementById("colorInput"); // NOVO
 const publicCheckbox = document.getElementById("publicCheckbox");
 const saveBtn = document.getElementById("saveProfile");
 
@@ -25,6 +26,7 @@ auth.onAuthStateChanged(async user => {
         bioInput.value = data.bio || "";
         avatarInput.value = data.avatarURL || "";
         bannerInput.value = data.bannerURL || "";
+        colorInput.value = data.color || "#5865f2"; // NOVO
         publicCheckbox.checked = data.public || false;
     }
 });
@@ -40,6 +42,7 @@ saveBtn.addEventListener("click", async () => {
         bio: bioInput.value || "",
         avatarURL: avatarInput.value || "",
         bannerURL: bannerInput.value || "",
+        color: colorInput.value || "#5865f2", // NOVO
         public: publicCheckbox.checked
     });
 
