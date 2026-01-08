@@ -1,0 +1,73 @@
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+/* FUNDO ANTIGO */
+body {
+  background: linear-gradient(180deg, #0a1a2f, #000814);
+  color: white;
+  min-height: 100vh;
+}
+
+/* ===== LOGIN (TOPO) ===== */
+#login-area {
+  background: linear-gradient(180deg, #0d2a4d, #081c33);
+  padding: 40px;
+  text-align: center;
+}
+
+#login-area h2 {
+  margin-bottom: 20px;
+}
+
+#login-area input {
+  width: 260px;
+  padding: 10px;
+  margin: 6px;
+  border-radius: 6px;
+  border: none;
+}
+
+#loginBtn {
+  margin-top: 10px;
+  padding: 10px 30px;
+  border: none;
+  border-radius: 6px;
+  background: #1e90ff;
+  color: white;
+  cursor: pointer;
+}
+
+#loginBtn:hover {
+  background: #187bcd;
+}
+
+#msg {
+  margin-top: 10px;
+  color: #ff6b6b;
+}
+
+/* ===== PERFIS ===== */
+#profiles {
+  padding: 40px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 20px;
+}
+
+/* CARD DE PERFIL */
+.profile-card {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  backdrop-filter: blur(6px);
+}
+
+.profile-card strong {
+  font-size: 16px;
+}
