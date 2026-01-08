@@ -12,45 +12,6 @@ body {
   min-height: 100vh;
 }
 
-/* ===== HEADER (LOGIN) ===== */
-.header {
-  width: 100%;
-  padding: 25px 40px;
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  background: linear-gradient(135deg, #141428, #1f1f3a);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-}
-
-.header h2 {
-  margin-right: 20px;
-}
-
-/* INPUTS */
-.header input {
-  width: 170px;
-  padding: 10px;
-  border-radius: 8px;
-  border: none;
-  outline: none;
-}
-
-/* BOTÃO LOGIN */
-.header button {
-  padding: 10px 24px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  background: #5865f2;
-  color: white;
-  font-weight: bold;
-}
-
-.header button:hover {
-  background: #4752c4;
-}
-
 /* ===== CHAT ===== */
 .chat-container {
   padding: 40px;
@@ -116,123 +77,125 @@ body {
   background: #c0392b;
 }
 
-/* ===== FORMULÁRIO DE PROFILE ===== */
-.profile-form-container {
-  padding: 20px;
-  margin: 20px auto;
-  max-width: 600px;
-  background: #141428;
-  border-radius: 10px;
+/* ===== HEADER (LOGIN) ===== */
+.header {
+  width: 100%;
+  padding: 25px 40px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: linear-gradient(135deg, #141428, #1f1f3a);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
 }
 
-.profile-form-container input {
-  display: block;
-  width: 100%;
+.header h2 {
+  margin-right: 20px;
+}
+
+.header input {
+  width: 170px;
   padding: 10px;
-  margin-bottom: 10px;
-  border-radius: 6px;
+  border-radius: 8px;
   border: none;
   outline: none;
 }
 
-.profile-form-container button {
-  padding: 10px 20px;
-  border-radius: 6px;
+.header button {
+  padding: 10px 24px;
+  border-radius: 8px;
   border: none;
+  cursor: pointer;
   background: #5865f2;
   color: white;
-  cursor: pointer;
+  font-weight: bold;
 }
 
-/* ===== GRID DE PROFILES ===== */
+.header button:hover {
+  background: #4752c4;
+}
+
+/* ===== FORMULÁRIO DE PROFILE ===== */
+.profile-form-container {
+    padding: 20px;
+    margin: 20px auto;
+    max-width: 600px;
+    background: #141428;
+    border-radius: 10px;
+}
+
+.profile-form-container input, .profile-form-container button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+    border: none;
+    outline: none;
+}
+
+.profile-form-container button {
+    background: #5865f2;
+    color: white;
+    cursor: pointer;
+}
+
+/* ===== PERFIS PÚBLICOS ===== */
 .profiles-section {
-  padding: 40px;
+    padding: 40px;
 }
 
 .profiles-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 25px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
 }
 
+/* ===== CARDS DE PROFILE ===== */
 .profile-card {
-  background: #141428;
-  border-radius: 10px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  min-height: 350px; /* aumenta o tamanho vertical */
-  height: auto; /* deixa crescer se tiver bio maior */
-  box-shadow: 0 4px 20px rgba(0,0,0,0.35);
-  transition: transform .25s ease, box-shadow .25s ease;
-  position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 300px; /* retangular para baixo */
+    box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+    transition: transform .25s ease, box-shadow .25s ease;
+    position: relative;
+    background-color: var(--profile-color, #141428); /* fundo colorido do usuário */
 }
-
 
 .profile-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.55);
+    transform: translateY(-6px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.55);
 }
 
-/* BANNER */
 .profile-card .banner {
-  width: 100%;
-  height: 100px;
-  background-size: cover;
-  background-position: center;
+    width: 100%;
+    height: 100px;
+    background-size: cover;
+    background-position: center;
 }
 
-/* BARRA DE COR ABAIXO DO BANNER */
-.profile-card .color-bar {
-  height: 10px;
-  width: 100%;
-  background: #5865f2; /* cor padrão, pode ser alterada pelo usuário */
+.profile-card .profile-content {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
-/* AVATAR */
 .profile-card .avatar {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  border: 3px solid #141428;
-  position: absolute;
-  top: 60px;
-  left: 20px;
-  background-size: cover;
-  background-position: center;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    object-fit: cover;
 }
 
-/* CONTEÚDO */
-.profile-card .content {
-  margin-top: 50px; /* para não sobrepor o avatar */
-  padding: 15px;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
+.profile-card strong {
+    font-size: 18px;
+    color: #fff;
 }
 
-.profile-card .displayName {
-  font-size: 18px;
-  font-weight: bold;
-  color: #4da6ff;
-}
-
-.profile-card .username {
-  font-size: 14px;
-  color: #aaa;
-}
-
-.profile-card .bio {
-  font-size: 14px;
-  color: #ddd;
-}
-
-/* BOTÃO DE ALTERAR COR */
-.profile-card .color-picker {
-  margin-top: 10px;
-  width: 100%;
-  height: 25px;
-  border: none;
-  cursor: pointer;
-  border-radius: 5px;
+.profile-card p {
+    font-size: 14px;
+    color: #ddd;
 }
