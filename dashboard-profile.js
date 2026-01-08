@@ -6,7 +6,7 @@ const nameInput = document.getElementById("nameInput");
 const bioInput = document.getElementById("bioInput");
 const avatarInput = document.getElementById("avatarInput");
 const bannerInput = document.getElementById("bannerInput");
-const colorInput = document.getElementById("colorInput"); // campo de cor
+const colorInput = document.getElementById("colorInput");
 const publicCheckbox = document.getElementById("publicCheckbox");
 
 // Redes sociais
@@ -23,7 +23,6 @@ const musicInput = document.getElementById("musicInput");
 
 const saveBtn = document.getElementById("saveProfile");
 
-// Carrega perfil existente
 auth.onAuthStateChanged(async user => {
     if (!user) {
         window.location.href = "index.html";
@@ -31,6 +30,15 @@ auth.onAuthStateChanged(async user => {
     }
 
     const profileRef = doc(db, "profiles", user.uid);
+
+    // Marca o usuário como online
+    await setDoc(profileRef, { isOnline: true }, { merge: true });
+
+    // Marca como offline quando fechar a aba ou sair
+    window.addEventListener("beforeunload", async () => {
+        await setDoc(profileRef, { isOnline: false }, { merge: true });
+    });
+
     const profileSnap = await getDoc(profileRef);
 
     if (profileSnap.exists()) {
@@ -49,6 +57,7 @@ auth.onAuthStateChanged(async user => {
         steamInput.value = data.steam || "";
         twitterInput.value = data.twitter || "";
         spotifyInput.value = data.spotify || "";
+
         musicInput.value = data.music || "";
     }
 });
