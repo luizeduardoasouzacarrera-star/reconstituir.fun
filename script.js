@@ -9,7 +9,7 @@ const msg = document.getElementById("msg");
 loginBtn.addEventListener("click", async () => {
   const username = document.getElementById("username").value.trim();
   const password = document.getElementById("password").value;
-
+ 
   if (!username || !password) {
     msg.innerText = "Preencha tudo";
     return;
