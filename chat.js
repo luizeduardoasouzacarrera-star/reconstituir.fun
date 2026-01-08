@@ -1,4 +1,3 @@
-// chat.js
 import { auth, db } from "./firebase.js";
 import {
   onAuthStateChanged,
@@ -21,7 +20,7 @@ const logoutBtn = document.getElementById("logoutBtn");
 
 let username = "";
 
-// 🔒 BLOQUEIO SEM LOGIN
+// 🔒 PROTEÇÃO
 onAuthStateChanged(auth, user => {
   if (!user) {
     window.location.replace("index.html");
@@ -30,7 +29,7 @@ onAuthStateChanged(auth, user => {
   }
 });
 
-// 📤 ENVIAR MENSAGEM
+// 📤 ENVIAR
 sendBtn.addEventListener("click", async () => {
   const text = messageInput.value.trim();
   if (!text) return;
@@ -44,7 +43,7 @@ sendBtn.addEventListener("click", async () => {
   messageInput.value = "";
 });
 
-// 📥 RECEBER MENSAGENS
+// 📥 RECEBER
 const q = query(collection(db, "messages"), orderBy("timestamp"));
 onSnapshot(q, snapshot => {
   chatDiv.innerHTML = "";
@@ -52,13 +51,11 @@ onSnapshot(q, snapshot => {
   snapshot.forEach(doc => {
     const d = doc.data();
 
-    // 👑 MARCA DE LÍDER (APENAS PARA LUIZ)
     let displayName = d.user;
     if (d.user === "luiz") {
-      displayName = "👑 " + d.user; // ou "[LÍDER] luiz"
+      displayName = "👑 " + d.user;
     }
 
-    // ⏰ HORÁRIO
     let time = "";
     if (d.timestamp) {
       time = new Date(d.timestamp.seconds * 1000)
