@@ -231,3 +231,35 @@ body {
 .profile-card .socials a img:hover {
   transform: scale(1.2);
 }
+
+.status-indicator {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 12px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.status-bubble {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    animation: blink 1s infinite;
+}
+
+.status-bubble.online {
+    background-color: #00ff00; /* verde */
+}
+
+.status-bubble.offline {
+    background-color: #ff0000; /* vermelho */
+}
+
+@keyframes blink {
+    0%, 50%, 100% { opacity: 1; }
+    25%, 75% { opacity: 0; }
+}
