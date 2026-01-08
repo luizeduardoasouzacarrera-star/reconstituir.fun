@@ -1,89 +1,77 @@
 import { db } from "./firebase.js";
 import { collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-const profilesContainer = document.getElementById("profiles");
+const profilesDiv = document.getElementById("profiles");
 
-const profilesQuery = query(collection(db, "profiles"), where("public", "==", true));
+function renderProfiles(profiles) {
+    profilesDiv.innerHTML = "";
 
-onSnapshot(profilesQuery, snapshot => {
-    profilesContainer.innerHTML = "";
-
-    snapshot.forEach(docSnap => {
-        const data = docSnap.data();
-
+    profiles.forEach(profile => {
         const card = document.createElement("div");
         card.classList.add("profile-card");
-        card.style.backgroundColor = data.color || "#141428";
+        card.style.backgroundColor = profile.color || "#141428";
 
         // Banner
-        if (data.bannerURL) {
-            const banner = document.createElement("div");
-            banner.classList.add("banner");
-            banner.style.backgroundImage = `url(${data.bannerURL})`;
-            card.appendChild(banner);
-        }
+        const banner = document.createElement("div");
+        banner.classList.add("banner");
+        if(profile.bannerURL) banner.style.backgroundImage = `url(${profile.bannerURL})`;
+        card.appendChild(banner);
 
         // Avatar
-        if (data.avatarURL) {
-            const avatar = document.createElement("img");
-            avatar.classList.add("avatar");
-            avatar.src = data.avatarURL;
-            card.appendChild(avatar);
-        }
+        const avatar = document.createElement("img");
+        avatar.classList.add("avatar");
+        if(profile.avatarURL) avatar.src = profile.avatarURL;
+        else avatar.src = "https://whitescreen.dev/images/pro/black-screen_39.png";
+        card.appendChild(avatar);
 
-        // Nome
-        const nameEl = document.createElement("strong");
-        nameEl.textContent = data.displayName || "Usuário sem nome";
-        card.appendChild(nameEl);
+        // Info
+        const info = document.createElement("div");
+        info.classList.add("profile-info");
 
-        // Bio
-        if (data.bio) {
-            const bioEl = document.createElement("p");
-            bioEl.textContent = data.bio;
-            card.appendChild(bioEl);
+        const name = document.createElement("strong");
+        name.textContent = profile.displayName || "Usuário";
+        info.appendChild(name);
+
+        if(profile.bio) {
+            const bio = document.createElement("p");
+            bio.textContent = profile.bio;
+            info.appendChild(bio);
         }
 
         // Redes sociais
         const socialDiv = document.createElement("div");
-        socialDiv.classList.add("socials");
+        socialDiv.classList.add("social-links");
 
-        if (data.roblox) {
-            const link = document.createElement("a");
-            link.href = data.roblox;
-            link.target = "_blank";
-            link.innerHTML = '<img src="icons/roblox.svg" alt="Roblox">';
-            socialDiv.appendChild(link);
-        }
-        if (data.instagram) {
-            const link = document.createElement("a");
-            link.href = data.instagram;
-            link.target = "_blank";
-            link.innerHTML = '<img src="icons/instagram.svg" alt="Instagram">';
-            socialDiv.appendChild(link);
-        }
-        if (data.tiktok) {
-            const link = document.createElement("a");
-            link.href = data.tiktok;
-            link.target = "_blank";
-            link.innerHTML = '<img src="icons/tiktok.svg" alt="TikTok">';
-            socialDiv.appendChild(link);
-        }
-        if (data.valorant) {
-            const link = document.createElement("a");
-            link.href = data.valorant;
-            link.target = "_blank";
-            link.innerHTML = '<img src="icons/valorant.svg" alt="Valorant">';
-            socialDiv.appendChild(link);
-        }
-        if (data.steam) {
-            const link = document.createElement("a");
-            link.href = data.steam;
-            link.target = "_blank";
-            link.innerHTML = '<img src="icons/steam.svg" alt="Steam">';
-            socialDiv.appendChild(link);
+        const socialIcons = {
+            roblox: "fab fa-roblox",
+            instagram: "fab fa-instagram",
+            tiktok: "fab fa-tiktok",
+            valorant: "fas fa-crosshairs",
+            steam: "fab fa-steam"
+        };
+
+        for(const [key, iconClass] of Object.entries(socialIcons)) {
+            if(profile[key]) {
+                const a = document.createElement("a");
+                a.href = profile[key];
+                a.target = "_blank";
+                const i = document.createElement("i");
+                i.className = iconClass;
+                a.appendChild(i);
+                socialDiv.appendChild(a);
+            }
         }
 
-        card.appendChild(socialDiv);
-        profilesContainer.appendChild(card);
+        info.appendChild(socialDiv);
+        card.appendChild(info);
+
+        profilesDiv.appendChild(card);
     });
+}
+
+// Carregar perfis públicos
+const q = query(collection(db, "profiles"), where("public", "==", true));
+onSnapshot(q, snapshot => {
+    const profiles = snapshot.docs.map(doc => doc.data());
+    renderProfiles(profiles);
 });
