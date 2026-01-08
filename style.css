@@ -19,7 +19,6 @@ body {
   display: flex;
   align-items: center;
   gap: 15px;
-
   background: linear-gradient(135deg, #141428, #1f1f3a);
   box-shadow: 0 4px 20px rgba(0,0,0,0.4);
 }
@@ -28,6 +27,7 @@ body {
   margin-right: 20px;
 }
 
+/* INPUTS */
 .header input {
   width: 170px;
   padding: 10px;
@@ -36,6 +36,7 @@ body {
   outline: none;
 }
 
+/* BOTÃO LOGIN */
 .header button {
   padding: 10px 24px;
   border-radius: 8px;
@@ -115,21 +116,6 @@ body {
   background: #c0392b;
 }
 
-/* ===== ÁREA DE PERFIS ===== */
-.profiles-section {
-  padding: 40px;
-}
-
-.profiles-section h3 {
-  margin-bottom: 15px;
-}
-
-.profiles-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-
 /* ===== FORMULÁRIO DE PROFILE ===== */
 .profile-form-container {
   padding: 20px;
@@ -137,15 +123,13 @@ body {
   max-width: 600px;
   background: #141428;
   border-radius: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
 }
 
 .profile-form-container input {
   display: block;
   width: 100%;
   padding: 10px;
+  margin-bottom: 10px;
   border-radius: 6px;
   border: none;
   outline: none;
@@ -160,17 +144,28 @@ body {
   cursor: pointer;
 }
 
-/* ===== CARD DE PROFILE ===== */
+/* ===== GRID DE PROFILES ===== */
+.profiles-section {
+  padding: 40px;
+}
+
+.profiles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 25px;
+}
+
+/* ===== CARDS DE PROFILE ===== */
 .profile-card {
-  width: 280px;
-  min-height: 220px; /* alongado para baixo */
   background: #141428;
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.35);
-  transition: transform .25s ease, box-shadow .25s ease;
   display: flex;
   flex-direction: column;
+  min-height: 250px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+  transition: transform .25s ease, box-shadow .25s ease;
+  position: relative;
 }
 
 .profile-card:hover {
@@ -178,44 +173,65 @@ body {
   box-shadow: 0 10px 30px rgba(0,0,0,0.55);
 }
 
+/* BANNER */
 .profile-card .banner {
   width: 100%;
-  height: 80px;
+  height: 100px;
   background-size: cover;
   background-position: center;
 }
 
-.profile-card .info {
-  padding: 10px 15px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  flex-grow: 1;
+/* BARRA DE COR ABAIXO DO BANNER */
+.profile-card .color-bar {
+  height: 10px;
+  width: 100%;
+  background: #5865f2; /* cor padrão, pode ser alterada pelo usuário */
 }
 
+/* AVATAR */
 .profile-card .avatar {
-  width: 60px;
-  height: 60px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
-  border: 2px solid #fff;
-  margin-top: -30px;
-  background-color: #fff;
+  border: 3px solid #141428;
+  position: absolute;
+  top: 60px;
+  left: 20px;
+  background-size: cover;
+  background-position: center;
+}
+
+/* CONTEÚDO */
+.profile-card .content {
+  margin-top: 50px; /* para não sobrepor o avatar */
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
 
 .profile-card .displayName {
+  font-size: 18px;
   font-weight: bold;
-  font-size: 16px;
-  color: #fff;
+  color: #4da6ff;
+}
+
+.profile-card .username {
+  font-size: 14px;
+  color: #aaa;
 }
 
 .profile-card .bio {
-  font-size: 13px;
-  color: #ccc;
+  font-size: 14px;
+  color: #ddd;
 }
 
-.profile-card .bottom-bar {
-  height: 8px;
-  background-color: #4da6ff; /* cor do card */
+/* BOTÃO DE ALTERAR COR */
+.profile-card .color-picker {
+  margin-top: 10px;
   width: 100%;
-  border-radius: 0 0 10px 10px;
+  height: 25px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
 }
