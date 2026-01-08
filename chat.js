@@ -12,27 +12,38 @@ import {
   query,
   orderBy,
   onSnapshot,
-  serverTimestamp
+  serverTimestamp,
+  deleteDoc,
+  doc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+// ===== ELEMENTOS =====
 const chatDiv = document.getElementById("chat");
 const sendBtn = document.getElementById("sendBtn");
 const messageInput = document.getElementById("message");
 const logoutBtn = document.getElementById("logoutBtn");
 
 let username = "";
+let isLuiz = false;
 
-// 🔒 BLOQUEIO SEM LOGIN
+// ===== AUTH =====
 onAuthStateChanged(auth, user => {
   if (!user) {
     window.location.replace("index.html");
-  } else {
-    username = user.email.split("@")[0];
+    return;
   }
+
+  username = user.email.split("@")[0];
+  isLuiz = username === "luiz";
 });
 
-// 📤 ENVIAR MENSAGEM
-sendBtn.addEventListener("click", async () => {
+// ===== ENVIAR =====
+sendBtn.addEventListener("click", sendMessage);
+messageInput.addEventListener("keypress", e => {
+  if (e.key === "Enter") sendMessage();
+});
+
+async function sendMessage() {
   const text = messageInput.value.trim();
   if (!text) return;
 
@@ -43,9 +54,9 @@ sendBtn.addEventListener("click", async () => {
   });
 
   messageInput.value = "";
-});
+}
 
-// 📥 RECEBER MENSAGENS
+// ===== LISTAR =====
 const q = query(
   collection(db, "messages"),
   orderBy("timestamp", "asc")
@@ -54,15 +65,41 @@ const q = query(
 onSnapshot(q, snapshot => {
   chatDiv.innerHTML = "";
 
-  snapshot.forEach(doc => {
-    const d = doc.data();
-    chatDiv.innerHTML += `<p><b>${d.user}:</b> ${d.text}</p>`;
+  snapshot.forEach(docSnap => {
+    const data = docSnap.data();
+    const id = docSnap.id;
+
+    const time = data.timestamp
+      ? new Date(data.timestamp.seconds * 1000).toLocaleTimeString("pt-BR", {
+          hour: "2-digit",
+          minute: "2-digit"
+        })
+      : "";
+
+    const p = document.createElement("p");
+
+    p.innerHTML = `<b>${data.user}</b> (${time}): ${data.text}`;
+
+    // 👉 APAGAR MSG (SÓ LUIZ)
+    if (isLuiz) {
+      p.style.cursor = "pointer";
+      p.title = "Clique para apagar";
+
+      p.addEventListener("click", async () => {
+        const confirmDelete = confirm("Apagar esta mensagem?");
+        if (confirmDelete) {
+          await deleteDoc(doc(db, "messages", id));
+        }
+      });
+    }
+
+    chatDiv.appendChild(p);
   });
 
   chatDiv.scrollTop = chatDiv.scrollHeight;
 });
 
-// 🚪 LOGOUT
+// ===== LOGOUT =====
 logoutBtn.addEventListener("click", () => {
   signOut(auth).then(() => {
     window.location.replace("index.html");
