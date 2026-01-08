@@ -12,23 +12,22 @@ const profilesDiv = document.getElementById("profiles");
 
 let currentUserId = "";
 
-// FUNÇÃO PARA SALVAR OU ATUALIZAR PROFILE
+// SALVAR OU ATUALIZAR PROFILE
 async function saveProfile() {
     if (!currentUserId) return;
 
     const profileData = {
         displayName: nameInput.value || "Usuário sem nome",
         bio: bioInput.value || "",
-        avatarURL: avatarInput.value || "https://via.placeholder.com/60",
-        bannerURL: bannerInput.value || "https://via.placeholder.com/280x80",
+        avatarURL: avatarInput.value || "https://via.placeholder.com/70",
+        bannerURL: bannerInput.value || "https://via.placeholder.com/320x100",
         color: colorInput.value || "#4da6ff"
     };
 
     await setDoc(doc(db, "profiles", currentUserId), profileData);
-    alert("Perfil atualizado!");
 }
 
-// FUNÇÃO PARA GERAR CARDS DE PROFILE
+// GERAR CARDS
 function renderProfiles(snapshot) {
     profilesDiv.innerHTML = "";
 
@@ -39,24 +38,25 @@ function renderProfiles(snapshot) {
         card.classList.add("profile-card");
 
         card.innerHTML = `
-            <div class="banner" style="background-image: url('${data.bannerURL || "https://via.placeholder.com/280x80"}')"></div>
-            <div class="info">
-                <img class="avatar" src="${data.avatarURL || "https://via.placeholder.com/60"}" alt="Avatar">
-                <div class="displayName">${data.displayName || "Usuário sem nome"}</div>
-                <div class="bio">${data.bio || ""}</div>
+            <div class="banner" style="background-image: url('${data.bannerURL}')">
+                <img class="avatar" src="${data.avatarURL}" alt="Avatar">
             </div>
-            <div class="bottom-bar" style="background-color: ${data.color || "#4da6ff"}"></div>
+            <div class="info">
+                <div class="displayName">${data.displayName}</div>
+                <div class="bio">${data.bio}</div>
+            </div>
+            <div class="bottom-bar" style="background-color: ${data.color}"></div>
         `;
 
         profilesDiv.appendChild(card);
     });
 }
 
-// MONITORA LOGIN
+// MONITORAR LOGIN
 auth.onAuthStateChanged(user => {
     if (!user) return;
 
-    currentUserId = user.email.split("@")[0]; // ID do documento é o username
+    currentUserId = user.email.split("@")[0];
 
     const profileRef = doc(db, "profiles", currentUserId);
     onSnapshot(profileRef, docSnap => {
@@ -71,7 +71,7 @@ auth.onAuthStateChanged(user => {
     });
 });
 
-// ESCUTA TODOS OS PROFILES
+// ESCUTAR TODOS OS PROFILES
 onSnapshot(collection(db, "profiles"), renderProfiles);
 
 // BOTÃO SALVAR
