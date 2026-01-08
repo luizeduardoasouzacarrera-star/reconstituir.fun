@@ -3,12 +3,13 @@ import { collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.
 
 const profilesDiv = document.getElementById("profiles");
 
+// Atualiza perfis em tempo real
 onSnapshot(collection(db, "profiles"), snapshot => {
   profilesDiv.innerHTML = "";
 
   snapshot.forEach(doc => {
     const data = doc.data();
-    if (!data.public) return; // só mostra perfis públicos
+    if (!data.public) return; // só mostra públicos
 
     profilesDiv.innerHTML += `
       <div class="profile-card">
