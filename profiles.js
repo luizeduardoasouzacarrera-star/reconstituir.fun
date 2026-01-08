@@ -1,60 +1,78 @@
-// profiles.js
-import { db } from "./firebase.js";
-import { collection, onSnapshot, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { auth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { auth, db } from "./firebase.js";
+import { doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-const profilesContainer = document.getElementById("profiles");
-const profileForm = document.getElementById("profileForm");
+// ELEMENTOS
+const nameInput = document.getElementById("nameInput");
+const bioInput = document.getElementById("bioInput");
+const avatarInput = document.getElementById("avatarInput");
+const bannerInput = document.getElementById("bannerInput");
+const colorInput = document.getElementById("colorInput");
+const saveBtn = document.getElementById("saveProfile");
+const profilesDiv = document.getElementById("profiles");
 
-// Cria profile automático quando usuário loga
-onAuthStateChanged(auth, async user => {
-  if (!user) return;
+let currentUserId = "";
 
-  const username = user.email.split("@")[0];
+// FUNÇÃO PARA SALVAR OU ATUALIZAR PROFILE
+async function saveProfile() {
+    if (!currentUserId) return;
 
-  const profileRef = doc(db, "profiles", username);
+    const profileData = {
+        displayName: nameInput.value || "Usuário sem nome",
+        bio: bioInput.value || "",
+        avatarURL: avatarInput.value || "https://via.placeholder.com/60",
+        bannerURL: bannerInput.value || "https://via.placeholder.com/280x80",
+        color: colorInput.value || "#4da6ff"
+    };
 
-  // Verifica se já existe, se não cria com valores padrão
-  const snap = await profileRef.get?.();
-  if (!snap || !snap.exists?.()) {
-    await setDoc(profileRef, {
-      username,
-      displayName: username,
-      bio: "Escreva sua bio aqui",
-      avatarURL: "https://whitescreen.dev/images/pro/black-screen_39.png",
-      bannerURL: "https://whitescreen.dev/images/pro/black-screen_39.png",
-      color: "#5865f2"
-    });
-  }
-});
-
-// Atualiza o card sempre que há mudanças
-onSnapshot(collection(db, "profiles"), snapshot => {
-  profilesContainer.innerHTML = "";
-
-  snapshot.forEach(docSnap => {
-    const data = docSnap.data();
-
-    const card = document.createElement("div");
-    card.classList.add("profile-card");
-
-    card.innerHTML = `
-      <div class="banner" style="background-image: url('${data.bannerURL}')">
-        <div class="avatar" style="background-image: url('${data.avatarURL}'); background-size: cover;"></div>
-      </div>
-      <div class="color-bar" style="background-color: ${data.color || '#5865f2'}"></div>
-      <div class="info">
-        <strong>${data.displayName}</strong>
-        <p>${data.bio}</p>
-      </div>
-    `;
-
-    profilesContainer.appendChild(card);
-  });
-});
-
-// Função para atualizar cor via formulário (paleta)
-export async function updateColor(username, color) {
-  const profileRef = doc(db, "profiles", username);
-  await setDoc(profileRef, { color }, { merge: true });
+    await setDoc(doc(db, "profiles", currentUserId), profileData);
+    alert("Perfil atualizado!");
 }
+
+// FUNÇÃO PARA GERAR CARDS DE PROFILE
+function renderProfiles(snapshot) {
+    profilesDiv.innerHTML = "";
+
+    snapshot.forEach(docSnap => {
+        const data = docSnap.data();
+
+        const card = document.createElement("div");
+        card.classList.add("profile-card");
+
+        card.innerHTML = `
+            <div class="banner" style="background-image: url('${data.bannerURL || "https://via.placeholder.com/280x80"}')"></div>
+            <div class="info">
+                <img class="avatar" src="${data.avatarURL || "https://via.placeholder.com/60"}" alt="Avatar">
+                <div class="displayName">${data.displayName || "Usuário sem nome"}</div>
+                <div class="bio">${data.bio || ""}</div>
+            </div>
+            <div class="bottom-bar" style="background-color: ${data.color || "#4da6ff"}"></div>
+        `;
+
+        profilesDiv.appendChild(card);
+    });
+}
+
+// MONITORA LOGIN
+auth.onAuthStateChanged(user => {
+    if (!user) return;
+
+    currentUserId = user.email.split("@")[0]; // ID do documento é o username
+
+    const profileRef = doc(db, "profiles", currentUserId);
+    onSnapshot(profileRef, docSnap => {
+        if (!docSnap.exists()) return;
+
+        const data = docSnap.data();
+        nameInput.value = data.displayName || "";
+        bioInput.value = data.bio || "";
+        avatarInput.value = data.avatarURL || "";
+        bannerInput.value = data.bannerURL || "";
+        colorInput.value = data.color || "#4da6ff";
+    });
+});
+
+// ESCUTA TODOS OS PROFILES
+onSnapshot(collection(db, "profiles"), renderProfiles);
+
+// BOTÃO SALVAR
+saveBtn.addEventListener("click", saveProfile);
