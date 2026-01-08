@@ -1,29 +1,28 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Login</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- 🔹 BARRA SUPERIOR (LOGIN) -->
-<div class="header">
-  <h2>Login</h2>
+    <!-- 🔹 BARRA SUPERIOR (LOGIN) -->
+    <div class="header">
+        <h2>Login</h2>
+        <input id="username" placeholder="Nome">
+        <input id="password" type="password" placeholder="Senha">
+        <button id="loginBtn" type="button">Entrar</button>
+        <span id="msg"></span>
+    </div>
 
-  <input id="username" placeholder="Nome">
-  <input id="password" type="password" placeholder="Senha">
+    <!-- 🔹 ÁREA GRANDE ABAIXO (PERFIS / FUTURO CONTEÚDO) -->
+    <div class="profiles-section">
+        <div id="profiles" class="profiles-grid"></div>
+    </div>
 
-  <button id="loginBtn" type="button">Entrar</button>
-  <span id="msg"></span>
-</div>
+    <script type="module" src="script.js"></script>
+    <script type="module" src="profiles.js"></script>
 
-<!-- 🔹 ÁREA GRANDE ABAIXO (PERFIS / FUTURO CONTEÚDO) -->
-<div class="profiles-section">
-  <div id="profiles" class="profiles-grid"></div>
-</div>
-
-<script type="module" src="script.js"></script>
-<script type="module" src="profiles.js"></script>
 </body>
 </html>
