@@ -1,15 +1,17 @@
 // chat.js
 import { auth, db } from "./firebase.js";
-import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import {
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
 import {
   collection,
   addDoc,
   query,
   orderBy,
   onSnapshot,
-  serverTimestamp,
-  deleteDoc,
-  doc
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const chatDiv = document.getElementById("chat");
@@ -19,7 +21,7 @@ const logoutBtn = document.getElementById("logoutBtn");
 
 let username = "";
 
-// 🔒 só entra logado
+// 🔒 BLOQUEIO SEM LOGIN
 onAuthStateChanged(auth, user => {
   if (!user) {
     window.location.replace("index.html");
@@ -28,7 +30,7 @@ onAuthStateChanged(auth, user => {
   }
 });
 
-// 📤 enviar mensagem
+// 📤 ENVIAR MENSAGEM
 sendBtn.addEventListener("click", async () => {
   const text = messageInput.value.trim();
   if (!text) return;
@@ -42,48 +44,45 @@ sendBtn.addEventListener("click", async () => {
   messageInput.value = "";
 });
 
-// 📥 receber mensagens
+// 📥 RECEBER MENSAGENS
 const q = query(collection(db, "messages"), orderBy("timestamp"));
-
 onSnapshot(q, snapshot => {
   chatDiv.innerHTML = "";
 
-  snapshot.forEach(docSnap => {
-    const data = docSnap.data();
+  snapshot.forEach(doc => {
+    const d = doc.data();
 
-    // ⏰ horário
-    let hora = "";
-    if (data.timestamp && data.timestamp.toDate) {
-      const d = data.timestamp.toDate();
-      hora =
-        d.getHours().toString().padStart(2, "0") +
-        ":" +
-        d.getMinutes().toString().padStart(2, "0");
+    // 👑 MARCA DE LÍDER (APENAS PARA LUIZ)
+    let displayName = d.user;
+    if (d.user === "luiz") {
+      displayName = "👑 " + d.user; // ou "[LÍDER] luiz"
     }
 
-    const p = document.createElement("p");
-    p.innerHTML = "<b>" + data.user + "</b> [" + hora + "]: " + data.text;
-
-    // 🗑️ apagar só se for luiz
-    if (username === "luiz") {
-      const btn = document.createElement("button");
-      btn.innerText = "Apagar";
-      btn.addEventListener("click", async () => {
-        await deleteDoc(doc(db, "messages", docSnap.id));
-      });
-      p.appendChild(btn);
+    // ⏰ HORÁRIO
+    let time = "";
+    if (d.timestamp) {
+      time = new Date(d.timestamp.seconds * 1000)
+        .toLocaleTimeString("pt-BR", {
+          hour: "2-digit",
+          minute: "2-digit"
+        });
     }
 
-    chatDiv.appendChild(p);
+    chatDiv.innerHTML += `
+      <p>
+        <b>${displayName}</b>
+        <span style="color:gray;font-size:12px">(${time})</span>:
+        ${d.text}
+      </p>
+    `;
   });
 
   chatDiv.scrollTop = chatDiv.scrollHeight;
 });
 
-// 🚪 logout
+// 🚪 LOGOUT
 logoutBtn.addEventListener("click", () => {
   signOut(auth).then(() => {
     window.location.replace("index.html");
   });
 });
-
