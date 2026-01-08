@@ -1,50 +1,49 @@
-// profiles.js
 import { db, auth } from "./firebase.js";
-import { collection, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { collection, onSnapshot, doc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-const profilesContainer = document.getElementById("profiles");
+const profiles = document.getElementById("profiles");
 
-// cores disponíveis na paleta
-const colors = ["#2f2f3f", "#5865f2", "#4da6ff", "#ff4757", "#ffa500", "#2ed573"];
+// cores disponíveis para troca
+const colors = ["#5865F2", "#57F287", "#EB459E", "#FEE75C", "#ED4245"];
 
 onSnapshot(collection(db, "profiles"), snapshot => {
-  profilesContainer.innerHTML = "";
+  profiles.innerHTML = "";
 
   snapshot.forEach(docSnap => {
     const data = docSnap.data();
+    const id = docSnap.id;
 
     const card = document.createElement("div");
     card.classList.add("profile-card");
-
-    // definir cor do card
-    card.style.setProperty("--profile-color", data.color || "#2f2f3f");
+    card.style.background = data.color || "#141428";
 
     card.innerHTML = `
-      <div class="profile-banner" style="background-image: url('${data.bannerURL || "https://whitescreen.dev/images/pro/black-screen_39.png"}')"></div>
-      <div class="profile-main">
-        <img src="${data.avatarURL || "https://whitescreen.dev/images/pro/black-screen_39.png"}" class="profile-avatar" />
-        <div class="profile-info">
-          <strong>${data.displayName || data.username || "Usuário sem nome"}</strong>
-          <p>${data.bio || "Sem bio"}</p>
-          ${data.uid === auth.currentUser?.uid ? `<div class="color-palette"></div>` : ""}
+      <div class="banner" style="background-image:url('${data.bannerURL || 'https://whitescreen.dev/images/pro/black-screen_39.png'}')"></div>
+      <div class="avatar" style="background-image:url('${data.avatarURL || 'https://whitescreen.dev/images/pro/black-screen_39.png'}')"></div>
+      <div class="info">
+        <strong>${data.displayName || data.username || "Usuário sem nome"}</strong>
+        <p>${data.bio || ""}</p>
+        <div class="color-palette">
+          ${colors.map(c => `<div class="color-option" style="background:${c}" data-color="${c}"></div>`).join("")}
         </div>
       </div>
     `;
 
-    // se for o usuário logado, criar paleta de cores
-    if (data.uid === auth.currentUser?.uid) {
-      const paletteDiv = card.querySelector(".color-palette");
-      colors.forEach(color => {
-        const colorBox = document.createElement("div");
-        colorBox.style.backgroundColor = color;
-        colorBox.addEventListener("click", async () => {
-          card.style.setProperty("--profile-color", color);
-          await updateDoc(doc(db, "profiles", data.username), { color });
+    // troca de cor se for o usuário logado
+    if (auth.currentUser && auth.currentUser.email.split("@")[0] === data.username) {
+      const palette = card.querySelectorAll(".color-option");
+      palette.forEach(div => {
+        div.addEventListener("click", async () => {
+          card.style.background = div.dataset.color;
+          await updateDoc(doc(db, "profiles", id), { color: div.dataset.color });
         });
-        paletteDiv.appendChild(colorBox);
       });
+    } else {
+      // se não for usuário logado, remove paleta
+      const paletteDiv = card.querySelector(".color-palette");
+      paletteDiv.remove();
     }
 
-    profilesContainer.appendChild(card);
+    profiles.appendChild(card);
   });
 });
