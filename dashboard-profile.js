@@ -6,7 +6,7 @@ const nameInput = document.getElementById("nameInput");
 const bioInput = document.getElementById("bioInput");
 const avatarInput = document.getElementById("avatarInput");
 const bannerInput = document.getElementById("bannerInput");
-const colorInput = document.getElementById("colorInput"); // campo de cor
+const colorInput = document.getElementById("colorInput");
 const publicCheckbox = document.getElementById("publicCheckbox");
 
 // Redes sociais
@@ -17,6 +17,9 @@ const valorantInput = document.getElementById("valorantInput");
 const steamInput = document.getElementById("steamInput");
 const twitterInput = document.getElementById("twitterInput");
 const spotifyInput = document.getElementById("spotifyInput");
+
+// Música
+const musicInput = document.getElementById("musicInput");
 
 const saveBtn = document.getElementById("saveProfile");
 
@@ -46,6 +49,7 @@ auth.onAuthStateChanged(async user => {
         steamInput.value = data.steam || "";
         twitterInput.value = data.twitter || "";
         spotifyInput.value = data.spotify || "";
+        musicInput.value = data.musicURL || "";
     }
 });
 
@@ -67,7 +71,8 @@ saveBtn.addEventListener("click", async () => {
         valorant: valorantInput.value || "",
         steam: steamInput.value || "",
         twitter: twitterInput.value || "",
-        spotify: spotifyInput.value || ""
+        spotify: spotifyInput.value || "",
+        musicURL: musicInput.value || ""
     });
 
     alert("Perfil salvo!");
