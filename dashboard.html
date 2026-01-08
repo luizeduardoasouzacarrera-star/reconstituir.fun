@@ -4,15 +4,11 @@
     <meta charset="UTF-8">
     <title>Dashboard</title>
     <link rel="stylesheet" href="style.css">
-
-    <!-- Font Awesome para ícones de redes sociais -->
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-    />
+    <!-- Font Awesome para ícones das redes sociais -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-papM7b6K5qfODZvsf0GjvG06xkH+76t+pxv1+VvI+Qb6X9Dqv3gy6Ik6J7y2PoxsL2J3n1/1n8CpjbKZ1d7g5w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
-    <!-- CHAT -->
+    <!-- ===== CHAT PRIVADO ===== -->
     <div class="chat-container">
         <h2>Chat privado</h2>
         <div id="chat"></div>
@@ -21,7 +17,7 @@
         <button id="logoutBtn">Sair</button>
     </div>
 
-    <!-- FORMULÁRIO DE PERFIL ABAIXO DO CHAT -->
+    <!-- ===== FORMULÁRIO DE PERFIL ABAIXO DO CHAT ===== -->
     <div class="profile-form-container">
         <h2>Seu Perfil</h2>
         <input id="nameInput" placeholder="Nome de exibição">
@@ -44,13 +40,13 @@
         <button id="saveProfile">Salvar Perfil</button>
     </div>
 
-    <!-- ÁREA DE PERFIS PÚBLICOS -->
+    <!-- ===== ÁREA DE PERFIS PÚBLICOS ===== -->
     <div class="profiles-section">
         <h2>Perfis Públicos</h2>
         <div id="profiles" class="profiles-grid"></div>
     </div>
 
-    <!-- SCRIPTS -->
+    <!-- ===== SCRIPTS ===== -->
     <script type="module" src="chat.js"></script>
     <script type="module" src="dashboard-profile.js"></script>
     <script type="module" src="profiles.js"></script>
