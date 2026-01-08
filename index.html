@@ -7,16 +7,27 @@
 </head>
 <body>
 
-<div class="header">
-  <h2>Login</h2>
+  <!-- FUNDO ORIGINAL -->
+  <div class="background"></div>
 
-  <input id="username" placeholder="Nome">
-  <input id="password" type="password" placeholder="Senha">
+  <!-- ÁREA DE LOGIN (COM BACKGROUND PRÓPRIO) -->
+  <div class="login-wrapper">
+    <div class="login-box">
+      <h2>Login</h2>
 
-  <button id="loginBtn">Entrar</button>
-  <p id="msg"></p>
-</div>
+      <input type="text" placeholder="Nome" id="username">
+      <input type="password" placeholder="Senha" id="password">
 
-<script type="module" src="script.js"></script>
+      <button id="loginBtn">Entrar</button>
+    </div>
+  </div>
+
+  <!-- PERFIS PÚBLICOS -->
+  <div class="profiles-container" id="profiles"></div>
+
+  <!-- SCRIPTS -->
+  <script type="module" src="firebase.js"></script>
+  <script type="module" src="profiles.js"></script>
+
 </body>
 </html>
