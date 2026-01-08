@@ -2,37 +2,35 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Painel</title>
+  <title>Chat Reconstituir</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    #chat-box {
+      border: 1px solid #aaa;
+      width: 100%;
+      height: 300px;
+      overflow-y: scroll;
+      padding: 5px;
+      margin-bottom: 10px;
+    }
+    .msg {
+      margin: 2px 0;
+    }
+    .me {
+      font-weight: bold;
+      color: blue;
+    }
+  </style>
 </head>
 <body>
+<h1>Chat Reconstituir</h1>
+<div id="chat-box"></div>
 
-<h1>Bem-vindo ao Painel!</h1>
-<p>Você está logado com sucesso 😎</p>
-
+<input type="text" id="chat-input" placeholder="Escreva sua mensagem">
+<button id="sendBtn">Enviar</button>
 <button id="logoutBtn">Sair</button>
 
 <script type="module" src="firebase.js"></script>
-<script type="module">
-  import { auth } from "./firebase.js";
-  import { signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-  const logoutBtn = document.getElementById("logoutBtn");
-
-  // 🔒 Se não estiver logado, volta para login
-  onAuthStateChanged(auth, user => {
-    if (!user) {
-      window.location.href = "index.html";
-    }
-  });
-
-  // Logout
-  logoutBtn.addEventListener("click", () => {
-    signOut(auth).then(() => {
-      window.location.href = "index.html";
-    });
-  });
-</script>
-
+<script type="module" src="chat.js"></script>
 </body>
 </html>
