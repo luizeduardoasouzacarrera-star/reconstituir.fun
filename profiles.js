@@ -1,95 +1,43 @@
-// profiles.js
-import { db, auth } from "./firebase.js";
-import {
-  doc,
-  setDoc,
-  getDocs,
-  collection,
-  query,
-  where,
-  onSnapshot
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { db } from "./firebase.js";
+import { collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// ===== ELEMENTOS =====
-const nameInput = document.getElementById("nameInput");
-const bioInput = document.getElementById("bioInput");
-const avatarInput = document.getElementById("avatarInput");
-const bannerInput = document.getElementById("bannerInput");
-const colorInput = document.getElementById("colorInput"); // cor do perfil
-const publicCheckbox = document.getElementById("publicCheckbox");
-const saveProfileBtn = document.getElementById("saveProfile");
-const profilesContainer = document.getElementById("profiles");
+const profilesDiv = document.getElementById("profiles");
 
-// ===== FUNÇÃO PARA CRIAR CARD =====
-function createProfileCard(profileData) {
-  const card = document.createElement("div");
-  card.classList.add("profile-card");
+const profilesRef = collection(db, "profiles");
+const q = query(profilesRef, where("public", "==", true));
 
-  // Banner
-  const banner = document.createElement("div");
-  banner.classList.add("banner");
-  banner.style.backgroundImage = `url(${profileData.bannerURL || ""})`;
-  card.appendChild(banner);
+onSnapshot(q, snapshot => {
+    profilesDiv.innerHTML = "";
+    snapshot.forEach(doc => {
+        const profile = doc.data();
 
-  // Avatar
-  const avatar = document.createElement("img");
-  avatar.classList.add("avatar");
-  avatar.src = profileData.avatarURL || "https://via.placeholder.com/60";
-  card.appendChild(avatar);
+        const card = document.createElement("div");
+        card.className = "profile-card";
+        card.style.setProperty("--profile-color", profile.color || "#141428");
 
-  // Nome
-  const name = document.createElement("strong");
-  name.textContent = profileData.displayName || "Usuário sem nome";
-  card.appendChild(name);
+        const banner = document.createElement("div");
+        banner.className = "banner";
+        banner.style.backgroundImage = `url(${profile.bannerURL || ""})`;
+        card.appendChild(banner);
 
-  // Bio
-  const bio = document.createElement("p");
-  bio.textContent = profileData.bio || "";
-  card.appendChild(bio);
+        const content = document.createElement("div");
+        content.className = "profile-content";
 
-  // Cor personalizada
-  card.style.borderLeft = `6px solid ${profileData.color || "#5865f2"}`;
+        const avatar = document.createElement("img");
+        avatar.className = "avatar";
+        avatar.src = profile.avatarURL || "https://whitescreen.dev/images/pro/black-screen_39.png";
 
-  return card;
-}
+        const name = document.createElement("strong");
+        name.textContent = profile.displayName || "Usuário";
 
-// ===== FUNÇÃO PARA SALVAR PROFILE =====
-async function saveProfile() {
-  const user = auth.currentUser;
-  if (!user) return alert("Você precisa estar logado!");
+        const bio = document.createElement("p");
+        bio.textContent = profile.bio || "";
 
-  const profileRef = doc(db, "profiles", user.uid);
+        content.appendChild(avatar);
+        content.appendChild(name);
+        content.appendChild(bio);
 
-  await setDoc(profileRef, {
-    displayName: nameInput.value || "Usuário sem nome",
-    bio: bioInput.value || "",
-    avatarURL: avatarInput.value || "",
-    bannerURL: bannerInput.value || "",
-    color: colorInput.value || "#5865f2",
-    public: publicCheckbox.checked
-  });
-
-  alert("Perfil salvo com sucesso!");
-}
-
-// ===== MOSTRAR TODOS OS PERFIS PÚBLICOS =====
-async function loadPublicProfiles() {
-  profilesContainer.innerHTML = "";
-  const q = query(collection(db, "profiles"), where("public", "==", true));
-  onSnapshot(q, (snapshot) => {
-    profilesContainer.innerHTML = "";
-    snapshot.forEach(docSnap => {
-      const data = docSnap.data();
-      const card = createProfileCard(data);
-      profilesContainer.appendChild(card);
+        card.appendChild(content);
+        profilesDiv.appendChild(card);
     });
-  });
-}
-
-// ===== EVENTOS =====
-if (saveProfileBtn) {
-  saveProfileBtn.addEventListener("click", saveProfile);
-}
-
-// ===== CARREGAR PERFIS AUTOMATICAMENTE =====
-loadPublicProfiles();
+});
