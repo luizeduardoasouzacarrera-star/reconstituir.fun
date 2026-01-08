@@ -9,15 +9,18 @@ const bannerInput = document.getElementById("bannerInput");
 const colorInput = document.getElementById("colorInput"); // campo de cor
 const publicCheckbox = document.getElementById("publicCheckbox");
 
-// Novas redes sociais
+// Redes sociais
 const robloxInput = document.getElementById("robloxInput");
 const instagramInput = document.getElementById("instagramInput");
 const tiktokInput = document.getElementById("tiktokInput");
 const valorantInput = document.getElementById("valorantInput");
 const steamInput = document.getElementById("steamInput");
+const twitterInput = document.getElementById("twitterInput");
+const spotifyInput = document.getElementById("spotifyInput");
 
 const saveBtn = document.getElementById("saveProfile");
 
+// Carrega perfil existente
 auth.onAuthStateChanged(async user => {
     if (!user) {
         window.location.href = "index.html";
@@ -41,10 +44,12 @@ auth.onAuthStateChanged(async user => {
         tiktokInput.value = data.tiktok || "";
         valorantInput.value = data.valorant || "";
         steamInput.value = data.steam || "";
+        twitterInput.value = data.twitter || "";
+        spotifyInput.value = data.spotify || "";
     }
 });
 
-// Salvar perfil
+// Salvar/atualizar perfil
 saveBtn.addEventListener("click", async () => {
     const user = auth.currentUser;
     if (!user) return;
@@ -60,7 +65,9 @@ saveBtn.addEventListener("click", async () => {
         instagram: instagramInput.value || "",
         tiktok: tiktokInput.value || "",
         valorant: valorantInput.value || "",
-        steam: steamInput.value || ""
+        steam: steamInput.value || "",
+        twitter: twitterInput.value || "",
+        spotify: spotifyInput.value || ""
     });
 
     alert("Perfil salvo!");
