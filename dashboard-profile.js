@@ -1,7 +1,6 @@
 import { auth, db } from "./firebase.js";
 import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// Elementos do formulário
 const nameInput = document.getElementById("nameInput");
 const bioInput = document.getElementById("bioInput");
 const avatarInput = document.getElementById("avatarInput");
@@ -9,7 +8,6 @@ const bannerInput = document.getElementById("bannerInput");
 const colorInput = document.getElementById("colorInput");
 const publicCheckbox = document.getElementById("publicCheckbox");
 
-// Redes sociais
 const robloxInput = document.getElementById("robloxInput");
 const instagramInput = document.getElementById("instagramInput");
 const tiktokInput = document.getElementById("tiktokInput");
@@ -17,8 +15,6 @@ const valorantInput = document.getElementById("valorantInput");
 const steamInput = document.getElementById("steamInput");
 const twitterInput = document.getElementById("twitterInput");
 const spotifyInput = document.getElementById("spotifyInput");
-
-// Música
 const musicInput = document.getElementById("musicInput");
 
 const saveBtn = document.getElementById("saveProfile");
@@ -30,15 +26,6 @@ auth.onAuthStateChanged(async user => {
     }
 
     const profileRef = doc(db, "profiles", user.uid);
-
-    // Marca o usuário como online
-    await setDoc(profileRef, { isOnline: true }, { merge: true });
-
-    // Marca como offline quando fechar a aba ou sair
-    window.addEventListener("beforeunload", async () => {
-        await setDoc(profileRef, { isOnline: false }, { merge: true });
-    });
-
     const profileSnap = await getDoc(profileRef);
 
     if (profileSnap.exists()) {
@@ -57,12 +44,10 @@ auth.onAuthStateChanged(async user => {
         steamInput.value = data.steam || "";
         twitterInput.value = data.twitter || "";
         spotifyInput.value = data.spotify || "";
-
         musicInput.value = data.music || "";
     }
 });
 
-// Salvar/atualizar perfil
 saveBtn.addEventListener("click", async () => {
     const user = auth.currentUser;
     if (!user) return;
