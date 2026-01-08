@@ -1,73 +1,127 @@
-/* RESET */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: Arial, sans-serif;
+  font-family: "Segoe UI", sans-serif;
 }
 
-/* FUNDO ANTIGO */
+/* 🌌 FUNDO GERAL */
 body {
-  background: linear-gradient(180deg, #0a1a2f, #000814);
-  color: white;
   min-height: 100vh;
+  color: white;
+  background: #020617;
+  overflow-x: hidden;
 }
 
-/* ===== LOGIN (TOPO) ===== */
-#login-area {
-  background: linear-gradient(180deg, #0d2a4d, #081c33);
-  padding: 40px;
+.background {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(circle at top, #0f2a44, transparent 60%),
+    linear-gradient(180deg, #020617, #000814);
+  z-index: -1;
+}
+
+/* 🔷 LOGIN HEADER */
+.login-header {
+  padding: 60px 20px 40px;
+  background: linear-gradient(180deg, #0b2c4d, #061a2f);
   text-align: center;
+  box-shadow: 0 10px 40px rgba(0,0,0,.6);
 }
 
-#login-area h2 {
-  margin-bottom: 20px;
+.login-header h1 {
+  font-size: 36px;
+  margin-bottom: 25px;
 }
 
-#login-area input {
+/* 🧊 LOGIN BOX */
+.login-box {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 12px;
+  background: rgba(255,255,255,0.08);
+  padding: 25px 30px;
+  border-radius: 14px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 30px rgba(0,0,0,.5);
+}
+
+.login-box input {
   width: 260px;
   padding: 10px;
-  margin: 6px;
-  border-radius: 6px;
+  border-radius: 8px;
   border: none;
+  outline: none;
 }
 
-#loginBtn {
-  margin-top: 10px;
-  padding: 10px 30px;
+.login-box button {
+  padding: 10px;
+  border-radius: 8px;
   border: none;
-  border-radius: 6px;
-  background: #1e90ff;
+  background: linear-gradient(135deg, #1e90ff, #3aa0ff);
   color: white;
+  font-weight: bold;
   cursor: pointer;
+  transition: transform .2s, box-shadow .2s;
 }
 
-#loginBtn:hover {
-  background: #187bcd;
+.login-box button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(30,144,255,.6);
 }
 
 #msg {
-  margin-top: 10px;
+  font-size: 14px;
   color: #ff6b6b;
 }
 
-/* ===== PERFIS ===== */
-#profiles {
-  padding: 40px;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 20px;
+/* 👤 PERFIS */
+.profiles-section {
+  padding: 60px 40px;
 }
 
-/* CARD DE PERFIL */
+.profiles-section h2 {
+  margin-bottom: 30px;
+  font-size: 24px;
+}
+
+/* GRID */
+.profiles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px,1fr));
+  gap: 25px;
+}
+
+/* 🧊 CARD PERFIL */
 .profile-card {
-  background: rgba(255, 255, 255, 0.08);
-  padding: 20px;
-  border-radius: 10px;
+  background: rgba(255,255,255,0.08);
+  padding: 30px 20px;
+  border-radius: 16px;
   text-align: center;
-  backdrop-filter: blur(6px);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 0 30px rgba(0,0,0,.4);
+  transition: transform .3s, box-shadow .3s;
+  animation: fadeUp .6s ease forwards;
+}
+
+.profile-card:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0,0,0,.6);
 }
 
 .profile-card strong {
-  font-size: 16px;
+  font-size: 18px;
+}
+
+/* ✨ ANIMAÇÃO */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
