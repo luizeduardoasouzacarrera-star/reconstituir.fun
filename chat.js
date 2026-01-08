@@ -81,4 +81,17 @@ onSnapshot(q, snapshot => {
 
   // 🗑️ EVENTO APAGAR
   const buttons = document.querySelectorAll("button[data-id]");
-  buttons.forEach(btn =
+  buttons.forEach(btn => {
+    btn.onclick = async () => {
+      const id = btn.getAttribute("data-id");
+      await deleteDoc(doc(db, "messages", id));
+    };
+  });
+});
+
+// 🚪 LOGOUT
+logoutBtn.addEventListener("click", () => {
+  signOut(auth).then(() => {
+    window.location.replace("index.html");
+  });
+});
