@@ -1,11 +1,7 @@
-// script.js
 import { auth } from "./firebase.js";
 import { loadUserProfile, loadAllProfiles } from "./profiles.js";
-import {
-  signInWithEmailAndPassword,
-  onAuthStateChanged,
-  signOut
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { signInWithEmailAndPassword, onAuthStateChanged } 
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 // ===== ELEMENTOS =====
 const usernameInput = document.getElementById("username");
@@ -24,17 +20,18 @@ loginBtn.addEventListener("click", async () => {
     return;
   }
 
-  // 🔹 converte o nome em email para Firebase
+  // 🔹 Converte nome em email
   const email = `${name.toLowerCase()}@example.com`;
 
   try {
     await signInWithEmailAndPassword(auth, email, password);
+    msgSpan.textContent = "";
   } catch (err) {
     msgSpan.textContent = "Erro no login: " + err.message;
   }
 });
 
-// ===== LOGOUT E AUTENTICAÇÃO =====
+// ===== AUTENTICAÇÃO =====
 onAuthStateChanged(auth, async user => {
   if (!user) {
     profilesDiv.innerHTML = "";
@@ -46,7 +43,8 @@ onAuthStateChanged(auth, async user => {
   if (!profile) {
     profilesDiv.innerHTML = "<p>Você não tem permissão para criar profile.</p>";
   } else {
-    displayProfiles(await loadAllProfiles(), user.uid);
+    const allProfiles = await loadAllProfiles();
+    displayProfiles(allProfiles, user.uid);
   }
 });
 
@@ -75,12 +73,11 @@ function displayProfiles(profiles, currentUid) {
     card.appendChild(name);
     card.appendChild(bio);
 
+    // 🔹 botão Editar só para o próprio profile
     if (p.id === currentUid) {
       const editBtn = document.createElement("button");
       editBtn.textContent = "Editar";
-      editBtn.onclick = () => {
-        window.location.href = "perfil.html";
-      };
+      editBtn.onclick = () => window.location.href = "perfil.html";
       card.appendChild(editBtn);
     }
 
