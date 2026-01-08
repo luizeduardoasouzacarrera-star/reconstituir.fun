@@ -1,89 +1,107 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: Arial, Helvetica, sans-serif;
+// chat.js
+import { auth, db } from "./firebase.js";
+
+import {
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+import {
+  collection,
+  addDoc,
+  query,
+  orderBy,
+  onSnapshot,
+  serverTimestamp,
+  deleteDoc,
+  doc
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// ===== ELEMENTOS =====
+const chatDiv = document.getElementById("chat");
+const sendBtn = document.getElementById("sendBtn");
+const messageInput = document.getElementById("message");
+const logoutBtn = document.getElementById("logoutBtn");
+
+let username = "";
+let isLuiz = false;
+
+// ===== AUTH =====
+onAuthStateChanged(auth, user => {
+  if (!user) {
+    window.location.replace("index.html");
+    return;
+  }
+
+  username = user.email.split("@")[0];
+  isLuiz = username === "luiz";
+});
+
+// ===== ENVIAR =====
+sendBtn.addEventListener("click", sendMessage);
+messageInput.addEventListener("keypress", e => {
+  if (e.key === "Enter") sendMessage();
+});
+
+async function sendMessage() {
+  const text = messageInput.value.trim();
+  if (!text) return;
+
+  await addDoc(collection(db, "messages"), {
+    user: username,
+    text: text,
+    timestamp: serverTimestamp()
+  });
+
+  messageInput.value = "";
 }
 
-/* ===== FUNDO GERAL ===== */
-body {
-  background: linear-gradient(135deg, #1e1e2f, #2b2b45);
-  color: #fff;
-  min-height: 100vh;
-}
+// ===== LISTAR =====
+const q = query(
+  collection(db, "messages"),
+  orderBy("timestamp", "asc")
+);
 
-/* ===== HEADER (LOGIN) ===== */
-.header {
-  width: 100%;
-  padding: 25px 40px;
-  display: flex;
-  align-items: center;
-  gap: 15px;
+onSnapshot(q, snapshot => {
+  chatDiv.innerHTML = "";
 
-  background: linear-gradient(135deg, #141428, #1f1f3a);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-}
+  snapshot.forEach(docSnap => {
+    const data = docSnap.data();
+    const id = docSnap.id;
 
-.header h2 {
-  margin-right: 20px;
-}
+    const time = data.timestamp
+      ? new Date(data.timestamp.seconds * 1000).toLocaleTimeString("pt-BR", {
+          hour: "2-digit",
+          minute: "2-digit"
+        })
+      : "";
 
-/* INPUTS */
-.header input {
-  width: 170px;
-  padding: 10px;
-  border-radius: 8px;
-  border: none;
-  outline: none;
-}
+    const p = document.createElement("p");
 
-/* BOTÃO LOGIN */
-.header button {
-  padding: 10px 24px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  background: #5865f2;
-  color: white;
-  font-weight: bold;
-}
+    p.innerHTML = `<b>${data.user}</b> (${time}): ${data.text}`;
 
-.header button:hover {
-  background: #4752c4;
-}
+    // 👉 APAGAR MSG (SÓ LUIZ)
+    if (isLuiz) {
+      p.style.cursor = "pointer";
+      p.title = "Clique para apagar";
 
-#msg {
-  margin-left: 10px;
-  color: #ff6b6b;
-}
+      p.addEventListener("click", async () => {
+        const confirmDelete = confirm("Apagar esta mensagem?");
+        if (confirmDelete) {
+          await deleteDoc(doc(db, "messages", id));
+        }
+      });
+    }
 
-/* ===== ÁREA DE PERFIS ===== */
-.profiles-section {
-  padding: 40px;
-}
+    chatDiv.appendChild(p);
+  });
 
-.profiles-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 25px;
-}
+  chatDiv.scrollTop = chatDiv.scrollHeight;
+});
 
-/* CARD PERFIL */
-.profile-card {
-  background: #141428;
-  border-radius: 10px;
-  padding: 25px;
-  min-height: 140px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.35);
-  transition: transform .25s ease, box-shadow .25s ease;
-}
-
-.profile-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.55);
-}
-
-.profile-card strong {
-  color: #4da6ff;
-  font-size: 16px;
-}
+// ===== LOGOUT =====
+logoutBtn.addEventListener("click", () => {
+  signOut(auth).then(() => {
+    window.location.replace("index.html");
+  });
+});
