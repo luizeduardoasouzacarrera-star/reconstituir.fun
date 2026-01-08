@@ -1,31 +1,24 @@
-// profiles.js
-import { auth, db } from "./firebase.js";
-import {
-  doc,
-  getDoc,
-  setDoc,
-  updateDoc,
-  serverTimestamp,
-  collection,
-  getDocs,
-  query,
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { doc, getDoc, setDoc, updateDoc, serverTimestamp, collection, getDocs, query } 
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { auth } from "./firebase.js";
 
-// Lista de emails autorizados a criar profiles
-const allowedUsers = ["luiz@example.com", "admin@example.com"]; // 🔹 coloque os emails autorizados aqui
+// 🔹 Lista de nomes autorizados a criar profiles (sem o @example.com)
+const allowedUsers = ["luiz", "admin"]; 
 
-// ===== CARREGAR PROFILE =====
+// Carrega profile do usuário, cria se não existir e usuário for autorizado
 export async function loadUserProfile(user) {
   if (!user) return null;
 
   const ref = doc(db, "profiles", user.uid);
   const snap = await getDoc(ref);
 
-  // Se não existe profile, cria apenas se usuário autorizado
-  if (!snap.exists() && allowedUsers.includes(user.email)) {
+  const username = user.email.split("@")[0];
+
+  // Cria profile se não existir e usuário for permitido
+  if (!snap.exists() && allowedUsers.includes(username)) {
     await setDoc(ref, {
-      username: user.email.split("@")[0],
-      displayName: user.email.split("@")[0],
+      username: username,
+      displayName: username,
       bio: "",
       avatarURL: "",
       bannerURL: "",
@@ -37,7 +30,7 @@ export async function loadUserProfile(user) {
   return updatedSnap.exists() ? updatedSnap.data() : null;
 }
 
-// ===== ATUALIZAR PROFILE =====
+// Atualiza profile do usuário
 export async function updateProfile(data) {
   const user = auth.currentUser;
   if (!user) return;
@@ -46,7 +39,7 @@ export async function updateProfile(data) {
   await updateDoc(ref, data);
 }
 
-// ===== LISTAR TODOS OS PROFILES =====
+// Lista todos os profiles para mostrar no grid
 export async function loadAllProfiles() {
   const q = query(collection(db, "profiles"));
   const snapshot = await getDocs(q);
