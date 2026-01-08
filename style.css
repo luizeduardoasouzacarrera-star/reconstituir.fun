@@ -11,6 +11,45 @@ body {
   color: #fff;
   min-height: 100vh;
 }
+
+/* ===== HEADER (LOGIN) ===== */
+.header {
+  width: 100%;
+  padding: 25px 40px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+
+  background: linear-gradient(135deg, #141428, #1f1f3a);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+
+.header h2 {
+  margin-right: 20px;
+}
+
+.header input {
+  width: 170px;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+}
+
+.header button {
+  padding: 10px 24px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  background: #5865f2;
+  color: white;
+  font-weight: bold;
+}
+
+.header button:hover {
+  background: #4752c4;
+}
+
 /* ===== CHAT ===== */
 .chat-container {
   padding: 40px;
@@ -31,18 +70,15 @@ body {
   margin-bottom: 12px;
 }
 
-/* MENSAGEM */
 #chat p {
   margin-bottom: 8px;
   line-height: 1.4;
 }
 
-/* NOME */
 #chat b {
   color: #4da6ff;
 }
 
-/* INPUT */
 #message {
   width: calc(100% - 200px);
   padding: 12px;
@@ -51,46 +87,6 @@ body {
   outline: none;
 }
 
-/* ===== HEADER (LOGIN) ===== */
-.header {
-  width: 100%;
-  padding: 25px 40px;
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  background: linear-gradient(135deg, #141428, #1f1f3a);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-}
-
-.header h2 {
-  margin-right: 20px;
-}
-
-/* INPUTS */
-.header input {
-  width: 170px;
-  padding: 10px;
-  border-radius: 8px;
-  border: none;
-  outline: none;
-}
-
-/* BOTÃO LOGIN */
-.header button {
-  padding: 10px 24px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  background: #5865f2;
-  color: white;
-  font-weight: bold;
-}
-
-.header button:hover {
-  background: #4752c4;
-}
-
-/* BOTÕES CHAT */
 #sendBtn,
 #logoutBtn {
   padding: 12px 20px;
@@ -124,84 +120,32 @@ body {
   padding: 40px;
 }
 
+.profiles-section h3 {
+  margin-bottom: 15px;
+}
+
 .profiles-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 25px;
-}
-
-/* CARD PERFIL ESTILO DISCORD */
-.profile-card {
-  background: #1e1e2f;
-  border-radius: 10px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.35);
-  overflow: hidden;
   display: flex;
-  flex-direction: column;
-  transition: transform .25s ease, box-shadow .25s ease;
-  height: 350px; /* altura maior para estilo retangular */
+  flex-wrap: wrap;
+  gap: 20px;
 }
 
-.profile-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.55);
-}
-
-.profile-card .banner {
-  width: 100%;
-  height: 100px;
-  background-size: cover;
-  background-position: center;
-  position: relative;
-}
-
-.profile-card .color-bar {
-  height: 15px;
-  background-color: #5865f2; /* cor padrão */
-}
-
-.profile-card .avatar {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  border: 3px solid #1e1e2f;
-  position: absolute;
-  bottom: -40px;
-  left: 20px;
-}
-
-.profile-card .info {
-  margin-top: 50px;
-  padding: 20px;
-}
-
-.profile-card .info strong {
-  display: block;
-  font-size: 18px;
-  color: #4da6ff;
-  margin-bottom: 5px;
-}
-
-.profile-card .info p {
-  font-size: 14px;
-  color: #ccc;
-}
-
-/* FORMULÁRIO DE PERFIL */
+/* ===== FORMULÁRIO DE PROFILE ===== */
 .profile-form-container {
   padding: 20px;
   margin: 20px auto;
   max-width: 600px;
   background: #141428;
   border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.profile-form-container input,
-.profile-form-container select {
+.profile-form-container input {
   display: block;
   width: 100%;
   padding: 10px;
-  margin-bottom: 10px;
   border-radius: 6px;
   border: none;
   outline: none;
@@ -214,4 +158,64 @@ body {
   background: #5865f2;
   color: white;
   cursor: pointer;
+}
+
+/* ===== CARD DE PROFILE ===== */
+.profile-card {
+  width: 280px;
+  min-height: 220px; /* alongado para baixo */
+  background: #141428;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+  transition: transform .25s ease, box-shadow .25s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.55);
+}
+
+.profile-card .banner {
+  width: 100%;
+  height: 80px;
+  background-size: cover;
+  background-position: center;
+}
+
+.profile-card .info {
+  padding: 10px 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex-grow: 1;
+}
+
+.profile-card .avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  margin-top: -30px;
+  background-color: #fff;
+}
+
+.profile-card .displayName {
+  font-weight: bold;
+  font-size: 16px;
+  color: #fff;
+}
+
+.profile-card .bio {
+  font-size: 13px;
+  color: #ccc;
+}
+
+.profile-card .bottom-bar {
+  height: 8px;
+  background-color: #4da6ff; /* cor do card */
+  width: 100%;
+  border-radius: 0 0 10px 10px;
 }
