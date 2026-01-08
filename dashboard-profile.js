@@ -6,7 +6,7 @@ const nameInput = document.getElementById("nameInput");
 const bioInput = document.getElementById("bioInput");
 const avatarInput = document.getElementById("avatarInput");
 const bannerInput = document.getElementById("bannerInput");
-const colorInput = document.getElementById("colorInput");
+const colorInput = document.getElementById("colorInput"); // campo de cor
 const publicCheckbox = document.getElementById("publicCheckbox");
 
 // Redes sociais
@@ -49,7 +49,7 @@ auth.onAuthStateChanged(async user => {
         steamInput.value = data.steam || "";
         twitterInput.value = data.twitter || "";
         spotifyInput.value = data.spotify || "";
-        musicInput.value = data.musicURL || "";
+        musicInput.value = data.music || "";
     }
 });
 
@@ -72,7 +72,7 @@ saveBtn.addEventListener("click", async () => {
         steam: steamInput.value || "",
         twitter: twitterInput.value || "",
         spotify: spotifyInput.value || "",
-        musicURL: musicInput.value || ""
+        music: musicInput.value || ""
     });
 
     alert("Perfil salvo!");
