@@ -40,7 +40,6 @@ onAuthStateChanged(auth, user => {
   if (!user) return;
 
   const userRef = doc(db, "profiles", user.uid);
-
   // Aqui você pode adicionar um input no HTML tipo <select> com cores
   const colorInput = document.getElementById("colorInput");
   if (colorInput) {
