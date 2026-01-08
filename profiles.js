@@ -1,78 +1,115 @@
-import { auth, db } from "./firebase.js";
-import { doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+// profile.js
+import { db, auth } from "./firebase.js";
+import {
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  collection,
+  onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// ELEMENTOS
-const nameInput = document.getElementById("nameInput");
-const bioInput = document.getElementById("bioInput");
-const avatarInput = document.getElementById("avatarInput");
-const bannerInput = document.getElementById("bannerInput");
-const colorInput = document.getElementById("colorInput");
-const saveBtn = document.getElementById("saveProfile");
-const profilesDiv = document.getElementById("profiles");
+// ===== ELEMENTOS =====
+const profilesContainer = document.querySelector(".profiles-section");
+const profilesGrid = document.querySelector(".profiles-grid");
 
-let currentUserId = "";
+// ===== FUNÇÃO PARA CRIAR CARD =====
+function createProfileCard(profileData, userId) {
+  const card = document.createElement("div");
+  card.classList.add("profile-card");
 
-// SALVAR OU ATUALIZAR PROFILE
-async function saveProfile() {
-    if (!currentUserId) return;
+  // Banner
+  const banner = document.createElement("div");
+  banner.classList.add("banner");
+  banner.style.backgroundImage = `url(${profileData.bannerURL || ""})`;
+  card.appendChild(banner);
 
-    const profileData = {
-        displayName: nameInput.value || "Usuário sem nome",
-        bio: bioInput.value || "",
-        avatarURL: avatarInput.value || "https://via.placeholder.com/70",
-        bannerURL: bannerInput.value || "https://via.placeholder.com/320x100",
-        color: colorInput.value || "#4da6ff"
-    };
+  // Barra de cor
+  const colorBar = document.createElement("div");
+  colorBar.classList.add("color-bar");
+  colorBar.style.height = "6px";
+  colorBar.style.width = "100%";
+  colorBar.style.background = profileData.color || "#5865f2";
+  colorBar.style.marginTop = "-6px";
+  card.appendChild(colorBar);
 
-    await setDoc(doc(db, "profiles", currentUserId), profileData);
+  // Avatar
+  const avatar = document.createElement("img");
+  avatar.classList.add("avatar");
+  avatar.src = profileData.avatarURL || "https://whitescreen.dev/images/pro/black-screen_39.png";
+  card.appendChild(avatar);
+
+  // Conteúdo
+  const content = document.createElement("div");
+  content.classList.add("content");
+
+  const name = document.createElement("strong");
+  name.textContent = profileData.displayName || profileData.username || "Usuário sem nome";
+  content.appendChild(name);
+
+  if (profileData.bio) {
+    const bio = document.createElement("p");
+    bio.textContent = profileData.bio;
+    content.appendChild(bio);
+  }
+
+  card.appendChild(content);
+
+  // Input para mudar cor (apenas se for o dono do profile)
+  if (auth.currentUser && auth.currentUser.uid === userId) {
+    const colorPicker = document.createElement("input");
+    colorPicker.type = "color";
+    colorPicker.value = profileData.color || "#5865f2";
+    colorPicker.classList.add("color-picker");
+    colorPicker.style.marginTop = "10px";
+    content.appendChild(colorPicker);
+
+    colorPicker.addEventListener("input", async (e) => {
+      const newColor = e.target.value;
+      colorBar.style.background = newColor;
+      await updateDoc(doc(db, "profiles", userId), { color: newColor });
+    });
+  }
+
+  return card;
 }
 
-// GERAR CARDS
-function renderProfiles(snapshot) {
-    profilesDiv.innerHTML = "";
+// ===== CARREGAR TODOS OS PROFILES =====
+export function loadAllProfiles() {
+  const profilesRef = collection(db, "profiles");
 
-    snapshot.forEach(docSnap => {
-        const data = docSnap.data();
-
-        const card = document.createElement("div");
-        card.classList.add("profile-card");
-
-        card.innerHTML = `
-            <div class="banner" style="background-image: url('${data.bannerURL}')">
-                <img class="avatar" src="${data.avatarURL}" alt="Avatar">
-            </div>
-            <div class="info">
-                <div class="displayName">${data.displayName}</div>
-                <div class="bio">${data.bio}</div>
-            </div>
-            <div class="bottom-bar" style="background-color: ${data.color}"></div>
-        `;
-
-        profilesDiv.appendChild(card);
+  onSnapshot(profilesRef, (snapshot) => {
+    profilesGrid.innerHTML = ""; // limpa grid
+    snapshot.forEach((docSnap) => {
+      const data = docSnap.data();
+      const userId = docSnap.id;
+      const card = createProfileCard(data, userId);
+      profilesGrid.appendChild(card);
     });
+  });
 }
 
-// MONITORAR LOGIN
-auth.onAuthStateChanged(user => {
-    if (!user) return;
+// ===== CRIAR/ATUALIZAR PROFILE DO USUÁRIO =====
+export async function createOrUpdateUserProfile(user, profileData) {
+  const profileRef = doc(db, "profiles", user.uid);
 
-    currentUserId = user.email.split("@")[0];
-
-    const profileRef = doc(db, "profiles", currentUserId);
-    onSnapshot(profileRef, docSnap => {
-        if (!docSnap.exists()) return;
-
-        const data = docSnap.data();
-        nameInput.value = data.displayName || "";
-        bioInput.value = data.bio || "";
-        avatarInput.value = data.avatarURL || "";
-        bannerInput.value = data.bannerURL || "";
-        colorInput.value = data.color || "#4da6ff";
+  const snap = await getDoc(profileRef);
+  if (!snap.exists()) {
+    await setDoc(profileRef, {
+      username: user.email.split("@")[0],
+      displayName: profileData.displayName || "",
+      avatarURL: profileData.avatarURL || "",
+      bannerURL: profileData.bannerURL || "",
+      bio: profileData.bio || "",
+      color: profileData.color || "#5865f2",
     });
-});
-
-// ESCUTAR TODOS OS PROFILES
-onSnapshot(collection(db, "profiles"), renderProfiles);
-
-// BOTÃO SALVAR
-saveBtn.addEventListener("click", saveProfile);
+  } else {
+    await updateDoc(profileRef, {
+      displayName: profileData.displayName || snap.data().displayName,
+      avatarURL: profileData.avatarURL || snap.data().avatarURL,
+      bannerURL: profileData.bannerURL || snap.data().bannerURL,
+      bio: profileData.bio || snap.data().bio,
+      color: profileData.color || snap.data().color,
+    });
+  }
+}
