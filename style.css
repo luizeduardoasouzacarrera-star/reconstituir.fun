@@ -156,18 +156,45 @@ body {
   font-size: 16px;
 }
 
+.profile-form-container {
+    padding: 20px;
+    margin: 20px auto;
+    max-width: 600px;
+    background: #141428;
+    border-radius: 10px;
+}
+
+.profile-form-container input {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+    border: none;
+    outline: none;
+}
+
+.profile-form-container button {
+    padding: 10px 20px;
+    border-radius: 6px;
+    border: none;
+    background: #5865f2;
+    color: white;
+    cursor: pointer;
+}
+
 .profile-card .avatar {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  margin-bottom: 10px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin-bottom: 10px;
 }
 
 .profile-card .banner {
-  width: 100%;
-  height: 80px;
-  background-size: cover;
-  background-position: center;
-  border-radius: 10px 10px 0 0;
-  margin-bottom: 10px;
+    width: 100%;
+    height: 80px;
+    background-size: cover;
+    background-position: center;
+    border-radius: 10px 10px 0 0;
+    margin-bottom: 10px;
 }
