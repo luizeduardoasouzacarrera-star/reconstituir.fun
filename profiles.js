@@ -11,51 +11,11 @@ onSnapshot(profilesQuery, snapshot => {
 
     snapshot.forEach(docSnap => {
         const data = docSnap.data();
+        const userId = docSnap.id;
 
         const card = document.createElement("div");
         card.classList.add("profile-card");
         card.style.backgroundColor = data.color || "#141428";
-
-        // ONLINE/OFFLINE
-        const statusIndicator = document.createElement("div");
-        statusIndicator.classList.add("status-indicator");
-        statusIndicator.style.position = "absolute";
-        statusIndicator.style.top = "10px";
-        statusIndicator.style.left = "10px";
-        statusIndicator.style.display = "flex";
-        statusIndicator.style.alignItems = "center";
-        statusIndicator.style.gap = "6px";
-
-        const dot = document.createElement("div");
-        dot.style.width = "10px";
-        dot.style.height = "10px";
-        dot.style.borderRadius = "50%";
-        dot.style.backgroundColor = "red";
-        dot.style.animation = "blink 1s infinite";
-
-        const statusText = document.createElement("span");
-        statusText.textContent = "OFFLINE";
-        statusText.style.color = "red";
-        statusText.style.fontSize = "12px";
-
-        statusIndicator.appendChild(dot);
-        statusIndicator.appendChild(statusText);
-        card.appendChild(statusIndicator);
-
-        // Realtime DB para atualizar status
-        const statusRef = ref(rtdb, "status/" + docSnap.id);
-        onValue(statusRef, snapshot => {
-            const status = snapshot.val();
-            if (status && status.isOnline) {
-                dot.style.backgroundColor = "lime";
-                statusText.textContent = "ONLINE";
-                statusText.style.color = "lime";
-            } else {
-                dot.style.backgroundColor = "red";
-                statusText.textContent = "OFFLINE";
-                statusText.style.color = "red";
-            }
-        });
 
         // Banner
         if (data.bannerURL) {
@@ -78,6 +38,21 @@ onSnapshot(profilesQuery, snapshot => {
         nameEl.textContent = data.displayName || "Usuário sem nome";
         card.appendChild(nameEl);
 
+        // Status Online/Offline
+        const statusEl = document.createElement("p");
+        statusEl.style.fontWeight = "bold";
+        card.appendChild(statusEl);
+
+        const statusRef = ref(rtdb, 'status/' + userId);
+        onValue(statusRef, snap => {
+            const status = snap.val();
+            if(status?.isOnline) {
+                statusEl.innerHTML = '<span class="online-dot"></span> ONLINE';
+            } else {
+                statusEl.innerHTML = '<span class="offline-dot"></span> OFFLINE';
+            }
+        });
+
         // Bio
         if (data.bio) {
             const bioEl = document.createElement("p");
@@ -89,7 +64,7 @@ onSnapshot(profilesQuery, snapshot => {
         const socialDiv = document.createElement("div");
         socialDiv.classList.add("socials");
 
-        const socialIcons = {
+        const icons = {
             roblox: "https://devforum-uploads.s3.dualstack.us-east-2.amazonaws.com/uploads/original/4X/0/e/e/0eeeb19633422b1241f4306419a0f15f39d58de9.png",
             instagram: "https://elementos.apresto.com.br/wp-content/uploads/2024/05/icon-Instagram-desenho.svg",
             tiktok: "https://cdn.worldvectorlogo.com/logos/tiktok-icon-2.svg",
@@ -99,30 +74,29 @@ onSnapshot(profilesQuery, snapshot => {
             spotify: "https://upload.wikimedia.org/wikipedia/commons/a/a1/2024_Spotify_logo_without_text_%28black%29.svg"
         };
 
-        Object.keys(socialIcons).forEach(key => {
-            if (data[key]) {
+        for (let key in icons) {
+            if(data[key]) {
                 const link = document.createElement("a");
                 link.href = data[key];
                 link.target = "_blank";
-
-                const img = document.createElement("img");
-                img.src = socialIcons[key];
-                img.alt = key;
-                link.appendChild(img);
-
+                link.innerHTML = `<img src="${icons[key]}" alt="${key}">`;
                 socialDiv.appendChild(link);
             }
-        });
+        }
 
         card.appendChild(socialDiv);
 
-        // Música
-        if (data.music) {
-            const audio = document.createElement("audio");
-            audio.src = `assets/${data.music}`;
-            audio.controls = true;
-            audio.style.marginTop = "10px";
-            card.appendChild(audio);
+        // Botão de música
+        if(data.music) {
+            const musicBtn = document.createElement("button");
+            musicBtn.classList.add("play-music-btn");
+            musicBtn.dataset.music = data.music;
+            musicBtn.textContent = "▶️ Tocar Música";
+            musicBtn.addEventListener("click", () => {
+                const music = new Audio(`assets/${musicBtn.dataset.music}`);
+                music.play();
+            });
+            card.appendChild(musicBtn);
         }
 
         profilesContainer.appendChild(card);
