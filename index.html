@@ -3,31 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <title>Login</title>
-  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- FUNDO ORIGINAL -->
-  <div class="background"></div>
+<!-- 🔹 TOPO: LOGIN -->
+<div id="login-area">
+  <h2>Login</h2>
 
-  <!-- ÁREA DE LOGIN (COM BACKGROUND PRÓPRIO) -->
-  <div class="login-wrapper">
-    <div class="login-box">
-      <h2>Login</h2>
+  <input id="username" placeholder="Nome">
+  <input id="password" type="password" placeholder="Senha">
 
-      <input type="text" placeholder="Nome" id="username">
-      <input type="password" placeholder="Senha" id="password">
+  <button id="loginBtn" type="button">Entrar</button>
+  <p id="msg"></p>
+</div>
 
-      <button id="loginBtn">Entrar</button>
-    </div>
-  </div>
+<!-- 🔹 ABAIXO: PERFIS -->
+<div id="profiles" style="display:grid;grid-template-columns:repeat(auto-fill,200px);gap:20px;"></div>
 
-  <!-- PERFIS PÚBLICOS -->
-  <div class="profiles-container" id="profiles"></div>
-
-  <!-- SCRIPTS -->
-  <script type="module" src="firebase.js"></script>
-  <script type="module" src="profiles.js"></script>
+<!-- SCRIPTS -->
+<script type="module" src="script.js"></script>
+<script type="module" src="profiles.js"></script>
 
 </body>
 </html>
