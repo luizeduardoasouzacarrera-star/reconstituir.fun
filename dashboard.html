@@ -3,24 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <title>Chat</title>
+
+  <!-- CSS BONITO -->
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="header">
-  <h2>Chat privado</h2>
-  <button id="logoutBtn">Sair</button>
-</div>
+  <div class="chat-container">
+    <h2>Chat privado</h2>
 
-<div class="chat-container">
-  <div id="chat"></div>
+    <div id="chat"></div>
 
-  <div style="display:flex; gap:10px;">
     <input id="message" placeholder="Digite sua mensagem">
     <button id="sendBtn">Enviar</button>
+    <button id="logoutBtn">Sair</button>
   </div>
-</div>
 
-<script type="module" src="chat.js"></script>
+  <script type="module" src="chat.js"></script>
 </body>
 </html>
