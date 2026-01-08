@@ -1,27 +1,24 @@
+// profiles.js
 import { db } from "./firebase.js";
 import {
   collection,
-  getDocs
+  onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-const profilesDiv = document.getElementById("profiles");
+const profilesContainer = document.getElementById("profiles");
 
-async function loadProfiles() {
-  const snapshot = await getDocs(collection(db, "profiles"));
+const profilesRef = collection(db, "profiles");
 
-  profilesDiv.innerHTML = "";
+onSnapshot(profilesRef, snapshot => {
+  profilesContainer.innerHTML = "";
 
   snapshot.forEach(doc => {
     const data = doc.data();
 
-    profilesDiv.innerHTML += `
+    profilesContainer.innerHTML += `
       <div class="profile-card">
-        <div class="profile-name">
-          ${data.name || doc.id}
-        </div>
+        <strong>${data.username}</strong>
       </div>
     `;
   });
-}
-
-loadProfiles();
+});
