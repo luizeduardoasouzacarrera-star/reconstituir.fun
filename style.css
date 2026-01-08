@@ -32,15 +32,18 @@ body {
   margin-bottom: 12px;
 }
 
+/* MENSAGEM */
 #chat p {
   margin-bottom: 8px;
   line-height: 1.4;
 }
 
+/* NOME */
 #chat b {
   color: #4da6ff;
 }
 
+/* INPUT */
 #message {
   width: calc(100% - 200px);
   padding: 12px;
@@ -49,6 +52,46 @@ body {
   outline: none;
 }
 
+/* ===== HEADER (LOGIN) ===== */
+.header {
+  width: 100%;
+  padding: 25px 40px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: linear-gradient(135deg, #141428, #1f1f3a);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+
+.header h2 {
+  margin-right: 20px;
+}
+
+/* INPUTS */
+.header input {
+  width: 170px;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+}
+
+/* BOTÃO LOGIN */
+.header button {
+  padding: 10px 24px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  background: #5865f2;
+  color: white;
+  font-weight: bold;
+}
+
+.header button:hover {
+  background: #4752c4;
+}
+
+/* BOTÕES CHAT */
 #sendBtn,
 #logoutBtn {
   padding: 12px 20px;
@@ -77,36 +120,34 @@ body {
   background: #c0392b;
 }
 
-/* ===== PERFIS ===== */
+/* ===== ÁREA DE PERFIS ===== */
 .profiles-section {
   padding: 40px;
 }
 
 .profiles-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 25px;
 }
 
-/* CARD RETANGULAR ESTILO DISCORD */
+/* CARD PERFIL ESTILO DISCORD */
 .profile-card {
-  position: relative;
+  background: #1e1e2f;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  background: #141428;
-  border-radius: 12px;
-  overflow: hidden;
-  min-height: 250px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.35);
   transition: transform .25s ease, box-shadow .25s ease;
+  height: 350px; /* altura maior para estilo retangular */
 }
 
 .profile-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-6px);
   box-shadow: 0 10px 30px rgba(0,0,0,0.55);
 }
 
-/* BANNER */
 .profile-card .banner {
   width: 100%;
   height: 100px;
@@ -115,60 +156,39 @@ body {
   position: relative;
 }
 
-/* AVATAR */
-.profile-card .avatar {
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  border: 3px solid white;
-  position: absolute;
-  bottom: -35px;
-  left: 15px;
-  background-size: cover;
-  background-position: center;
+.profile-card .color-bar {
+  height: 15px;
+  background-color: #5865f2; /* cor padrão */
 }
 
-/* CONTEÚDO DO CARD */
+.profile-card .avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 3px solid #1e1e2f;
+  position: absolute;
+  bottom: -40px;
+  left: 20px;
+}
+
 .profile-card .info {
-  margin-top: 40px;
-  padding: 10px 15px 15px 15px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  margin-top: 50px;
+  padding: 20px;
 }
 
 .profile-card .info strong {
+  display: block;
   font-size: 18px;
   color: #4da6ff;
+  margin-bottom: 5px;
 }
 
 .profile-card .info p {
   font-size: 14px;
-  color: #ddd;
-  line-height: 1.2;
+  color: #ccc;
 }
 
-/* PALETA DE CORES */
-.color-palette {
-  display: flex;
-  gap: 6px;
-  margin-top: 8px;
-}
-
-.color-option {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  cursor: pointer;
-  border: 2px solid transparent;
-  transition: border 0.2s;
-}
-
-.color-option:hover {
-  border: 2px solid #fff;
-}
-
-/* FORMULÁRIO DE PROFILE */
+/* FORMULÁRIO DE PERFIL */
 .profile-form-container {
   padding: 20px;
   margin: 20px auto;
@@ -177,7 +197,8 @@ body {
   border-radius: 10px;
 }
 
-.profile-form-container input {
+.profile-form-container input,
+.profile-form-container select {
   display: block;
   width: 100%;
   padding: 10px;
