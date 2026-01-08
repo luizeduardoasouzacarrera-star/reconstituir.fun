@@ -4,7 +4,7 @@ import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "SUA_API_KEY",
+  apiKey: "AIzaSyCHScM8UbJjH-4aw8gZwClant01Mo0xAkc",
   authDomain: "reconstituir-b35a3.firebaseapp.com",
   projectId: "reconstituir-b35a3",
   storageBucket: "reconstituir-b35a3.firebasestorage.app",
@@ -13,5 +13,6 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+
 export const auth = getAuth(app);
 export const db = getFirestore(app);
