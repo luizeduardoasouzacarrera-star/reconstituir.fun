@@ -6,8 +6,16 @@ const nameInput = document.getElementById("nameInput");
 const bioInput = document.getElementById("bioInput");
 const avatarInput = document.getElementById("avatarInput");
 const bannerInput = document.getElementById("bannerInput");
-const colorInput = document.getElementById("colorInput"); // novo campo para cor
+const colorInput = document.getElementById("colorInput"); // campo de cor
 const publicCheckbox = document.getElementById("publicCheckbox");
+
+// Novas redes sociais
+const robloxInput = document.getElementById("robloxInput");
+const instagramInput = document.getElementById("instagramInput");
+const tiktokInput = document.getElementById("tiktokInput");
+const valorantInput = document.getElementById("valorantInput");
+const steamInput = document.getElementById("steamInput");
+
 const saveBtn = document.getElementById("saveProfile");
 
 auth.onAuthStateChanged(async user => {
@@ -25,8 +33,14 @@ auth.onAuthStateChanged(async user => {
         bioInput.value = data.bio || "";
         avatarInput.value = data.avatarURL || "";
         bannerInput.value = data.bannerURL || "";
-        colorInput.value = data.color || "#5865f2"; // cor padrão
+        colorInput.value = data.color || "#5865f2";
         publicCheckbox.checked = data.public || false;
+
+        robloxInput.value = data.roblox || "";
+        instagramInput.value = data.instagram || "";
+        tiktokInput.value = data.tiktok || "";
+        valorantInput.value = data.valorant || "";
+        steamInput.value = data.steam || "";
     }
 });
 
@@ -35,27 +49,19 @@ saveBtn.addEventListener("click", async () => {
     const user = auth.currentUser;
     if (!user) return;
 
-    const colorValue = colorInput.value || "#5865f2";
-
     await setDoc(doc(db, "profiles", user.uid), {
-        username: user.email.split("@")[0],
         displayName: nameInput.value || user.email.split("@")[0],
         bio: bioInput.value || "",
         avatarURL: avatarInput.value || "",
         bannerURL: bannerInput.value || "",
-        color: colorValue,
-        public: publicCheckbox.checked
+        color: colorInput.value || "#5865f2",
+        public: publicCheckbox.checked,
+        roblox: robloxInput.value || "",
+        instagram: instagramInput.value || "",
+        tiktok: tiktokInput.value || "",
+        valorant: valorantInput.value || "",
+        steam: steamInput.value || ""
     });
-
-    // Atualiza o card imediatamente se já existir
-    const ownCard = document.querySelector(`.profile-card[data-uid="${user.uid}"]`);
-    if (ownCard) {
-        ownCard.style.setProperty("--profile-color", colorValue);
-        ownCard.querySelector(".profile-name").textContent = nameInput.value || user.email.split("@")[0];
-        ownCard.querySelector(".profile-bio").textContent = bioInput.value || "";
-        ownCard.querySelector(".avatar").src = avatarInput.value || "";
-        ownCard.querySelector(".banner").style.backgroundImage = `url(${bannerInput.value || ""})`;
-    }
 
     alert("Perfil salvo!");
 });
