@@ -1,55 +1,63 @@
+// chat.js
 import { auth, db } from "./firebase.js";
-import { signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import {
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-document.addEventListener("DOMContentLoaded", () => {
-  const chatBox = document.getElementById("chat-box");
-  const chatInput = document.getElementById("chat-input");
-  const sendBtn = document.getElementById("sendBtn");
-  const logoutBtn = document.getElementById("logoutBtn");
+import {
+  collection,
+  addDoc,
+  query,
+  orderBy,
+  onSnapshot,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  let currentUser = null;
+const chatDiv = document.getElementById("chat");
+const sendBtn = document.getElementById("sendBtn");
+const messageInput = document.getElementById("message");
+const logoutBtn = document.getElementById("logoutBtn");
 
-  // 🔒 Bloqueio de acesso
-  onAuthStateChanged(auth, user => {
-    if (!user) {
-      window.location.href = "index.html";
-    } else {
-      currentUser = user.email.split("@")[0]; // pega o “nome” do email
-    }
+let username = "";
+
+// 🔒 BLOQUEIO TOTAL SEM LOGIN
+onAuthStateChanged(auth, user => {
+  if (!user) {
+    window.location.replace("index.html"); // NÃO deixa entrar
+  } else {
+    username = user.email.split("@")[0];
+  }
+});
+
+// 📤 ENVIAR MENSAGEM
+sendBtn.addEventListener("click", async () => {
+  const text = messageInput.value.trim();
+  if (!text) return;
+
+  await addDoc(collection(db, "messages"), {
+    user: username,
+    text: text,
+    timestamp: serverTimestamp()
   });
 
-  // Enviar mensagem
-  sendBtn.addEventListener("click", async () => {
-    const text = chatInput.value.trim();
-    if (!text) return;
-    await addDoc(collection(db, "messages"), {
-      user: currentUser,
-      text,
-      timestamp: serverTimestamp()
-    });
-    chatInput.value = "";
-  });
+  messageInput.value = "";
+});
 
-  // Atualizar chat em tempo real
-  const q = query(collection(db, "messages"), orderBy("timestamp"));
-  onSnapshot(q, snapshot => {
-    chatBox.innerHTML = "";
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      const div = document.createElement("div");
-      div.classList.add("msg");
-      if (data.user === currentUser) div.classList.add("me");
-      div.innerText = `${data.user}: ${data.text}`;
-      chatBox.appendChild(div);
-      chatBox.scrollTop = chatBox.scrollHeight;
-    });
+// 📥 RECEBER MENSAGENS EM TEMPO REAL
+const q = query(collection(db, "messages"), orderBy("timestamp"));
+onSnapshot(q, snapshot => {
+  chatDiv.innerHTML = "";
+  snapshot.forEach(doc => {
+    const d = doc.data();
+    chatDiv.innerHTML += `<p><b>${d.user}:</b> ${d.text}</p>`;
   });
+  chatDiv.scrollTop = chatDiv.scrollHeight;
+});
 
-  // Logout
-  logoutBtn.addEventListener("click", () => {
-    signOut(auth).then(() => {
-      window.location.href = "index.html";
-    });
+// 🚪 LOGOUT
+logoutBtn.addEventListener("click", () => {
+  signOut(auth).then(() => {
+    window.location.replace("index.html");
   });
 });
