@@ -1,18 +1,8 @@
-import { auth, db } from "./firebase.js";
+import { db, rtdb } from "./firebase.js";
 import { collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
 const profilesContainer = document.getElementById("profiles");
-
-// Links das logos
-const socialIcons = {
-  roblox: "https://devforum-uploads.s3.dualstack.us-east-2.amazonaws.com/uploads/original/4X/0/e/e/0eeeb19633422b1241f4306419a0f15f39d58de9.png",
-  instagram: "https://elementos.apresto.com.br/wp-content/uploads/2024/05/icon-Instagram-desenho.svg",
-  tiktok: "https://cdn.worldvectorlogo.com/logos/tiktok-icon-2.svg",
-  valorant: "https://www.svgrepo.com/show/424912/valorant-logo-play-2.svg",
-  steam: "https://img.icons8.com/ios11/512/FFFFFF/steam-circled.png",
-  twitter: "https://cdn.freelogovectors.net/wp-content/uploads/2023/07/x-logo-twitter-freelogovectors.net_.png",
-  spotify: "https://upload.wikimedia.org/wikipedia/commons/a/a1/2024_Spotify_logo_without_text_%28black%29.svg"
-};
 
 const profilesQuery = query(collection(db, "profiles"), where("public", "==", true));
 
@@ -26,15 +16,46 @@ onSnapshot(profilesQuery, snapshot => {
         card.classList.add("profile-card");
         card.style.backgroundColor = data.color || "#141428";
 
-        // Status online/offline
-        const statusDiv = document.createElement("div");
-        statusDiv.classList.add("status-indicator");
-        if (data.isOnline) {
-            statusDiv.innerHTML = `<span class="status-bubble online"></span> ONLINE`;
-        } else {
-            statusDiv.innerHTML = `<span class="status-bubble offline"></span> OFFLINE`;
-        }
-        card.appendChild(statusDiv);
+        // ONLINE/OFFLINE
+        const statusIndicator = document.createElement("div");
+        statusIndicator.classList.add("status-indicator");
+        statusIndicator.style.position = "absolute";
+        statusIndicator.style.top = "10px";
+        statusIndicator.style.left = "10px";
+        statusIndicator.style.display = "flex";
+        statusIndicator.style.alignItems = "center";
+        statusIndicator.style.gap = "6px";
+
+        const dot = document.createElement("div");
+        dot.style.width = "10px";
+        dot.style.height = "10px";
+        dot.style.borderRadius = "50%";
+        dot.style.backgroundColor = "red";
+        dot.style.animation = "blink 1s infinite";
+
+        const statusText = document.createElement("span");
+        statusText.textContent = "OFFLINE";
+        statusText.style.color = "red";
+        statusText.style.fontSize = "12px";
+
+        statusIndicator.appendChild(dot);
+        statusIndicator.appendChild(statusText);
+        card.appendChild(statusIndicator);
+
+        // Realtime DB para atualizar status
+        const statusRef = ref(rtdb, "status/" + docSnap.id);
+        onValue(statusRef, snapshot => {
+            const status = snapshot.val();
+            if (status && status.isOnline) {
+                dot.style.backgroundColor = "lime";
+                statusText.textContent = "ONLINE";
+                statusText.style.color = "lime";
+            } else {
+                dot.style.backgroundColor = "red";
+                statusText.textContent = "OFFLINE";
+                statusText.style.color = "red";
+            }
+        });
 
         // Banner
         if (data.bannerURL) {
@@ -64,30 +85,45 @@ onSnapshot(profilesQuery, snapshot => {
             card.appendChild(bioEl);
         }
 
-        // Música
-        if (data.music) {
-            const musicBtn = document.createElement("button");
-            musicBtn.textContent = "▶ Iniciar Música";
-            musicBtn.addEventListener("click", () => {
-                const audio = new Audio(`assets/${data.music}`);
-                audio.play();
-            });
-            card.appendChild(musicBtn);
-        }
-
         // Redes sociais
         const socialDiv = document.createElement("div");
         socialDiv.classList.add("socials");
-        for (const key of Object.keys(socialIcons)) {
+
+        const socialIcons = {
+            roblox: "https://devforum-uploads.s3.dualstack.us-east-2.amazonaws.com/uploads/original/4X/0/e/e/0eeeb19633422b1241f4306419a0f15f39d58de9.png",
+            instagram: "https://elementos.apresto.com.br/wp-content/uploads/2024/05/icon-Instagram-desenho.svg",
+            tiktok: "https://cdn.worldvectorlogo.com/logos/tiktok-icon-2.svg",
+            valorant: "https://www.svgrepo.com/show/424912/valorant-logo-play-2.svg",
+            steam: "https://img.icons8.com/?size=50&id=pOa8st0SGd5C&format=png",
+            twitter: "https://img.freepik.com/free-vector/new-twitter-logo-x-icon-black-background_1017-45427.jpg",
+            spotify: "https://upload.wikimedia.org/wikipedia/commons/a/a1/2024_Spotify_logo_without_text_%28black%29.svg"
+        };
+
+        Object.keys(socialIcons).forEach(key => {
             if (data[key]) {
                 const link = document.createElement("a");
                 link.href = data[key];
                 link.target = "_blank";
-                link.innerHTML = `<img src="${socialIcons[key]}" alt="${key}">`;
+
+                const img = document.createElement("img");
+                img.src = socialIcons[key];
+                img.alt = key;
+                link.appendChild(img);
+
                 socialDiv.appendChild(link);
             }
-        }
+        });
+
         card.appendChild(socialDiv);
+
+        // Música
+        if (data.music) {
+            const audio = document.createElement("audio");
+            audio.src = `assets/${data.music}`;
+            audio.controls = true;
+            audio.style.marginTop = "10px";
+            card.appendChild(audio);
+        }
 
         profilesContainer.appendChild(card);
     });
