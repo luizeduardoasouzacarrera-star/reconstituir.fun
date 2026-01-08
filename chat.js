@@ -11,7 +11,9 @@ import {
   query,
   orderBy,
   onSnapshot,
-  serverTimestamp
+  serverTimestamp,
+  deleteDoc,
+  doc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const chatDiv = document.getElementById("chat");
@@ -24,7 +26,7 @@ let username = "";
 // 🔒 BLOQUEIO TOTAL SEM LOGIN
 onAuthStateChanged(auth, user => {
   if (!user) {
-    window.location.replace("index.html"); // NÃO deixa entrar
+    window.location.replace("index.html");
   } else {
     username = user.email.split("@")[0];
   }
@@ -46,18 +48,9 @@ sendBtn.addEventListener("click", async () => {
 
 // 📥 RECEBER MENSAGENS EM TEMPO REAL
 const q = query(collection(db, "messages"), orderBy("timestamp"));
+
 onSnapshot(q, snapshot => {
   chatDiv.innerHTML = "";
-  snapshot.forEach(doc => {
-    const d = doc.data();
-    chatDiv.innerHTML += `<p><b>${d.user}:</b> ${d.text}</p>`;
-  });
-  chatDiv.scrollTop = chatDiv.scrollHeight;
-});
 
-// 🚪 LOGOUT
-logoutBtn.addEventListener("click", () => {
-  signOut(auth).then(() => {
-    window.location.replace("index.html");
-  });
-});
+  snapshot.forEach(docc => {
+    const d = docc.data();
