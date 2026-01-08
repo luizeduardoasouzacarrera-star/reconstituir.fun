@@ -1,7 +1,7 @@
 import { auth, db } from "./firebase.js";
 import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// Pega elementos do HTML
+// Elementos do HTML
 const nameInput = document.getElementById("nameInput");
 const bioInput = document.getElementById("bioInput");
 const avatarInput = document.getElementById("avatarInput");
@@ -9,16 +9,17 @@ const bannerInput = document.getElementById("bannerInput");
 const publicCheckbox = document.getElementById("publicCheckbox");
 const saveBtn = document.getElementById("saveProfile");
 
-// Checa se usuário está logado
+// Checa login do usuário
 auth.onAuthStateChanged(async user => {
   if (!user) {
-    window.location.href = "index.html"; // se não logado, volta pro login
+    window.location.href = "index.html";
     return;
   }
 
   const profileRef = doc(db, "profiles", user.uid);
   const profileSnap = await getDoc(profileRef);
 
+  // Se já existe perfil, preenche os campos
   if (profileSnap.exists()) {
     const data = profileSnap.data();
     nameInput.value = data.displayName || "";
