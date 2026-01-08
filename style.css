@@ -124,3 +124,34 @@ body {
 #logoutBtn:hover {
   background: #c0392b;
 }
+
+/* ===== ÁREA DE PERFIS ===== */
+.profiles-section {
+  padding: 40px;
+}
+
+.profiles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 25px;
+}
+
+/* CARD PERFIL */
+.profile-card {
+  background: #141428;
+  border-radius: 10px;
+  padding: 25px;
+  min-height: 140px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+
+.profile-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.55);
+}
+
+.profile-card strong {
+  color: #4da6ff;
+  font-size: 16px;
+}
