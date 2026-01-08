@@ -1,3 +1,4 @@
+// profiles.js
 import { db } from "./firebase.js";
 import { collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -47,39 +48,48 @@ onSnapshot(profilesQuery, snapshot => {
         const socialDiv = document.createElement("div");
         socialDiv.classList.add("socials");
 
+        // Roblox (usar ícone genérico)
         if (data.roblox) {
             const link = document.createElement("a");
             link.href = data.roblox;
             link.target = "_blank";
-            link.innerHTML = '<img src="icons/roblox.svg" alt="Roblox">';
+            link.innerHTML = '<i class="fa-brands fa-roblox"></i>';
             socialDiv.appendChild(link);
         }
+
+        // Instagram
         if (data.instagram) {
             const link = document.createElement("a");
             link.href = data.instagram;
             link.target = "_blank";
-            link.innerHTML = '<img src="icons/instagram.svg" alt="Instagram">';
+            link.innerHTML = '<i class="fa-brands fa-instagram"></i>';
             socialDiv.appendChild(link);
         }
+
+        // TikTok
         if (data.tiktok) {
             const link = document.createElement("a");
             link.href = data.tiktok;
             link.target = "_blank";
-            link.innerHTML = '<img src="icons/tiktok.svg" alt="TikTok">';
+            link.innerHTML = '<i class="fa-brands fa-tiktok"></i>';
             socialDiv.appendChild(link);
         }
+
+        // Valorant (usar ícone genérico de crosshairs)
         if (data.valorant) {
             const link = document.createElement("a");
             link.href = data.valorant;
             link.target = "_blank";
-            link.innerHTML = '<img src="icons/valorant.svg" alt="Valorant">';
+            link.innerHTML = '<i class="fa-solid fa-crosshairs"></i>';
             socialDiv.appendChild(link);
         }
+
+        // Steam
         if (data.steam) {
             const link = document.createElement("a");
             link.href = data.steam;
             link.target = "_blank";
-            link.innerHTML = '<img src="icons/steam.svg" alt="Steam">';
+            link.innerHTML = '<i class="fa-brands fa-steam"></i>';
             socialDiv.appendChild(link);
         }
 
