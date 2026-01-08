@@ -1,30 +1,20 @@
-import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 
-    "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { db, auth } from "./firebase.js";
+// profiles.js
+import { db } from "./firebase.js";
+import { collection, onSnapshot } from
+  "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-export async function loadUserProfile(user) {
-    const ref = doc(db, "profiles", user.uid);
-    const snap = await getDoc(ref);
+const profiles = document.getElementById("profiles");
 
-    if (!snap.exists()) {
-        await setDoc(ref, {
-            username: user.email.split("@")[0],
-            displayName: user.email.split("@")[0],
-            bio: "",
-            avatarURL: "",
-            bannerURL: "",
-            createdAt: serverTimestamp()
-        });
-    }
+onSnapshot(collection(db, "profiles"), snapshot => {
+  profiles.innerHTML = "";
 
-    const updatedSnap = await getDoc(ref);
-    return updatedSnap.data();
-}
+  snapshot.forEach(doc => {
+    const data = doc.data();
 
-export async function updateProfile(data) {
-    const user = auth.currentUser;
-    if (!user) return;
-
-    const ref = doc(db, "profiles", user.uid);
-    await updateDoc(ref, data);
-}
+    profiles.innerHTML += `
+      <div class="profile-card">
+        <strong>${data.username}</strong>
+      </div>
+    `;
+  });
+});
