@@ -9,7 +9,7 @@ const socialIcons = {
   instagram: "https://elementos.apresto.com.br/wp-content/uploads/2024/05/icon-Instagram-desenho.svg",
   tiktok: "https://cdn.worldvectorlogo.com/logos/tiktok-icon-2.svg",
   valorant: "https://www.svgrepo.com/show/424912/valorant-logo-play-2.svg",
-  steam: "https://img.icons8.com/?size=50&id=pOa8st0SGd5w&format=png",
+  steam: "https://img.icons8.com/ios11/512/FFFFFF/steam-circled.png",
   twitter: "https://img.freepik.com/free-vector/new-twitter-logo-x-icon-black-background_1017-45427.jpg",
   spotify: "https://upload.wikimedia.org/wikipedia/commons/a/a1/2024_Spotify_logo_without_text_%28black%29.svg"
 };
