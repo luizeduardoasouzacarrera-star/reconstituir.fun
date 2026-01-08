@@ -1,11 +1,16 @@
+// script.js
 import { auth } from "./firebase.js";
 import { signInWithEmailAndPassword } from
   "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-document.getElementById("loginBtn").addEventListener("click", () => {
+const loginBtn = document.getElementById("loginBtn");
+const msg = document.getElementById("msg");
+
+loginBtn.addEventListener("click", async () => {
+  console.log("CLIQUEI EM ENTRAR");
+
   const username = document.getElementById("username").value.trim();
   const password = document.getElementById("password").value;
-  const msg = document.getElementById("msg");
 
   if (!username || !password) {
     msg.innerText = "Preencha tudo";
@@ -14,11 +19,11 @@ document.getElementById("loginBtn").addEventListener("click", () => {
 
   const emailFake = `${username.toLowerCase()}@reconstituir.fun`;
 
-  signInWithEmailAndPassword(auth, emailFake, password)
-    .then(() => {
-      window.location.href = "dashboard.html";
-    })
-    .catch(() => {
-      msg.innerText = "Nome ou senha inválidos";
-    });
+  try {
+    await signInWithEmailAndPassword(auth, emailFake, password);
+    window.location.href = "dashboard.html";
+  } catch (err) {
+    console.error(err);
+    msg.innerText = "Nome ou senha inválidos";
+  }
 });
