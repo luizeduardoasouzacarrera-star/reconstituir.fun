@@ -43,6 +43,5 @@ saveBtn.addEventListener("click", async () => {
     bannerURL: bannerInput.value || "",
     public: publicCheckbox.checked
   });
-
   alert("Perfil salvo!");
 });
