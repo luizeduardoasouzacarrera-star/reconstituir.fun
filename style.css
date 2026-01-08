@@ -51,7 +51,29 @@ body {
   border: none;
   outline: none;
 }
+/* INPUTS */
+.header input {
+  width: 170px;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+}
 
+/* BOTÃO LOGIN */
+.header button {
+  padding: 10px 24px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  background: #5865f2;
+  color: white;
+  font-weight: bold;
+}
+
+.header button:hover {
+  background: #4752c4;
+}
 /* BOTÕES */
 #sendBtn,
 #logoutBtn {
