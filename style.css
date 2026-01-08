@@ -5,14 +5,14 @@
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* ===== FUNDO GERAL (ANTIGO / LIMPO) ===== */
+/* ===== FUNDO GERAL ===== */
 body {
   background: linear-gradient(135deg, #1e1e2f, #2b2b45);
   color: #fff;
   min-height: 100vh;
 }
 
-/* ===== HEADER (FUNDO SÓ AQUI) ===== */
+/* ===== HEADER (LOGIN) ===== */
 .header {
   width: 100%;
   padding: 25px 40px;
@@ -20,12 +20,10 @@ body {
   align-items: center;
   gap: 15px;
 
-  /* FUNDO ESCURO APENAS NO TOPO */
   background: linear-gradient(135deg, #141428, #1f1f3a);
   box-shadow: 0 4px 20px rgba(0,0,0,0.4);
 }
 
-/* TÍTULO */
 .header h2 {
   margin-right: 20px;
 }
@@ -39,7 +37,7 @@ body {
   outline: none;
 }
 
-/* BOTÕES */
+/* BOTÃO LOGIN */
 .header button {
   padding: 10px 24px;
   border-radius: 8px;
@@ -59,77 +57,30 @@ body {
   color: #ff6b6b;
 }
 
-/* ===== CHAT ===== */
-.chat-container {
-  padding: 40px;
-}
-
-#chat {
-  background: #141422;
-  border-radius: 10px;
-  padding: 15px;
-  height: 300px;
-  overflow-y: auto;
-  margin-bottom: 10px;
-}
-
-#chat p {
-  margin-bottom: 8px;
-}
-
-#chat b {
-  color: #4da6ff;
-}
-
-.chat-container input {
-  width: calc(100% - 110px);
-  padding: 12px;
-  border-radius: 8px;
-  border: none;
-  outline: none;
-}
-
-.chat-container button {
-  padding: 12px 20px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  background: #5865f2;
-  color: white;
-  font-weight: bold;
-}
-
-#logoutBtn {
-  background: #e74c3c;
-}
-
-#logoutBtn:hover {
-  background: #c0392b;
-}
-/* ===== PERFIS (ABAIXO DO LOGIN) ===== */
+/* ===== ÁREA DE PERFIS ===== */
 .profiles-section {
   padding: 40px;
 }
 
 .profiles-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 25px;
 }
 
-/* CARD DE PERFIL (MESMO ESTILO DO CHAT) */
+/* CARD PERFIL */
 .profile-card {
-  background: #141422;
+  background: #141428;
   border-radius: 10px;
-  padding: 20px;
-  text-align: center;
+  padding: 25px;
+  min-height: 140px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.35);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  transition: transform .25s ease, box-shadow .25s ease;
 }
 
 .profile-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  transform: translateY(-6px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.55);
 }
 
 .profile-card strong {
