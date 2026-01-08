@@ -12,51 +12,40 @@ import {
   query,
   orderBy,
   onSnapshot,
-  serverTimestamp,
-  deleteDoc,
-  doc
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// ELEMENTOS
 const chatDiv = document.getElementById("chat");
 const sendBtn = document.getElementById("sendBtn");
 const messageInput = document.getElementById("message");
 const logoutBtn = document.getElementById("logoutBtn");
 
 let username = "";
-let isLuiz = false;
 
-// ===== LOGIN CHECK =====
+// 🔒 BLOQUEIO SEM LOGIN
 onAuthStateChanged(auth, user => {
   if (!user) {
     window.location.replace("index.html");
-    return;
+  } else {
+    username = user.email.split("@")[0];
   }
-
-  username = user.email.split("@")[0];
-  isLuiz = username === "luiz";
 });
 
-// ===== ENVIAR =====
-sendBtn.addEventListener("click", sendMessage);
-messageInput.addEventListener("keypress", e => {
-  if (e.key === "Enter") sendMessage();
-});
-
-async function sendMessage() {
+// 📤 ENVIAR MENSAGEM
+sendBtn.addEventListener("click", async () => {
   const text = messageInput.value.trim();
   if (!text) return;
 
   await addDoc(collection(db, "messages"), {
     user: username,
-    text,
+    text: text,
     timestamp: serverTimestamp()
   });
 
   messageInput.value = "";
-}
+});
 
-// ===== LISTENER =====
+// 📥 RECEBER MENSAGENS
 const q = query(
   collection(db, "messages"),
   orderBy("timestamp", "asc")
@@ -65,36 +54,15 @@ const q = query(
 onSnapshot(q, snapshot => {
   chatDiv.innerHTML = "";
 
-  snapshot.forEach(d => {
-    const data = d.data();
-    const id = d.id;
-
-    const time = data.timestamp
-      ? new Date(data.timestamp.seconds * 1000).toLocaleTimeString("pt-BR", {
-          hour: "2-digit",
-          minute: "2-digit"
-        })
-      : "";
-
-    const crown = data.user === "luiz" ? " 👑" : "";
-
-    const p = document.createElement("p");
-    p.innerHTML = `<b>${data.user}${crown}</b> (${time}): ${data.text}`;
-
-    // botão invisível visualmente (não quebra layout)
-    if (isLuiz) {
-      p.addEventListener("dblclick", async () => {
-        await deleteDoc(doc(db, "messages", id));
-      });
-    }
-
-    chatDiv.appendChild(p);
+  snapshot.forEach(doc => {
+    const d = doc.data();
+    chatDiv.innerHTML += `<p><b>${d.user}:</b> ${d.text}</p>`;
   });
 
   chatDiv.scrollTop = chatDiv.scrollHeight;
 });
 
-// ===== LOGOUT =====
+// 🚪 LOGOUT
 logoutBtn.addEventListener("click", () => {
   signOut(auth).then(() => {
     window.location.replace("index.html");
