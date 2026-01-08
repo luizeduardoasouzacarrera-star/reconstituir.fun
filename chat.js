@@ -54,3 +54,31 @@ onSnapshot(q, snapshot => {
 
   snapshot.forEach(docc => {
     const d = docc.data();
+
+    // ⏰ FORMATAR HORÁRIO
+    let hora = "";
+    if (d.timestamp && d.timestamp.toDate) {
+      hora = d.timestamp.toDate().toLocaleTimeString("pt-BR", {
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    }
+
+    // 🗑️ BOTÃO APAGAR (SÓ PARA LUIZ)
+    let deleteBtn = "";
+    if (username === "luiz") {
+      deleteBtn = `<button data-id="${docc.id}">Apagar</button>`;
+    }
+
+    chatDiv.innerHTML +=
+      `<p>
+        <b>${d.user}</b> [${hora}]: ${d.text}
+        ${deleteBtn}
+      </p>`;
+  });
+
+  chatDiv.scrollTop = chatDiv.scrollHeight;
+
+  // 🗑️ EVENTO APAGAR
+  const buttons = document.querySelectorAll("button[data-id]");
+  buttons.forEach(btn =
