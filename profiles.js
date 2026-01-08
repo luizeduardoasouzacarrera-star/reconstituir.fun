@@ -10,7 +10,6 @@ onSnapshot(collection(db, "profiles"), snapshot => {
 
   snapshot.forEach(doc => {
     const data = doc.data();
-    
     profiles.innerHTML += `
       <div class="profile-card">
         <strong>${data.username}</strong>
