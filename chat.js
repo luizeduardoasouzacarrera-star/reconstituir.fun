@@ -10,7 +10,9 @@ import {
   query,
   orderBy,
   onSnapshot,
-  serverTimestamp
+  serverTimestamp,
+  deleteDoc,
+  doc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const chatDiv = document.getElementById("chat");
@@ -20,7 +22,7 @@ const logoutBtn = document.getElementById("logoutBtn");
 
 let username = "";
 
-// 🔒 PROTEÇÃO
+// 🔒 PROTEÇÃO DE LOGIN
 onAuthStateChanged(auth, user => {
   if (!user) {
     window.location.replace("index.html");
@@ -29,7 +31,7 @@ onAuthStateChanged(auth, user => {
   }
 });
 
-// 📤 ENVIAR
+// 📤 ENVIAR MENSAGEM
 sendBtn.addEventListener("click", async () => {
   const text = messageInput.value.trim();
   if (!text) return;
@@ -43,19 +45,21 @@ sendBtn.addEventListener("click", async () => {
   messageInput.value = "";
 });
 
-// 📥 RECEBER
+// 📥 RECEBER MENSAGENS
 const q = query(collection(db, "messages"), orderBy("timestamp"));
 onSnapshot(q, snapshot => {
   chatDiv.innerHTML = "";
 
-  snapshot.forEach(doc => {
-    const d = doc.data();
+  snapshot.forEach(docSnap => {
+    const d = docSnap.data();
+    const id = docSnap.id;
 
-    let displayName = d.user;
-    if (d.user === "luiz") {
-      displayName = "👑 " + d.user;
-    }
+    // 👑 LÍDER
+    let displayName = d.user === "luiz"
+      ? "👑 " + d.user
+      : d.user;
 
+    // ⏰ HORÁRIO
     let time = "";
     if (d.timestamp) {
       time = new Date(d.timestamp.seconds * 1000)
@@ -65,16 +69,48 @@ onSnapshot(q, snapshot => {
         });
     }
 
+    // 🗑 BOTÃO APAGAR (SÓ PARA LUIZ)
+    let deleteBtn = "";
+    if (username === "luiz") {
+      deleteBtn = `
+        <button
+          data-id="${id}"
+          style="
+            margin-left:8px;
+            background:none;
+            border:none;
+            color:#ff6b6b;
+            cursor:pointer;
+            font-size:12px;
+          "
+        >
+          apagar
+        </button>
+      `;
+    }
+
     chatDiv.innerHTML += `
       <p>
         <b>${displayName}</b>
         <span style="color:gray;font-size:12px">(${time})</span>:
         ${d.text}
+        ${deleteBtn}
       </p>
     `;
   });
 
   chatDiv.scrollTop = chatDiv.scrollHeight;
+});
+
+// 🗑 EVENTO DE APAGAR (DELEGAÇÃO)
+chatDiv.addEventListener("click", async (e) => {
+  if (e.target.tagName === "BUTTON" && e.target.dataset.id) {
+    const id = e.target.dataset.id;
+
+    if (username === "luiz") {
+      await deleteDoc(doc(db, "messages", id));
+    }
+  }
 });
 
 // 🚪 LOGOUT
