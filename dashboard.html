@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <title>Dashboard</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Font Awesome para ícones sociais -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
+    <!-- ===== CHAT ===== -->
     <div class="chat-container">
         <h2>Chat privado</h2>
         <div id="chat"></div>
@@ -14,30 +17,26 @@
         <button id="logoutBtn">Sair</button>
     </div>
 
-    <!-- FORMULÁRIO DE PERFIL ABAIXO DO CHAT -->
+    <!-- ===== FORMULÁRIO DE PERFIL ===== -->
     <div class="profile-form-container">
         <h2>Seu Perfil</h2>
         <input id="nameInput" placeholder="Nome de exibição">
         <input id="bioInput" placeholder="Bio">
         <input id="avatarInput" placeholder="URL do Avatar">
         <input id="bannerInput" placeholder="URL do Banner">
-        <input id="colorInput" type="color" value="#5865f2">
-        <label>
-            <input type="checkbox" id="publicCheckbox">
-            Tornar público
-        </label>
-
-        <h3>Redes sociais</h3>
+        <input id="colorInput" type="color" value="#141428">
         <input id="robloxInput" placeholder="Link Roblox">
         <input id="instagramInput" placeholder="Link Instagram">
         <input id="tiktokInput" placeholder="Link TikTok">
         <input id="valorantInput" placeholder="Link Valorant">
         <input id="steamInput" placeholder="Link Steam">
-
+        <label>
+            <input type="checkbox" id="publicCheckbox"> Tornar público
+        </label>
         <button id="saveProfile">Salvar Perfil</button>
     </div>
 
-    <!-- AREA DE PERFIS PÚBLICOS -->
+    <!-- ===== PERFIS PÚBLICOS ===== -->
     <div class="profiles-section">
         <h2>Perfis Públicos</h2>
         <div id="profiles" class="profiles-grid"></div>
