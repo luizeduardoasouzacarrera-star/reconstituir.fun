@@ -1,115 +1,78 @@
-// profile.js
 import { db, auth } from "./firebase.js";
-import {
-  doc,
-  getDoc,
-  setDoc,
-  updateDoc,
-  collection,
-  onSnapshot
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { collection, getDocs, doc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // ===== ELEMENTOS =====
-const profilesContainer = document.querySelector(".profiles-section");
-const profilesGrid = document.querySelector(".profiles-grid");
+const profilesGrid = document.getElementById("profilesGrid");
+const profileForm = document.getElementById("profileForm");
+const displayNameInput = document.getElementById("displayName");
+const bioInput = document.getElementById("bio");
+const avatarInput = document.getElementById("avatarURL");
+const bannerInput = document.getElementById("bannerURL");
+const colorInput = document.getElementById("color");
 
-// ===== FUNÇÃO PARA CRIAR CARD =====
-function createProfileCard(profileData, userId) {
-  const card = document.createElement("div");
-  card.classList.add("profile-card");
+// ===== FUNÇÃO PARA CARREGAR TODOS OS PROFILES =====
+export async function loadProfiles() {
+  profilesGrid.innerHTML = ""; // limpa antes
+  const querySnapshot = await getDocs(collection(db, "profiles"));
 
-  // Banner
-  const banner = document.createElement("div");
-  banner.classList.add("banner");
-  banner.style.backgroundImage = `url(${profileData.bannerURL || ""})`;
-  card.appendChild(banner);
+  querySnapshot.forEach((doc) => {
+    const data = doc.data();
 
-  // Barra de cor
-  const colorBar = document.createElement("div");
-  colorBar.classList.add("color-bar");
-  colorBar.style.height = "6px";
-  colorBar.style.width = "100%";
-  colorBar.style.background = profileData.color || "#5865f2";
-  colorBar.style.marginTop = "-6px";
-  card.appendChild(colorBar);
+    const card = document.createElement("div");
+    card.classList.add("profile-card");
 
-  // Avatar
-  const avatar = document.createElement("img");
-  avatar.classList.add("avatar");
-  avatar.src = profileData.avatarURL || "https://whitescreen.dev/images/pro/black-screen_39.png";
-  card.appendChild(avatar);
+    // Banner
+    const banner = document.createElement("div");
+    banner.classList.add("banner");
+    banner.style.backgroundImage = `url(${data.bannerURL || "default-banner.png"})`;
+    card.appendChild(banner);
 
-  // Conteúdo
-  const content = document.createElement("div");
-  content.classList.add("content");
+    // Barra de cor
+    const colorBar = document.createElement("div");
+    colorBar.classList.add("color-bar");
+    colorBar.style.background = data.color || "#5865f2";
+    card.appendChild(colorBar);
 
-  const name = document.createElement("strong");
-  name.textContent = profileData.displayName || profileData.username || "Usuário sem nome";
-  content.appendChild(name);
+    // Avatar
+    const avatar = document.createElement("img");
+    avatar.classList.add("avatar");
+    avatar.src = data.avatarURL || "default-avatar.png";
+    card.appendChild(avatar);
 
-  if (profileData.bio) {
+    // Nome
+    const name = document.createElement("strong");
+    name.textContent = data.displayName || "Usuário sem nome";
+    card.appendChild(name);
+
+    // Bio
     const bio = document.createElement("p");
-    bio.textContent = profileData.bio;
-    content.appendChild(bio);
-  }
+    bio.textContent = data.bio || "";
+    card.appendChild(bio);
 
-  card.appendChild(content);
-
-  // Input para mudar cor (apenas se for o dono do profile)
-  if (auth.currentUser && auth.currentUser.uid === userId) {
-    const colorPicker = document.createElement("input");
-    colorPicker.type = "color";
-    colorPicker.value = profileData.color || "#5865f2";
-    colorPicker.classList.add("color-picker");
-    colorPicker.style.marginTop = "10px";
-    content.appendChild(colorPicker);
-
-    colorPicker.addEventListener("input", async (e) => {
-      const newColor = e.target.value;
-      colorBar.style.background = newColor;
-      await updateDoc(doc(db, "profiles", userId), { color: newColor });
-    });
-  }
-
-  return card;
-}
-
-// ===== CARREGAR TODOS OS PROFILES =====
-export function loadAllProfiles() {
-  const profilesRef = collection(db, "profiles");
-
-  onSnapshot(profilesRef, (snapshot) => {
-    profilesGrid.innerHTML = ""; // limpa grid
-    snapshot.forEach((docSnap) => {
-      const data = docSnap.data();
-      const userId = docSnap.id;
-      const card = createProfileCard(data, userId);
-      profilesGrid.appendChild(card);
-    });
+    profilesGrid.appendChild(card);
   });
 }
 
-// ===== CRIAR/ATUALIZAR PROFILE DO USUÁRIO =====
-export async function createOrUpdateUserProfile(user, profileData) {
+// ===== FUNÇÃO PARA CRIAR OU ATUALIZAR PERFIL DO USUÁRIO =====
+profileForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const user = auth.currentUser;
+  if (!user) return alert("Faça login primeiro!");
+
   const profileRef = doc(db, "profiles", user.uid);
 
-  const snap = await getDoc(profileRef);
-  if (!snap.exists()) {
-    await setDoc(profileRef, {
-      username: user.email.split("@")[0],
-      displayName: profileData.displayName || "",
-      avatarURL: profileData.avatarURL || "",
-      bannerURL: profileData.bannerURL || "",
-      bio: profileData.bio || "",
-      color: profileData.color || "#5865f2",
-    });
-  } else {
-    await updateDoc(profileRef, {
-      displayName: profileData.displayName || snap.data().displayName,
-      avatarURL: profileData.avatarURL || snap.data().avatarURL,
-      bannerURL: profileData.bannerURL || snap.data().bannerURL,
-      bio: profileData.bio || snap.data().bio,
-      color: profileData.color || snap.data().color,
-    });
-  }
-}
+  await setDoc(profileRef, {
+    displayName: displayNameInput.value || "Usuário sem nome",
+    bio: bioInput.value || "",
+    avatarURL: avatarInput.value || "default-avatar.png",
+    bannerURL: bannerInput.value || "default-banner.png",
+    color: colorInput.value || "#5865f2"
+  });
+
+  profileForm.reset();
+  loadProfiles(); // atualiza os cards após criar/editar
+});
+
+// ===== CHAMAR FUNÇÃO DE CARREGAMENTO =====
+loadProfiles();
