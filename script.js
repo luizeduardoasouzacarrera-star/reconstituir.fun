@@ -16,8 +16,16 @@ const profilesDiv = document.getElementById("profiles");
 
 // ===== LOGIN =====
 loginBtn.addEventListener("click", async () => {
-  const email = usernameInput.value;
+  const name = usernameInput.value.trim();
   const password = passwordInput.value;
+
+  if (!name || !password) {
+    msgSpan.textContent = "Preencha nome e senha!";
+    return;
+  }
+
+  // 🔹 converte o nome em email para Firebase
+  const email = `${name.toLowerCase()}@example.com`;
 
   try {
     await signInWithEmailAndPassword(auth, email, password);
@@ -29,12 +37,10 @@ loginBtn.addEventListener("click", async () => {
 // ===== LOGOUT E AUTENTICAÇÃO =====
 onAuthStateChanged(auth, async user => {
   if (!user) {
-    // não logado
     profilesDiv.innerHTML = "";
     return;
   }
 
-  // Carregar profile do usuário atual
   const profile = await loadUserProfile(user);
 
   if (!profile) {
@@ -69,12 +75,10 @@ function displayProfiles(profiles, currentUid) {
     card.appendChild(name);
     card.appendChild(bio);
 
-    // Se for o próprio profile, permitir editar
     if (p.id === currentUid) {
       const editBtn = document.createElement("button");
       editBtn.textContent = "Editar";
       editBtn.onclick = () => {
-        // redireciona para página de edição de profile
         window.location.href = "perfil.html";
       };
       card.appendChild(editBtn);
