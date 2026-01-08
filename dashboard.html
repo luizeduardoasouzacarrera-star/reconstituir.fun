@@ -19,13 +19,14 @@
 
   const logoutBtn = document.getElementById("logoutBtn");
 
-  // Se não estiver logado, redireciona para login
+  // 🔒 Se não estiver logado, volta para login
   onAuthStateChanged(auth, user => {
     if (!user) {
       window.location.href = "index.html";
     }
   });
 
+  // Logout
   logoutBtn.addEventListener("click", () => {
     signOut(auth).then(() => {
       window.location.href = "index.html";
