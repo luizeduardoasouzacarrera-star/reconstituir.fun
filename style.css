@@ -228,7 +228,6 @@ body {
     color: white;
     cursor: pointer;
 }
-
 /* RESPONSIVO */
 @media (max-width: 400px) {
   .profile-card {
