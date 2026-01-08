@@ -3,26 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <title>Login</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- 🔹 TOPO: LOGIN -->
+<!-- LOGIN EM CIMA -->
 <div id="login-area">
   <h2>Login</h2>
 
   <input id="username" placeholder="Nome">
-  <input id="password" type="password" placeholder="Senha">
+  <input id="password" type="password" placeholder="Senha"><br>
 
   <button id="loginBtn" type="button">Entrar</button>
   <p id="msg"></p>
 </div>
 
-<!-- 🔹 ABAIXO: PERFIS -->
-<div id="profiles" style="display:grid;grid-template-columns:repeat(auto-fill,200px);gap:20px;"></div>
+<!-- PERFIS EMBAIXO -->
+<div id="profiles"></div>
 
-<!-- SCRIPTS -->
 <script type="module" src="script.js"></script>
 <script type="module" src="profiles.js"></script>
-
 </body>
 </html>
