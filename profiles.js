@@ -13,7 +13,7 @@ const socialIcons = {
   valorant: "https://www.svgrepo.com/show/424912/valorant-logo-play-2.svg",
   steam: "https://img.icons8.com/?size=50&id=pOa8st0SGd5C&format=png",
   spotify: "https://upload.wikimedia.org/wikipedia/commons/a/a1/2024_Spotify_logo_without_text_%28black%29.svg",
-  twitter: "https://cdn.freelogovectors.net/wp-content/uploads/2023/07/x-logo-twitter-freelogovectors.net_.png"
+  twitter: "https://i.pinimg.com/736x/69/a6/2a/69a62a5edc08d755dd8a4ef017e14c63.jpg"
 };
 
 onSnapshot(profilesQuery, snapshot => {
