@@ -1,4 +1,3 @@
-/* ===== RESET ===== */
 * {
   margin: 0;
   padding: 0;
@@ -11,6 +10,46 @@ body {
   background: linear-gradient(135deg, #1e1e2f, #2b2b45);
   color: #fff;
   min-height: 100vh;
+}
+
+/* ===== CHAT ===== */
+.chat-container {
+  padding: 40px;
+  max-width: 900px;
+  margin: auto;
+}
+
+.chat-container h2 {
+  margin-bottom: 15px;
+}
+
+#chat {
+  background: #141422;
+  border-radius: 10px;
+  padding: 15px;
+  height: 300px;
+  overflow-y: auto;
+  margin-bottom: 12px;
+}
+
+/* MENSAGEM */
+#chat p {
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+/* NOME */
+#chat b {
+  color: #4da6ff;
+}
+
+/* INPUT */
+#message {
+  width: calc(100% - 200px);
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
 }
 
 /* ===== HEADER (LOGIN) ===== */
@@ -50,45 +89,7 @@ body {
   background: #4752c4;
 }
 
-/* ===== CHAT ===== */
-.chat-container {
-  padding: 40px;
-  max-width: 900px;
-  margin: auto;
-}
-
-.chat-container h2 {
-  margin-bottom: 15px;
-}
-
-#chat {
-  background: #141422;
-  border-radius: 10px;
-  padding: 15px;
-  height: 300px;
-  overflow-y: auto;
-  margin-bottom: 12px;
-}
-
-#chat p {
-  margin-bottom: 8px;
-  line-height: 1.4;
-}
-
-#chat b {
-  color: #4da6ff;
-}
-
-#message {
-  width: calc(100% - 200px);
-  padding: 12px;
-  border-radius: 8px;
-  border: none;
-  outline: none;
-}
-
-#sendBtn,
-#logoutBtn {
+#sendBtn, #logoutBtn {
   padding: 12px 20px;
   border-radius: 8px;
   border: none;
@@ -115,64 +116,25 @@ body {
   background: #c0392b;
 }
 
-/* ===== FORMULÁRIO DE PERFIL ===== */
-.profile-form-container {
-  padding: 20px;
-  margin: 20px auto;
-  max-width: 600px;
-  background: #141428;
-  border-radius: 10px;
-}
-
-.profile-form-container h2,
-.profile-form-container h3 {
-  margin-bottom: 10px;
-}
-
-.profile-form-container input {
-  display: block;
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 10px;
-  border-radius: 6px;
-  border: none;
-  outline: none;
-}
-
-.profile-form-container button {
-  padding: 10px 20px;
-  border-radius: 6px;
-  border: none;
-  background: #5865f2;
-  color: white;
-  cursor: pointer;
-}
-
-/* ===== ÁREA DE PERFIS ===== */
+/* ===== PERFIS ===== */
 .profiles-section {
   padding: 40px;
 }
 
-.profiles-section h2 {
-  margin-bottom: 20px;
-}
-
 .profiles-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 25px;
 }
 
-/* ===== CARDS DE PROFILE ===== */
+/* CARD PERFIL */
 .profile-card {
   background: #141428;
-  border-radius: 10px;
+  border-radius: 15px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  min-height: 320px;
-  padding: 15px;
+  min-height: 300px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.35);
   transition: transform .25s ease, box-shadow .25s ease;
   position: relative;
@@ -188,46 +150,51 @@ body {
   height: 100px;
   background-size: cover;
   background-position: center;
-  border-radius: 10px 10px 0 0;
-  margin-bottom: 10px;
 }
 
 .profile-card .avatar {
-  width: 70px;
-  height: 70px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
-  margin-top: -35px;
+  margin: -40px 0 10px 15px;
   border: 3px solid #fff;
-  margin-bottom: 10px;
 }
 
-.profile-card strong {
-  color: #fff;
+.profile-card .profile-info {
+  padding: 10px 15px;
+  flex: 1;
+}
+
+.profile-card .profile-info strong {
+  color: #4da6ff;
   font-size: 18px;
-  margin-bottom: 5px;
 }
 
-.profile-card p {
-  color: #ccc;
+.profile-card .profile-info p {
+  margin: 5px 0;
   font-size: 14px;
-  text-align: center;
-  margin: 0 10px 10px 10px;
+  color: #ccc;
 }
 
-.profile-card .socials {
+/* COR PERSONALIZADA */
+.profile-card .color-bar {
+  height: 5px;
+  width: 100%;
+}
+
+/* REDES SOCIAIS */
+.profile-card .social-icons {
   display: flex;
-  gap: 8px;
-  margin-top: auto;
+  gap: 10px;
+  padding: 10px 15px;
 }
 
-.profile-card .socials a img {
-  width: 24px;
-  height: 24px;
-  cursor: pointer;
-  filter: brightness(0) invert(1);
-  transition: transform 0.2s;
+.profile-card .social-icons a {
+  color: #fff;
+  font-size: 20px;
+  transition: color 0.2s ease;
 }
 
-.profile-card .socials a img:hover {
-  transform: scale(1.2);
+.profile-card .social-icons a:hover {
+  color: #4da6ff;
 }
