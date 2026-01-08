@@ -1,30 +1,26 @@
-import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 
-    "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { db, auth } from "./firebase.js";
+// script.js
+import { auth } from "./firebase.js";
+import { signInWithEmailAndPassword } from
+  "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-export async function loadUserProfile(user) {
-    const ref = doc(db, "profiles", user.uid);
-    const snap = await getDoc(ref);
+const loginBtn = document.getElementById("loginBtn");
+const msg = document.getElementById("msg");
 
-    if (!snap.exists()) {
-        await setDoc(ref, {
-            username: user.email.split("@")[0],
-            displayName: user.email.split("@")[0],
-            bio: "",
-            avatarURL: "",
-            bannerURL: "",
-            createdAt: serverTimestamp()
-        });
-    }
+loginBtn.addEventListener("click", async () => {
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value;
 
-    const updatedSnap = await getDoc(ref);
-    return updatedSnap.data();
-}
+  if (!username || !password) {
+    msg.innerText = "Preencha tudo";
+    return;
+  }
 
-export async function updateProfile(data) {
-    const user = auth.currentUser;
-    if (!user) return;
+  const emailFake = `${username.toLowerCase()}@reconstituir.fun`;
 
-    const ref = doc(db, "profiles", user.uid);
-    await updateDoc(ref, data);
-}
+  try {
+    await signInWithEmailAndPassword(auth, emailFake, password);
+    window.location.href = "dashboard.html";
+  } catch (err) {
+    msg.innerText = "Nome ou senha inválidos";
+  }
+});
