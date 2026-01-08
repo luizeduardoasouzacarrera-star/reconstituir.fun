@@ -1,107 +1,63 @@
-// chat.js
-import { auth, db } from "./firebase.js";
-
-import {
-  onAuthStateChanged,
-  signOut
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
 import {
   collection,
   addDoc,
+  onSnapshot,
   query,
   orderBy,
-  onSnapshot,
-  serverTimestamp,
-  deleteDoc,
-  doc
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// ===== ELEMENTOS =====
-const chatDiv = document.getElementById("chat");
+import { auth, db } from "./firebase.js";
+import { loadUserProfile } from "./profiles.js";
+
+// ELEMENTOS
+const chat = document.getElementById("chat");
+const msgInput = document.getElementById("msgInput");
 const sendBtn = document.getElementById("sendBtn");
-const messageInput = document.getElementById("message");
-const logoutBtn = document.getElementById("logoutBtn");
 
-let username = "";
-let isLuiz = false;
-
-// ===== AUTH =====
-onAuthStateChanged(auth, user => {
-  if (!user) {
-    window.location.replace("index.html");
-    return;
-  }
-
-  username = user.email.split("@")[0];
-  isLuiz = username === "luiz";
-});
-
-// ===== ENVIAR =====
+// ===== ENVIAR MENSAGEM =====
 sendBtn.addEventListener("click", sendMessage);
-messageInput.addEventListener("keypress", e => {
+msgInput.addEventListener("keypress", (e) => {
   if (e.key === "Enter") sendMessage();
 });
 
 async function sendMessage() {
-  const text = messageInput.value.trim();
-  if (!text) return;
+  const user = auth.currentUser;
+  if (!user) return;
+
+  const text = msgInput.value.trim();
+  if (text === "") return;
+
+  const profile = await loadUserProfile(user);
 
   await addDoc(collection(db, "messages"), {
-    user: username,
+    uid: user.uid,
     text: text,
-    timestamp: serverTimestamp()
+    displayName: profile.displayName,
+    createdAt: serverTimestamp()
   });
 
-  messageInput.value = "";
+  msgInput.value = "";
 }
 
-// ===== LISTAR =====
+// ===== LISTEN MENSAGENS =====
 const q = query(
   collection(db, "messages"),
-  orderBy("timestamp", "asc")
+  orderBy("createdAt", "asc")
 );
 
-onSnapshot(q, snapshot => {
-  chatDiv.innerHTML = "";
+onSnapshot(q, (snapshot) => {
+  chat.innerHTML = "";
 
-  snapshot.forEach(docSnap => {
-    const data = docSnap.data();
-    const id = docSnap.id;
+  snapshot.forEach((doc) => {
+    const m = doc.data();
 
-    const time = data.timestamp
-      ? new Date(data.timestamp.seconds * 1000).toLocaleTimeString("pt-BR", {
-          hour: "2-digit",
-          minute: "2-digit"
-        })
-      : "";
-
-    const p = document.createElement("p");
-
-    p.innerHTML = `<b>${data.user}</b> (${time}): ${data.text}`;
-
-    // 👉 APAGAR MSG (SÓ LUIZ)
-    if (isLuiz) {
-      p.style.cursor = "pointer";
-      p.title = "Clique para apagar";
-
-      p.addEventListener("click", async () => {
-        const confirmDelete = confirm("Apagar esta mensagem?");
-        if (confirmDelete) {
-          await deleteDoc(doc(db, "messages", id));
-        }
-      });
-    }
-
-    chatDiv.appendChild(p);
+    chat.innerHTML += `
+      <p>
+        <b>${m.displayName}:</b> ${m.text}
+      </p>
+    `;
   });
 
-  chatDiv.scrollTop = chatDiv.scrollHeight;
-});
-
-// ===== LOGOUT =====
-logoutBtn.addEventListener("click", () => {
-  signOut(auth).then(() => {
-    window.location.replace("index.html");
-  });
+  chat.scrollTop = chat.scrollHeight;
 });
