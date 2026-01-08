@@ -1,63 +1,102 @@
+// chat.js
+import { auth, db } from "./firebase.js";
+
+import {
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
 import {
   collection,
   addDoc,
-  onSnapshot,
   query,
   orderBy,
-  serverTimestamp
+  onSnapshot,
+  serverTimestamp,
+  deleteDoc,
+  doc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-import { auth, db } from "./firebase.js";
-import { loadUserProfile } from "./profiles.js";
-
 // ELEMENTOS
-const chat = document.getElementById("chat");
-const msgInput = document.getElementById("msgInput");
+const chatDiv = document.getElementById("chat");
 const sendBtn = document.getElementById("sendBtn");
+const messageInput = document.getElementById("message");
+const logoutBtn = document.getElementById("logoutBtn");
 
-// ===== ENVIAR MENSAGEM =====
+let username = "";
+let isLuiz = false;
+
+// ===== LOGIN CHECK =====
+onAuthStateChanged(auth, user => {
+  if (!user) {
+    window.location.replace("index.html");
+    return;
+  }
+
+  username = user.email.split("@")[0];
+  isLuiz = username === "luiz";
+});
+
+// ===== ENVIAR =====
 sendBtn.addEventListener("click", sendMessage);
-msgInput.addEventListener("keypress", (e) => {
+messageInput.addEventListener("keypress", e => {
   if (e.key === "Enter") sendMessage();
 });
 
 async function sendMessage() {
-  const user = auth.currentUser;
-  if (!user) return;
-
-  const text = msgInput.value.trim();
-  if (text === "") return;
-
-  const profile = await loadUserProfile(user);
+  const text = messageInput.value.trim();
+  if (!text) return;
 
   await addDoc(collection(db, "messages"), {
-    uid: user.uid,
-    text: text,
-    displayName: profile.displayName,
-    createdAt: serverTimestamp()
+    user: username,
+    text,
+    timestamp: serverTimestamp()
   });
 
-  msgInput.value = "";
+  messageInput.value = "";
 }
 
-// ===== LISTEN MENSAGENS =====
+// ===== LISTENER =====
 const q = query(
   collection(db, "messages"),
-  orderBy("createdAt", "asc")
+  orderBy("timestamp", "asc")
 );
 
-onSnapshot(q, (snapshot) => {
-  chat.innerHTML = "";
+onSnapshot(q, snapshot => {
+  chatDiv.innerHTML = "";
 
-  snapshot.forEach((doc) => {
-    const m = doc.data();
+  snapshot.forEach(d => {
+    const data = d.data();
+    const id = d.id;
 
-    chat.innerHTML += `
-      <p>
-        <b>${m.displayName}:</b> ${m.text}
-      </p>
-    `;
+    const time = data.timestamp
+      ? new Date(data.timestamp.seconds * 1000).toLocaleTimeString("pt-BR", {
+          hour: "2-digit",
+          minute: "2-digit"
+        })
+      : "";
+
+    const crown = data.user === "luiz" ? " 👑" : "";
+
+    const p = document.createElement("p");
+    p.innerHTML = `<b>${data.user}${crown}</b> (${time}): ${data.text}`;
+
+    // botão invisível visualmente (não quebra layout)
+    if (isLuiz) {
+      p.addEventListener("dblclick", async () => {
+        await deleteDoc(doc(db, "messages", id));
+      });
+    }
+
+    chatDiv.appendChild(p);
   });
 
-  chat.scrollTop = chat.scrollHeight;
+  chatDiv.scrollTop = chatDiv.scrollHeight;
+});
+
+// ===== LOGOUT =====
+logoutBtn.addEventListener("click", () => {
+  signOut(auth).then(() => {
+    window.location.replace("index.html");
+  });
 });
