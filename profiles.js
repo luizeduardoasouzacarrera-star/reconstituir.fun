@@ -3,6 +3,7 @@ import { collection, query, where, onSnapshot } from "https://www.gstatic.com/fi
 
 const profilesContainer = document.getElementById("profiles");
 
+// Consulta apenas perfis públicos
 const profilesQuery = query(collection(db, "profiles"), where("public", "==", true));
 
 onSnapshot(profilesQuery, snapshot => {
@@ -47,7 +48,8 @@ onSnapshot(profilesQuery, snapshot => {
         const socialDiv = document.createElement("div");
         socialDiv.classList.add("socials");
 
-        const icons = {
+        // Mapeamento de rede social -> imagem
+        const socialImages = {
             roblox: "https://devforum-uploads.s3.dualstack.us-east-2.amazonaws.com/uploads/original/4X/0/e/e/0eeeb19633422b1241f4306419a0f15f39d58de9.png",
             instagram: "https://elementos.apresto.com.br/wp-content/uploads/2024/05/icon-Instagram-desenho.svg",
             tiktok: "https://cdn.worldvectorlogo.com/logos/tiktok-icon-2.svg",
@@ -57,27 +59,38 @@ onSnapshot(profilesQuery, snapshot => {
             spotify: "https://upload.wikimedia.org/wikipedia/commons/a/a1/2024_Spotify_logo_without_text_%28black%29.svg"
         };
 
-        for (let key in icons) {
+        for (const [key, imgUrl] of Object.entries(socialImages)) {
             if (data[key]) {
                 const link = document.createElement("a");
                 link.href = data[key];
                 link.target = "_blank";
-                link.innerHTML = `<img src="${icons[key]}" alt="${key}">`;
+                link.innerHTML = `<img src="${imgUrl}" alt="${key}">`;
                 socialDiv.appendChild(link);
             }
         }
 
         card.appendChild(socialDiv);
 
-        // Botão de tocar música
+        // Botão para tocar música
         if (data.music) {
-            const playBtn = document.createElement("button");
-            playBtn.textContent = "▶ Iniciar Música";
-            playBtn.addEventListener("click", () => {
-                const audio = new Audio(`assets/${data.music}`);
+            const musicBtn = document.createElement("button");
+            musicBtn.textContent = "Iniciar música";
+            musicBtn.style.marginTop = "10px";
+            musicBtn.style.padding = "6px 10px";
+            musicBtn.style.borderRadius = "6px";
+            musicBtn.style.border = "none";
+            musicBtn.style.cursor = "pointer";
+            musicBtn.style.backgroundColor = "#5865f2";
+            musicBtn.style.color = "#fff";
+
+            // Cria o objeto Audio apontando para a pasta assets
+            const audio = new Audio(`assets/${data.music}`);
+
+            musicBtn.addEventListener("click", () => {
                 audio.play();
             });
-            card.appendChild(playBtn);
+
+            card.appendChild(musicBtn);
         }
 
         profilesContainer.appendChild(card);
