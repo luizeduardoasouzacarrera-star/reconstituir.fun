@@ -2,24 +2,31 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Login</title>
+  <title>Reconstituir</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- LOGIN EM CIMA -->
-<div id="login-area">
-  <h2>Login</h2>
+<!-- 🌌 FUNDO -->
+<div class="background"></div>
 
-  <input id="username" placeholder="Nome">
-  <input id="password" type="password" placeholder="Senha"><br>
+<!-- 🔷 TOPO LOGIN -->
+<header class="login-header">
+  <h1>Reconstituir</h1>
 
-  <button id="loginBtn" type="button">Entrar</button>
-  <p id="msg"></p>
-</div>
+  <div class="login-box">
+    <input id="username" placeholder="Usuário">
+    <input id="password" type="password" placeholder="Senha">
+    <button id="loginBtn" type="button">Entrar</button>
+    <p id="msg"></p>
+  </div>
+</header>
 
-<!-- PERFIS EMBAIXO -->
-<div id="profiles"></div>
+<!-- 👤 PERFIS -->
+<section class="profiles-section">
+  <h2>Perfis da comunidade</h2>
+  <div id="profiles" class="profiles-grid"></div>
+</section>
 
 <script type="module" src="script.js"></script>
 <script type="module" src="profiles.js"></script>
