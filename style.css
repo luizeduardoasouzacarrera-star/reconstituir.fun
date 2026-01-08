@@ -1,107 +1,82 @@
-// chat.js
-import { auth, db } from "./firebase.js";
-
-import {
-  onAuthStateChanged,
-  signOut
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-import {
-  collection,
-  addDoc,
-  query,
-  orderBy,
-  onSnapshot,
-  serverTimestamp,
-  deleteDoc,
-  doc
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-// ===== ELEMENTOS =====
-const chatDiv = document.getElementById("chat");
-const sendBtn = document.getElementById("sendBtn");
-const messageInput = document.getElementById("message");
-const logoutBtn = document.getElementById("logoutBtn");
-
-let username = "";
-let isLuiz = false;
-
-// ===== AUTH =====
-onAuthStateChanged(auth, user => {
-  if (!user) {
-    window.location.replace("index.html");
-    return;
-  }
-
-  username = user.email.split("@")[0];
-  isLuiz = username === "luiz";
-});
-
-// ===== ENVIAR =====
-sendBtn.addEventListener("click", sendMessage);
-messageInput.addEventListener("keypress", e => {
-  if (e.key === "Enter") sendMessage();
-});
-
-async function sendMessage() {
-  const text = messageInput.value.trim();
-  if (!text) return;
-
-  await addDoc(collection(db, "messages"), {
-    user: username,
-    text: text,
-    timestamp: serverTimestamp()
-  });
-
-  messageInput.value = "";
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
-// ===== LISTAR =====
-const q = query(
-  collection(db, "messages"),
-  orderBy("timestamp", "asc")
-);
+/* ===== FUNDO GERAL ===== */
+body {
+  background: linear-gradient(135deg, #1e1e2f, #2b2b45);
+  color: #fff;
+  min-height: 100vh;
+}
 
-onSnapshot(q, snapshot => {
-  chatDiv.innerHTML = "";
+/* ===== CHAT ===== */
+.chat-container {
+  padding: 40px;
+  max-width: 900px;
+  margin: auto;
+}
 
-  snapshot.forEach(docSnap => {
-    const data = docSnap.data();
-    const id = docSnap.id;
+.chat-container h2 {
+  margin-bottom: 15px;
+}
 
-    const time = data.timestamp
-      ? new Date(data.timestamp.seconds * 1000).toLocaleTimeString("pt-BR", {
-          hour: "2-digit",
-          minute: "2-digit"
-        })
-      : "";
+#chat {
+  background: #141422;
+  border-radius: 10px;
+  padding: 15px;
+  height: 300px;
+  overflow-y: auto;
+  margin-bottom: 12px;
+}
 
-    const p = document.createElement("p");
+/* MENSAGEM */
+#chat p {
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
 
-    p.innerHTML = `<b>${data.user}</b> (${time}): ${data.text}`;
+/* NOME */
+#chat b {
+  color: #4da6ff;
+}
 
-    // 👉 APAGAR MSG (SÓ LUIZ)
-    if (isLuiz) {
-      p.style.cursor = "pointer";
-      p.title = "Clique para apagar";
+/* INPUT */
+#message {
+  width: calc(100% - 200px);
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+}
 
-      p.addEventListener("click", async () => {
-        const confirmDelete = confirm("Apagar esta mensagem?");
-        if (confirmDelete) {
-          await deleteDoc(doc(db, "messages", id));
-        }
-      });
-    }
+/* BOTÕES */
+#sendBtn,
+#logoutBtn {
+  padding: 12px 20px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  margin-left: 6px;
+}
 
-    chatDiv.appendChild(p);
-  });
+#sendBtn {
+  background: #5865f2;
+  color: white;
+}
 
-  chatDiv.scrollTop = chatDiv.scrollHeight;
-});
+#sendBtn:hover {
+  background: #4752c4;
+}
 
-// ===== LOGOUT =====
-logoutBtn.addEventListener("click", () => {
-  signOut(auth).then(() => {
-    window.location.replace("index.html");
-  });
-});
+#logoutBtn {
+  background: #e74c3c;
+  color: white;
+}
+
+#logoutBtn:hover {
+  background: #c0392b;
+}
