@@ -155,18 +155,19 @@ body {
   gap: 25px;
 }
 
-/* ===== CARDS DE PROFILE ===== */
 .profile-card {
   background: #141428;
   border-radius: 10px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  min-height: 250px;
+  min-height: 350px; /* aumenta o tamanho vertical */
+  height: auto; /* deixa crescer se tiver bio maior */
   box-shadow: 0 4px 20px rgba(0,0,0,0.35);
   transition: transform .25s ease, box-shadow .25s ease;
   position: relative;
 }
+
 
 .profile-card:hover {
   transform: translateY(-6px);
