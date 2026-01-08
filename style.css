@@ -12,78 +12,71 @@ body {
   min-height: 100vh;
 }
 
-/* ===== HEADER (LOGIN) ===== */
-.header {
-  width: 100%;
-  padding: 25px 40px;
-  display: flex;
-  align-items: center;
-  gap: 15px;
-
-  background: linear-gradient(135deg, #141428, #1f1f3a);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+/* ===== CHAT ===== */
+.chat-container {
+  padding: 40px;
+  max-width: 900px;
+  margin: auto;
 }
 
-.header h2 {
-  margin-right: 20px;
+.chat-container h2 {
+  margin-bottom: 15px;
 }
 
-/* INPUTS */
-.header input {
-  width: 170px;
-  padding: 10px;
+#chat {
+  background: #141422;
+  border-radius: 10px;
+  padding: 15px;
+  height: 300px;
+  overflow-y: auto;
+  margin-bottom: 12px;
+}
+
+/* MENSAGEM */
+#chat p {
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+/* NOME */
+#chat b {
+  color: #4da6ff;
+}
+
+/* INPUT */
+#message {
+  width: calc(100% - 200px);
+  padding: 12px;
   border-radius: 8px;
   border: none;
   outline: none;
 }
 
-/* BOTÃO LOGIN */
-.header button {
-  padding: 10px 24px;
+/* BOTÕES */
+#sendBtn,
+#logoutBtn {
+  padding: 12px 20px;
   border-radius: 8px;
   border: none;
   cursor: pointer;
-  background: #5865f2;
-  color: white;
   font-weight: bold;
+  margin-left: 6px;
 }
 
-.header button:hover {
+#sendBtn {
+  background: #5865f2;
+  color: white;
+}
+
+#sendBtn:hover {
   background: #4752c4;
 }
 
-#msg {
-  margin-left: 10px;
-  color: #ff6b6b;
+#logoutBtn {
+  background: #e74c3c;
+  color: white;
 }
 
-/* ===== ÁREA DE PERFIS ===== */
-.profiles-section {
-  padding: 40px;
-}
-
-.profiles-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 25px;
-}
-
-/* CARD PERFIL */
-.profile-card {
-  background: #141428;
-  border-radius: 10px;
-  padding: 25px;
-  min-height: 140px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.35);
-  transition: transform .25s ease, box-shadow .25s ease;
-}
-
-.profile-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.55);
-}
-
-.profile-card strong {
-  color: #4da6ff;
-  font-size: 16px;
+#logoutBtn:hover {
+  background: #c0392b;
 }
