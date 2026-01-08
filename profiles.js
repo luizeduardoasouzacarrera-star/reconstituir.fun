@@ -1,4 +1,3 @@
-// profiles.js
 import { db } from "./firebase.js";
 import { collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -48,50 +47,23 @@ onSnapshot(profilesQuery, snapshot => {
         const socialDiv = document.createElement("div");
         socialDiv.classList.add("socials");
 
-        // Roblox (usar ícone genérico)
-        if (data.roblox) {
-            const link = document.createElement("a");
-            link.href = data.roblox;
-            link.target = "_blank";
-            link.innerHTML = '<i class="fa-brands fa-roblox"></i>';
-            socialDiv.appendChild(link);
-        }
+        const socials = [
+            { key: "roblox", icon: "fa-roblox" },
+            { key: "instagram", icon: "fa-brands fa-instagram" },
+            { key: "tiktok", icon: "fa-brands fa-tiktok" },
+            { key: "valorant", icon: "fa-solid fa-crosshairs" },
+            { key: "steam", icon: "fa-brands fa-steam" }
+        ];
 
-        // Instagram
-        if (data.instagram) {
-            const link = document.createElement("a");
-            link.href = data.instagram;
-            link.target = "_blank";
-            link.innerHTML = '<i class="fa-brands fa-instagram"></i>';
-            socialDiv.appendChild(link);
-        }
-
-        // TikTok
-        if (data.tiktok) {
-            const link = document.createElement("a");
-            link.href = data.tiktok;
-            link.target = "_blank";
-            link.innerHTML = '<i class="fa-brands fa-tiktok"></i>';
-            socialDiv.appendChild(link);
-        }
-
-        // Valorant (usar ícone genérico de crosshairs)
-        if (data.valorant) {
-            const link = document.createElement("a");
-            link.href = data.valorant;
-            link.target = "_blank";
-            link.innerHTML = '<i class="fa-solid fa-crosshairs"></i>';
-            socialDiv.appendChild(link);
-        }
-
-        // Steam
-        if (data.steam) {
-            const link = document.createElement("a");
-            link.href = data.steam;
-            link.target = "_blank";
-            link.innerHTML = '<i class="fa-brands fa-steam"></i>';
-            socialDiv.appendChild(link);
-        }
+        socials.forEach(social => {
+            if (data[social.key]) {
+                const link = document.createElement("a");
+                link.href = data[social.key];
+                link.target = "_blank";
+                link.innerHTML = `<i class="${social.icon}"></i>`;
+                socialDiv.appendChild(link);
+            }
+        });
 
         card.appendChild(socialDiv);
         profilesContainer.appendChild(card);
