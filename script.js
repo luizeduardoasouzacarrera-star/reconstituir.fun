@@ -1,7 +1,5 @@
-// script.js
 import { auth } from "./firebase.js";
-import { signInWithEmailAndPassword } 
-  from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   const loginBtn = document.getElementById("loginBtn");
@@ -20,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     signInWithEmailAndPassword(auth, emailFake, password)
       .then(() => {
-        // 🔥 REDIRECIONA PARA OUTRA PÁGINA
+        // Redireciona para chat
         window.location.href = "dashboard.html";
       })
       .catch(() => {
