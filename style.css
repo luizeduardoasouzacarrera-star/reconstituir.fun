@@ -96,7 +96,7 @@ body {
   background: #141428;
   border-radius: 12px;
   overflow: hidden;
-  min-height: 160px;
+  min-height: 250px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.35);
   transition: transform .25s ease, box-shadow .25s ease;
 }
