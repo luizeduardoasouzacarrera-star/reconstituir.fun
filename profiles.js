@@ -8,7 +8,7 @@ const socialIcons = {
   roblox: "https://devforum-uploads.s3.dualstack.us-east-2.amazonaws.com/uploads/original/4X/0/e/e/0eeeb19633422b1241f4306419a0f15f39d58de9.png",
   instagram: "https://elementos.apresto.com.br/wp-content/uploads/2024/05/icon-Instagram-desenho.svg",
   tiktok: "https://cdn.worldvectorlogo.com/logos/tiktok-icon-2.svg",
-  valorant: "https://images.icon-icons.com/3660/PNG/512/valorant_logo_play_riot_games_icon_228477.png",
+  valorant: "https://www.svgrepo.com/show/424912/valorant-logo-play-2.svg",
   steam: "https://img.icons8.com/?size=50&id=pOa8st0SGd5C&format=png"
 };
 
