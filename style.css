@@ -232,32 +232,17 @@ body {
   transform: scale(1.2);
 }
 
-.status-indicator {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    font-size: 12px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.status-bubble {
+.online-dot, .offline-dot {
+    display: inline-block;
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    display: inline-block;
+    margin-right: 6px;
     animation: blink 1s infinite;
 }
 
-.status-bubble.online {
-    background-color: #00ff00; /* verde */
-}
-
-.status-bubble.offline {
-    background-color: #ff0000; /* vermelho */
-}
+.online-dot { background: #4caf50; }
+.offline-dot { background: #f44336; }
 
 @keyframes blink {
     0%, 50%, 100% { opacity: 1; }
