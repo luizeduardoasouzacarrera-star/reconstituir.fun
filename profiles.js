@@ -1,4 +1,3 @@
-// profiles.js
 import { db, auth } from "./firebase.js";
 import { collection, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -21,8 +20,7 @@ let isAdmin = false;
 
 // Cria card de perfil
 function createProfileCard(userId, data) {
-  // Filtro público: no login só mostra public
-  if (!data.public && (!isDashboard || !isAdmin)) return;
+  if (!data.public && (!isDashboard || !isAdmin)) return null; // retorna null se não renderiza
 
   const card = document.createElement("div");
   card.className = "profile-card";
@@ -88,28 +86,36 @@ function createProfileCard(userId, data) {
     const toggleBtn = document.createElement("button");
     toggleBtn.textContent = data.public ? "❌ Remover público" : "✅ Tornar público";
     toggleBtn.style.background = "#e74c3c";
-
     toggleBtn.onclick = async () => {
-      await updateDoc(doc(db, "profiles", userId), {
-        public: !data.public
-      });
+      await updateDoc(doc(db, "profiles", userId), { public: !data.public });
     };
-
     card.appendChild(toggleBtn);
   }
 
-  profilesContainer.appendChild(card);
+  return { userId, card }; // retorna o card + userId
 }
 
-// ===== Observa perfis em tempo real (funciona no login e dashboard) =====
+// Observa perfis em tempo real
 onSnapshot(collection(db, "profiles"), snap => {
   profilesContainer.innerHTML = "";
+
+  let cards = [];
   snap.forEach(docSnap => {
-    createProfileCard(docSnap.id, docSnap.data());
+    const result = createProfileCard(docSnap.id, docSnap.data());
+    if (result) cards.push(result);
   });
+
+  // Ordena: perfil do luiz primeiro
+  cards.sort((a, b) => {
+    if (a.userId === "EIKx6Iz2hRZuzNUkFlvBc8QefSh1") return -1;
+    if (b.userId === "EIKx6Iz2hRZuzNUkFlvBc8QefSh1") return 1;
+    return 0;
+  });
+
+  cards.forEach(c => profilesContainer.appendChild(c.card));
 });
 
-// ===== Observa usuário logado para admin (dashboard apenas) =====
+// Observa usuário logado para admin (dashboard apenas)
 if (isDashboard) {
   auth.onAuthStateChanged(user => {
     if (!user) return;
@@ -119,9 +125,20 @@ if (isDashboard) {
     // Atualiza cards quando muda admin
     onSnapshot(collection(db, "profiles"), snap => {
       profilesContainer.innerHTML = "";
+      let cards = [];
       snap.forEach(docSnap => {
-        createProfileCard(docSnap.id, docSnap.data());
+        const result = createProfileCard(docSnap.id, docSnap.data());
+        if (result) cards.push(result);
       });
+
+      // Perfil do luiz primeiro
+      cards.sort((a, b) => {
+        if (a.userId === "EIKx6Iz2hRZuzNUkFlvBc8QefSh1") return -1;
+        if (b.userId === "EIKx6Iz2hRZuzNUkFlvBc8QefSh1") return 1;
+        return 0;
+      });
+
+      cards.forEach(c => profilesContainer.appendChild(c.card));
     });
   });
 }
