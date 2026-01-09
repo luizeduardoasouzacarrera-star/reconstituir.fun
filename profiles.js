@@ -54,11 +54,11 @@ async function createProfileCard(userId, data) {
     if (isOnline) {
       statusDot.classList.remove("offline-dot");
       statusDot.classList.add("online-dot");
-      statusText.textContent = "ONLINE";
+      statusText.textContent = "OFFLINE";
     } else {
       statusDot.classList.remove("online-dot");
       statusDot.classList.add("offline-dot");
-      statusText.textContent = "OFFLINE";
+      statusText.textContent = "ONLINE";
     }
   });
 
