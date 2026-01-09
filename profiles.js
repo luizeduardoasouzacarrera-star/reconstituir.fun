@@ -1,6 +1,9 @@
 // profiles.js
 import { db, rtdb } from "./firebase.js"; // db = Firestore, rtdb = Realtime Database
-import { doc, getDocs, collection } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import {
+  collection,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { ref as rRef, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
 // Elementos
@@ -22,25 +25,21 @@ async function createProfileCard(userId, data) {
   const card = document.createElement("div");
   card.classList.add("profile-card");
 
-  // Cor do perfil (aplica na borda superior)
+  // Cor do perfil aplicada como camada de destaque
   const color = data.color || "#5865f2";
-  card.style.borderTop = `5px solid ${color}`;
+  card.style.setProperty("--profile-color", color);
 
-  // ===== STATUS ONLINE/OFFLINE =====
+  // Status online/offline
   const status = document.createElement("div");
   status.style.position = "absolute";
   status.style.top = "10px";
   status.style.left = "10px";
   status.style.display = "flex";
   status.style.alignItems = "center";
-  status.style.gap = "6px";
+  status.style.gap = "5px";
 
   const statusDot = document.createElement("span");
-  statusDot.style.width = "10px";
-  statusDot.style.height = "10px";
-  statusDot.style.borderRadius = "50%";
-  statusDot.style.animation = "blink 1s infinite";
-  statusDot.classList.add("offline"); // padrão
+  statusDot.classList.add("online-dot"); // default
 
   const statusText = document.createElement("span");
   statusText.style.fontSize = "12px";
@@ -51,34 +50,34 @@ async function createProfileCard(userId, data) {
   status.appendChild(statusText);
   card.appendChild(status);
 
-  // Atualização em tempo real do Realtime Database
+  // Atualização do status em tempo real
   const onlineRef = rRef(rtdb, `status/${userId}`);
-  onValue(onlineRef, snapshot => {
+  onValue(onlineRef, (snapshot) => {
     const isOnline = snapshot.val() || false;
     if (isOnline) {
-      statusDot.classList.remove("offline");
-      statusDot.classList.add("online");
+      statusDot.classList.remove("offline-dot");
+      statusDot.classList.add("online-dot");
       statusText.textContent = "ONLINE";
     } else {
-      statusDot.classList.remove("online");
-      statusDot.classList.add("offline");
+      statusDot.classList.remove("online-dot");
+      statusDot.classList.add("offline-dot");
       statusText.textContent = "OFFLINE";
     }
   });
 
-  // ===== BANNER =====
+  // Banner
   const banner = document.createElement("div");
   banner.classList.add("banner");
   banner.style.backgroundImage = `url('${data.bannerURL || ""}')`;
   card.appendChild(banner);
 
-  // ===== AVATAR =====
+  // Avatar
   const avatar = document.createElement("img");
   avatar.classList.add("avatar");
   avatar.src = data.avatarURL || "";
   card.appendChild(avatar);
 
-  // ===== NOME E BIO =====
+  // Nome e bio
   const nameEl = document.createElement("strong");
   nameEl.textContent = data.displayName || userId;
   card.appendChild(nameEl);
@@ -89,7 +88,7 @@ async function createProfileCard(userId, data) {
     card.appendChild(bioEl);
   }
 
-  // ===== REDES SOCIAIS =====
+  // Redes sociais
   const socialsDiv = document.createElement("div");
   socialsDiv.classList.add("socials");
   Object.keys(socialIcons).forEach(key => {
@@ -105,7 +104,7 @@ async function createProfileCard(userId, data) {
   });
   card.appendChild(socialsDiv);
 
-  // ===== MÚSICA =====
+  // Botão de música
   if (data.music) {
     const audioBtn = document.createElement("button");
     audioBtn.textContent = "▶️ Tocar música";
@@ -134,10 +133,9 @@ async function createProfileCard(userId, data) {
   profilesContainer.appendChild(card);
 }
 
-// ===== PEGAR TODOS OS PERFIS =====
+// Pegar todos os perfis do Firestore
 async function loadProfiles() {
   profilesContainer.innerHTML = "";
-
   const profilesCollection = collection(db, "profiles");
   const snapshot = await getDocs(profilesCollection);
 
@@ -147,5 +145,5 @@ async function loadProfiles() {
   });
 }
 
-// ===== INICIALIZA =====
+// Inicializa
 loadProfiles();
