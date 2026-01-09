@@ -1,7 +1,6 @@
 import { auth, db } from "./firebase.js";
 import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// Elementos
 const nameInput = document.getElementById("nameInput");
 const bioInput = document.getElementById("bioInput");
 const avatarInput = document.getElementById("avatarInput");
@@ -19,19 +18,13 @@ const spotifyInput = document.getElementById("spotifyInput");
 const musicInput = document.getElementById("musicInput");
 
 const saveBtn = document.getElementById("saveProfile");
-const playMusicBtn = document.getElementById("playMusicBtn");
 
-let audio = null;
-
-// Carregar perfil
+// Carrega perfil existente
 auth.onAuthStateChanged(async user => {
     if (!user) {
         window.location.href = "index.html";
         return;
     }
-
-    // Marcar online
-    await setDoc(doc(db, "profiles", user.uid), { isOnline: true }, { merge: true });
 
     const profileRef = doc(db, "profiles", user.uid);
     const profileSnap = await getDoc(profileRef);
@@ -79,36 +72,4 @@ saveBtn.addEventListener("click", async () => {
     });
 
     alert("Perfil salvo!");
-});
-
-// Tocar música
-playMusicBtn.addEventListener("click", () => {
-    if (audio) {
-        audio.pause();
-        audio = null;
-        playMusicBtn.textContent = "▶️ Tocar Música";
-        return;
-    }
-
-    const musicName = musicInput.value.trim();
-    if (!musicName) return alert("Adicione o nome da música no perfil!");
-
-    audio = new Audio(`assets/${musicName}`);
-    audio.play();
-    playMusicBtn.textContent = "⏸️ Parar Música";
-
-    audio.onended = () => {
-        playMusicBtn.textContent = "▶️ Tocar Música";
-        audio = null;
-    };
-});
-
-// Logout
-const logoutBtn = document.getElementById("logoutBtn");
-logoutBtn.addEventListener("click", async () => {
-    const user = auth.currentUser;
-    if (user) {
-        await setDoc(doc(db, "profiles", user.uid), { isOnline: false }, { merge: true });
-    }
-    auth.signOut();
 });
