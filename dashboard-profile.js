@@ -62,11 +62,11 @@ function updateStatusButton() {
     if (!statusBtn) return;
 
     if (currentStatus) {
-        statusBtn.textContent = "🟢 ONLINE";
-        statusBtn.style.background = "#4caf50";
-    } else {
         statusBtn.textContent = "🔴 OFFLINE";
         statusBtn.style.background = "#5865f2";
+    } else {
+        statusBtn.textContent = "🟢 ONLINE";
+        statusBtn.style.background = "#4caf50";
     }
 }
 
