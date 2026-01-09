@@ -1,10 +1,12 @@
+
+// firebase.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getDatabase } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { getDatabase, ref, set, onDisconnect, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyCHScM8UbJjH-4aw8gZwClant01Mo0xAkc",
+   apiKey: "AIzaSyCHScM8UbJjH-4aw8gZwClant01Mo0xAkc",
     authDomain: "reconstituir-b35a3.firebaseapp.com",
     projectId: "reconstituir-b35a3",
     storageBucket: "reconstituir-b35a3.firebasestorage.app",
@@ -13,7 +15,9 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const rtdb = getDatabase(app);
 
-export const auth = getAuth(app);
-export const db = getFirestore(app);
-export const rtdb = getDatabase(app);
+export { auth, db, rtdb, ref, set, onDisconnect, onValue };
+
