@@ -21,7 +21,7 @@ body {
   display: flex;
   align-items: center;
   gap: 15px;
-  background: linear-gradient(135deg, #5c5b5b, #5c5b5b);
+  background: transparent; /* transparente para mostrar o GIF */
   box-shadow: 0 4px 20px rgba(0,0,0,0.4);
 }
 
@@ -35,6 +35,8 @@ body {
   border-radius: 8px;
   border: none;
   outline: none;
+  background: rgba(0,0,0,0.4); /* leve transparência para legibilidade */
+  color: #fff;
 }
 
 .header button {
@@ -48,7 +50,7 @@ body {
 }
 
 .header button:hover {
-  background: ##210000;
+  background: #4752c4;
 }
 
 /* ===== CHAT ===== */
@@ -56,6 +58,8 @@ body {
   padding: 40px;
   max-width: 900px;
   margin: auto;
+  background: rgba(0,0,0,0.5); /* leve transparência para não bloquear o GIF */
+  border-radius: 10px;
 }
 
 .chat-container h2 {
@@ -63,7 +67,7 @@ body {
 }
 
 #chat {
-  background: #141422;
+  background: rgba(20,20,34,0.7);
   border-radius: 10px;
   padding: 15px;
   height: 300px;
@@ -86,6 +90,8 @@ body {
   border-radius: 8px;
   border: none;
   outline: none;
+  background: rgba(0,0,0,0.4);
+  color: #fff;
 }
 
 #sendBtn,
@@ -121,7 +127,7 @@ body {
   padding: 20px;
   margin: 20px auto;
   max-width: 600px;
-  background: #141428;
+  background: rgba(0,0,0,0.5); /* transparente para mostrar o GIF */
   border-radius: 10px;
 }
 
@@ -138,6 +144,8 @@ body {
   border-radius: 6px;
   border: none;
   outline: none;
+  background: rgba(0,0,0,0.4);
+  color: #fff;
 }
 
 .profile-form-container button {
@@ -166,7 +174,7 @@ body {
 
 /* ===== CARDS DE PROFILE ===== */
 .profile-card {
-  background: #141428;
+  background: rgba(20,20,34,0.8); /* leve transparência para mostrar o GIF levemente atrás */
   border-radius: 10px;
   overflow: hidden;
   display: flex;
@@ -180,7 +188,6 @@ body {
   --profile-color: #5865f2;
 }
 
-/* Cor do card inteira sem cobrir avatar, banner, bio e socials */
 .profile-card::before {
   content: '';
   position: absolute;
