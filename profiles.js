@@ -1,11 +1,6 @@
-// profiles.js
-import { db, auth } from "./firebase.js";
-import {
-  collection,
-  onSnapshot,
-  doc,
-  updateDoc
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+// profiles-login.js
+import { db } from "./firebase.js";
+import { collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const profilesContainer = document.getElementById("profiles");
 
@@ -19,8 +14,8 @@ const socialIcons = {
   spotify: "https://upload.wikimedia.org/wikipedia/commons/a/a1/2024_Spotify_logo_without_text_%28black%29.svg"
 };
 
-function createProfileCard(userId, data, isAdmin) {
-  if (!data.public && !isAdmin) return;
+function createProfileCard(data) {
+  if (!data.public) return; // Só mostra perfis públicos
 
   const card = document.createElement("div");
   card.className = "profile-card";
@@ -37,7 +32,7 @@ function createProfileCard(userId, data, isAdmin) {
   card.appendChild(avatar);
 
   const name = document.createElement("strong");
-  name.textContent = `${data.displayName || userId}${data.emoji || ""}`;
+  name.textContent = `${data.displayName || ""}${data.emoji || ""}`;
   card.appendChild(name);
 
   if (data.bio) {
@@ -49,7 +44,6 @@ function createProfileCard(userId, data, isAdmin) {
 
   const socials = document.createElement("div");
   socials.className = "socials";
-
   Object.keys(socialIcons).forEach(key => {
     if (data[key]) {
       const a = document.createElement("a");
@@ -61,17 +55,14 @@ function createProfileCard(userId, data, isAdmin) {
       socials.appendChild(a);
     }
   });
-
   card.appendChild(socials);
 
-  // 🎵 BOTÃO DE MÚSICA (AGORA FUNCIONA)
+  // Música (opcional)
   if (data.music && data.music.trim() !== "") {
     const audio = new Audio(`assets/${data.music}`);
-
     const btn = document.createElement("button");
     btn.textContent = "▶️ Tocar música";
     btn.style.background = data.musicBtnColor || "#1db954";
-
     btn.onclick = () => {
       if (audio.paused) {
         audio.play();
@@ -81,37 +72,15 @@ function createProfileCard(userId, data, isAdmin) {
         btn.textContent = "▶️ Tocar música";
       }
     };
-
     card.appendChild(btn);
-  }
-
-  // 👑 CONTROLE ADMIN (LUIS)
-  if (isAdmin && userId !== auth.currentUser.uid) {
-    const toggleBtn = document.createElement("button");
-    toggleBtn.textContent = data.public ? "❌ Remover público" : "✅ Tornar público";
-    toggleBtn.style.background = "#e74c3c";
-
-    toggleBtn.onclick = async () => {
-      await updateDoc(doc(db, "profiles", userId), {
-        public: !data.public
-      });
-    };
-
-    card.appendChild(toggleBtn);
   }
 
   profilesContainer.appendChild(card);
 }
 
-auth.onAuthStateChanged(user => {
-  if (!user) return;
-
-  const isAdmin = user.uid === "EIKx6Iz2hRZuzNUkFlvBc8QefSh1";
-
-  onSnapshot(collection(db, "profiles"), snap => {
-    profilesContainer.innerHTML = "";
-    snap.forEach(docSnap => {
-      createProfileCard(docSnap.id, docSnap.data(), isAdmin);
-    });
+onSnapshot(collection(db, "profiles"), snap => {
+  profilesContainer.innerHTML = "";
+  snap.forEach(docSnap => {
+    createProfileCard(docSnap.data());
   });
 });
