@@ -266,8 +266,8 @@ body {
     animation: blink 1s infinite;
 }
 
-.online-dot { background: #4caf50; }
-.offline-dot { background: #f44336; }
+.online-dot { background: #f44336; }
+.offline-dot { background: #4caf50; }
 
 @keyframes blink {
     0%, 50%, 100% { opacity: 1; }
