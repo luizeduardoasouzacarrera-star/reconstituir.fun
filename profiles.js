@@ -21,44 +21,40 @@ async function loadProfiles() {
     snapshot.forEach(docSnap => {
         const data = docSnap.data();
 
+        // CARD PRINCIPAL (igual antes)
         const card = document.createElement("div");
         card.className = "profile-card";
+        card.style.backgroundColor = data.color || "#5865f2";
 
-        // ===== BANNER =====
+        // Banner
         if (data.bannerURL) {
-            const banner = document.createElement("div");
+            const banner = document.createElement("img");
+            banner.src = data.bannerURL;
             banner.className = "profile-banner";
-            banner.style.backgroundImage = `url(${data.bannerURL})`;
             card.appendChild(banner);
         }
-
-        // ===== CONTEÚDO =====
-        const content = document.createElement("div");
-        content.className = "profile-content";
-        content.style.backgroundColor = data.color || "#5865f2";
 
         // Avatar
         if (data.avatarURL) {
             const avatar = document.createElement("img");
             avatar.src = data.avatarURL;
             avatar.className = "profile-avatar";
-            content.appendChild(avatar);
+            card.appendChild(avatar);
         }
 
         // Nome
         const name = document.createElement("h3");
         name.textContent = data.displayName || "Usuário";
-        content.appendChild(name);
+        card.appendChild(name);
 
-        // Bio (COM COR PERSONALIZADA)
+        // Bio (ÚNICA COISA NOVA: cor)
         if (data.bio) {
             const bio = document.createElement("p");
             bio.textContent = data.bio;
             bio.style.color = data.bioColor || "#ffffff";
-            content.appendChild(bio);
+            card.appendChild(bio);
         }
 
-        card.appendChild(content);
         profilesContainer.appendChild(card);
     });
 }
