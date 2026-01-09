@@ -1,5 +1,10 @@
+// dashboard-profile.js
 import { auth, db } from "./firebase.js";
-import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import {
+  doc,
+  getDoc,
+  setDoc
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // Inputs
 const nameInput = document.getElementById("nameInput");
@@ -23,59 +28,58 @@ const saveBtn = document.getElementById("saveProfile");
 
 // Carregar perfil
 auth.onAuthStateChanged(async user => {
-    if (!user) {
-        window.location.href = "index.html";
-        return;
-    }
+  if (!user) {
+    window.location.href = "index.html";
+    return;
+  }
 
-    const ref = doc(db, "profiles", user.uid);
-    const snap = await getDoc(ref);
+  const ref = doc(db, "profiles", user.uid);
+  const snap = await getDoc(ref);
 
-    if (snap.exists()) {
-        const data = snap.data();
+  if (snap.exists()) {
+    const data = snap.data();
 
-        nameInput.value = data.displayName || "";
-        bioInput.value = data.bio || "";
-        bioColorInput.value = data.bioColor || "#ffffff";
-        avatarInput.value = data.avatarURL || "";
-        bannerInput.value = data.bannerURL || "";
-        colorInput.value = data.color || "#5865f2";
-        publicCheckbox.checked = data.public || false;
+    nameInput.value = data.displayName || "";
+    bioInput.value = data.bio || "";
+    bioColorInput.value = data.bioColor || "#ffffff";
+    avatarInput.value = data.avatarURL || "";
+    bannerInput.value = data.bannerURL || "";
+    colorInput.value = data.color || "#5865f2";
+    publicCheckbox.checked = data.public || false;
 
-        robloxInput.value = data.roblox || "";
-        instagramInput.value = data.instagram || "";
-        tiktokInput.value = data.tiktok || "";
-        valorantInput.value = data.valorant || "";
-        steamInput.value = data.steam || "";
-        twitterInput.value = data.twitter || "";
-        spotifyInput.value = data.spotify || "";
-        musicInput.value = data.music || "";
-    }
+    robloxInput.value = data.roblox || "";
+    instagramInput.value = data.instagram || "";
+    tiktokInput.value = data.tiktok || "";
+    valorantInput.value = data.valorant || "";
+    steamInput.value = data.steam || "";
+    twitterInput.value = data.twitter || "";
+    spotifyInput.value = data.spotify || "";
+    musicInput.value = data.music || "";
+  }
 });
 
 // Salvar perfil
 saveBtn.addEventListener("click", async () => {
-    const user = auth.currentUser;
-    if (!user) return;
+  const user = auth.currentUser;
+  if (!user) return;
 
-    await setDoc(doc(db, "profiles", user.uid), {
-        displayName: nameInput.value || user.email.split("@")[0],
-        bio: bioInput.value || "",
-        bioColor: bioColorInput.value || "#ffffff",
-        avatarURL: avatarInput.value || "",
-        bannerURL: bannerInput.value || "",
-        color: colorInput.value || "#5865f2",
-        public: publicCheckbox.checked,
+  await setDoc(doc(db, "profiles", user.uid), {
+    displayName: nameInput.value || user.email.split("@")[0],
+    bio: bioInput.value || "",
+    bioColor: bioColorInput.value || "#ffffff",
+    avatarURL: avatarInput.value || "",
+    bannerURL: bannerInput.value || "",
+    color: colorInput.value || "#5865f2",
+    public: publicCheckbox.checked,
+    roblox: robloxInput.value || "",
+    instagram: instagramInput.value || "",
+    tiktok: tiktokInput.value || "",
+    valorant: valorantInput.value || "",
+    steam: steamInput.value || "",
+    twitter: twitterInput.value || "",
+    spotify: spotifyInput.value || "",
+    music: musicInput.value || ""
+  });
 
-        roblox: robloxInput.value || "",
-        instagram: instagramInput.value || "",
-        tiktok: tiktokInput.value || "",
-        valorant: valorantInput.value || "",
-        steam: steamInput.value || "",
-        twitter: twitterInput.value || "",
-        spotify: spotifyInput.value || "",
-        music: musicInput.value || ""
-    });
-
-    alert("Perfil salvo!");
+  alert("Perfil salvo!");
 });
