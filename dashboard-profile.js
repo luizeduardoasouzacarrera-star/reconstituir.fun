@@ -20,7 +20,6 @@ const spotifyInput = document.getElementById("spotifyInput");
 const musicInput = document.getElementById("musicInput");
 
 const saveBtn = document.getElementById("saveProfile");
-const statusBtn = document.getElementById("statusBtn"); // Seu botão original de online/offline
 
 let currentStatus = true; // status atual
 
@@ -56,34 +55,6 @@ auth.onAuthStateChanged(async user => {
         updateStatusButton();
     }
 });
-
-// Função para atualizar o botão de status
-function updateStatusButton() {
-    if (!statusBtn) return;
-
-    if (currentStatus) {
-        statusBtn.textContent = "🔴 OFFLINE";
-        statusBtn.style.background = "#5865f2";
-    } else {
-        statusBtn.textContent = "🟢 ONLINE";
-        statusBtn.style.background = "#4caf50";
-    }
-}
-
-// Alternar status quando clicar
-if (statusBtn) {
-    statusBtn.addEventListener("click", async () => {
-        const user = auth.currentUser;
-        if (!user) return;
-
-        currentStatus = !currentStatus;
-        updateStatusButton();
-
-        await setDoc(doc(db, "profiles", user.uid), {
-            isOnline: currentStatus
-        }, { merge: false });
-    });
-}
 
 // Salvar perfil
 saveBtn.addEventListener("click", async () => {
