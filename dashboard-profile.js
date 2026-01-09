@@ -1,8 +1,9 @@
 // dashboard-profile.js
 import { auth, db, rtdb } from "./firebase.js"; // rtdb = Realtime Database
 import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { ref as rRef, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { ref as rRef, set, onDisconnect } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
+// Inputs de perfil
 const nameInput = document.getElementById("nameInput");
 const bioInput = document.getElementById("bioInput");
 const avatarInput = document.getElementById("avatarInput");
@@ -21,28 +22,42 @@ const musicInput = document.getElementById("musicInput");
 
 const saveBtn = document.getElementById("saveProfile");
 
-// NOVO: Botão de alternar status online/offline
-const toggleStatusBtn = document.getElementById("toggleStatusBtn");
+// Botão de alternar ONLINE/OFFLINE
+const toggleOnlineBtn = document.createElement("button");
+toggleOnlineBtn.textContent = "🔴 Offline";
+toggleOnlineBtn.style.marginBottom = "10px";
+toggleOnlineBtn.style.padding = "10px 14px";
+toggleOnlineBtn.style.border = "none";
+toggleOnlineBtn.style.borderRadius = "6px";
+toggleOnlineBtn.style.background = "#ff0000";
+toggleOnlineBtn.style.color = "#fff";
+toggleOnlineBtn.style.cursor = "pointer";
+document.querySelector(".profile-form-container").prepend(toggleOnlineBtn);
+
+let isOnline = false;
 let userStatusRef;
 
-// Carrega perfil existente
+// Carrega perfil existente e configura status online
 auth.onAuthStateChanged(async user => {
     if (!user) {
         window.location.href = "index.html";
         return;
     }
 
-    // Referência do status no Realtime Database
-    userStatusRef = rRef(rtdb, `status/${user.uid}`);
-
-    // Atualiza botão conforme status atual
-    onValue(userStatusRef, snapshot => {
-        const isOnline = snapshot.val() || false;
-        toggleStatusBtn.textContent = isOnline ? "Estou Online" : "Estou Offline";
-    });
-
     const profileRef = doc(db, "profiles", user.uid);
     const profileSnap = await getDoc(profileRef);
+
+    // Realtime Database: referência do status
+    userStatusRef = rRef(rtdb, `status/${user.uid}`);
+
+    // Inicializa como ONLINE
+    set(userStatusRef, true);
+    isOnline = true;
+    toggleOnlineBtn.textContent = "🟢 Online";
+    toggleOnlineBtn.style.background = "#4caf50";
+
+    // Configura para ir OFFLINE automaticamente ao desconectar
+    onDisconnect(userStatusRef).set(false);
 
     if (profileSnap.exists()) {
         const data = profileSnap.data();
@@ -61,6 +76,19 @@ auth.onAuthStateChanged(async user => {
         twitterInput.value = data.twitter || "";
         spotifyInput.value = data.spotify || "";
         musicInput.value = data.music || "";
+    }
+});
+
+// Alterna ONLINE/OFFLINE manualmente
+toggleOnlineBtn.addEventListener("click", () => {
+    isOnline = !isOnline;
+    set(userStatusRef, isOnline);
+    if (isOnline) {
+        toggleOnlineBtn.textContent = "🟢 Online";
+        toggleOnlineBtn.style.background = "#4caf50";
+    } else {
+        toggleOnlineBtn.textContent = "🔴 Offline";
+        toggleOnlineBtn.style.background = "#ff0000";
     }
 });
 
@@ -87,16 +115,4 @@ saveBtn.addEventListener("click", async () => {
     });
 
     alert("Perfil salvo!");
-});
-
-// NOVO: Alternar status online/offline ao clicar
-toggleStatusBtn.addEventListener("click", async () => {
-    if (!userStatusRef) return;
-
-    // Pega valor atual uma vez
-    let snapshot = await new Promise(resolve => onValue(userStatusRef, resolve, { onlyOnce: true }));
-    const currentStatus = snapshot.val() || false;
-
-    // Alterna valor
-    await set(userStatusRef, !currentStatus);
 });
