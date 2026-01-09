@@ -1,117 +1,88 @@
-// profiles.js
-import { db } from "./firebase.js";
-import {
-  collection,
-  getDocs
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+// dashboard-profile.js
+import { auth, db } from "./firebase.js";
+import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// Elementos
-const profilesContainer = document.getElementById("profiles");
+// Inputs
+const nameInput = document.getElementById("nameInput");
+const bioInput = document.getElementById("bioInput");
+const bioColorInput = document.getElementById("bioColorInput");
+const avatarInput = document.getElementById("avatarInput");
+const bannerInput = document.getElementById("bannerInput");
+const colorInput = document.getElementById("colorInput");
+const publicCheckbox = document.getElementById("publicCheckbox");
 
-// URLs padrão de redes sociais
-const socialIcons = {
-  roblox: "https://devforum-uploads.s3.dualstack.us-east-2.amazonaws.com/uploads/original/4X/0/e/e/0eeeb19633422b1241f4306419a0f15f39d58de9.png",
-  instagram: "https://elementos.apresto.com.br/wp-content/uploads/2024/05/icon-Instagram-desenho.svg",
-  tiktok: "https://cdn.worldvectorlogo.com/logos/tiktok-icon-2.svg",
-  valorant: "https://www.svgrepo.com/show/424912/valorant-logo-play-2.svg",
-  steam: "https://img.icons8.com/?size=50&id=pOa8st0SGd5C&format=png",
-  twitter: "https://cdn.freelogovectors.net/wp-content/uploads/2023/07/x-logo-twitter-freelogovectors.net_.png",
-  spotify: "https://upload.wikimedia.org/wikipedia/commons/a/a1/2024_Spotify_logo_without_text_%28black%29.svg"
-};
+const robloxInput = document.getElementById("robloxInput");
+const instagramInput = document.getElementById("instagramInput");
+const tiktokInput = document.getElementById("tiktokInput");
+const valorantInput = document.getElementById("valorantInput");
+const steamInput = document.getElementById("steamInput");
+const twitterInput = document.getElementById("twitterInput");
+const spotifyInput = document.getElementById("spotifyInput");
 
-// Função para criar cada card
-function createProfileCard(userId, data) {
-  const card = document.createElement("div");
-  card.classList.add("profile-card");
+const musicInput = document.getElementById("musicInput");
+const musicBtnColorInput = document.getElementById("musicBtnColorInput");
 
-  // Cor do profile (como já funcionava antes)
-  const color = data.color || "#5865f2";
-  card.style.setProperty("--profile-color", color);
+const saveBtn = document.getElementById("saveProfile");
 
-  // Banner
-  const banner = document.createElement("div");
-  banner.classList.add("banner");
-  banner.style.backgroundImage = `url('${data.bannerURL || ""}')`;
-  card.appendChild(banner);
-
-  // Avatar
-  const avatar = document.createElement("img");
-  avatar.classList.add("avatar");
-  avatar.src = data.avatarURL || "";
-  card.appendChild(avatar);
-
-  // Nome
-  const nameEl = document.createElement("strong");
-  nameEl.textContent = data.displayName || userId;
-  card.appendChild(nameEl);
-
-  // Bio (COM COR PERSONALIZADA)
-  if (data.bio) {
-    const bioEl = document.createElement("p");
-    bioEl.textContent = data.bio;
-    bioEl.style.color = data.bioColor || "#ffffff";
-    card.appendChild(bioEl);
-  }
-
-  // Redes sociais
-  const socialsDiv = document.createElement("div");
-  socialsDiv.classList.add("socials");
-
-  Object.keys(socialIcons).forEach(key => {
-    if (data[key]) {
-      const a = document.createElement("a");
-      a.href = data[key];
-      a.target = "_blank";
-
-      const img = document.createElement("img");
-      img.src = socialIcons[key];
-
-      a.appendChild(img);
-      socialsDiv.appendChild(a);
+// Carregar perfil
+auth.onAuthStateChanged(async user => {
+    if (!user) {
+        window.location.href = "index.html";
+        return;
     }
-  });
 
-  card.appendChild(socialsDiv);
+    const ref = doc(db, "profiles", user.uid);
+    const snap = await getDoc(ref);
 
-  // Música
-  if (data.music) {
-    const audioBtn = document.createElement("button");
-    audioBtn.textContent = "▶️ Tocar música";
-    audioBtn.style.marginTop = "10px";
-    audioBtn.style.padding = "8px 14px";
-    audioBtn.style.border = "none";
-    audioBtn.style.borderRadius = "6px";
-    audioBtn.style.background = "#1db954";
-    audioBtn.style.color = "#fff";
-    audioBtn.style.cursor = "pointer";
+    if (snap.exists()) {
+        const data = snap.data();
 
-    const audio = new Audio(`assets/${data.music}`);
+        nameInput.value = data.displayName || "";
+        bioInput.value = data.bio || "";
+        bioColorInput.value = data.bioColor || "#ffffff";
+        avatarInput.value = data.avatarURL || "";
+        bannerInput.value = data.bannerURL || "";
+        colorInput.value = data.color || "#5865f2";
+        publicCheckbox.checked = data.public || false;
 
-    audioBtn.addEventListener("click", () => {
-      if (audio.paused) {
-        audio.play();
-        audioBtn.textContent = "⏸️ Pausar música";
-      } else {
-        audio.pause();
-        audioBtn.textContent = "▶️ Tocar música";
-      }
+        robloxInput.value = data.roblox || "";
+        instagramInput.value = data.instagram || "";
+        tiktokInput.value = data.tiktok || "";
+        valorantInput.value = data.valorant || "";
+        steamInput.value = data.steam || "";
+        twitterInput.value = data.twitter || "";
+        spotifyInput.value = data.spotify || "";
+
+        musicInput.value = data.music || "";
+        musicBtnColorInput.value = data.musicBtnColor || "#1db954";
+    }
+});
+
+// Salvar perfil
+saveBtn.addEventListener("click", async () => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    await setDoc(doc(db, "profiles", user.uid), {
+        displayName: nameInput.value || user.email.split("@")[0],
+        bio: bioInput.value || "",
+        bioColor: bioColorInput.value || "#ffffff",
+        avatarURL: avatarInput.value || "",
+        bannerURL: bannerInput.value || "",
+        color: colorInput.value || "#5865f2",
+        public: publicCheckbox.checked,
+
+        roblox: robloxInput.value || "",
+        instagram: instagramInput.value || "",
+        tiktok: tiktokInput.value || "",
+        valorant: valorantInput.value || "",
+        steam: steamInput.value || "",
+        twitter: twitterInput.value || "",
+        spotify: spotifyInput.value || "",
+
+        music: musicInput.value || "",
+        musicBtnColor: musicBtnColorInput.value || "#1db954"
     });
 
-    card.appendChild(audioBtn);
-  }
-
-  profilesContainer.appendChild(card);
-}
-
-// Carregar perfis
-async function loadProfiles() {
-  profilesContainer.innerHTML = "";
-
-  const snapshot = await getDocs(collection(db, "profiles"));
-  snapshot.forEach(docSnap => {
-    createProfileCard(docSnap.id, docSnap.data());
-  });
-}
-
-// Inicializa
-loadProfiles();
+    alert("Perfil salvo!");
+});
