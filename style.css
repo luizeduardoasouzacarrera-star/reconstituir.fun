@@ -8,7 +8,8 @@
 
 /* ===== FUNDO GERAL ===== */
 body {
-  background: linear-gradient(135deg, #1e1e2f, #2b2b45);
+  background: url('assets/fundo.gif') no-repeat center center fixed;
+  background-size: cover;
   color: #fff;
   min-height: 100vh;
 }
@@ -250,8 +251,6 @@ body {
 .profile-card .socials a img:hover {
   transform: scale(1.2);
 }
-
-
 
 /* ===== BOTÃO DE MÚSICA ===== */
 .profile-card button {
