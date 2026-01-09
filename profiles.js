@@ -89,10 +89,10 @@ function createProfileCard(userId, data) {
     btn.addEventListener("click", () => {
       if (audio.paused) {
         audio.play();
-        btn.textContent = "⏸️ Pausar música";
+        btn.textContent = "Pausar música";
       } else {
         audio.pause();
-        btn.textContent = "▶️ Tocar música";
+        btn.textContent = "Tocar música";
       }
     });
 
