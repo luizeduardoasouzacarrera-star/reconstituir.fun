@@ -21,7 +21,38 @@ const musicInput = document.getElementById("musicInput");
 
 const saveBtn = document.getElementById("saveProfile");
 
-let currentStatus = true; // status atual
+// ===== BOTÃO MANUAL ONLINE/OFFLINE =====
+const statusBtn = document.createElement("button");
+statusBtn.id = "statusBtn";
+statusBtn.style.marginTop = "10px";
+statusBtn.style.padding = "8px 14px";
+statusBtn.style.border = "none";
+statusBtn.style.borderRadius = "6px";
+statusBtn.style.background = "#5865f2";
+statusBtn.style.color = "#fff";
+statusBtn.style.cursor = "pointer";
+statusBtn.textContent = "OFFLINE";
+
+// Adiciona o botão abaixo do botão de salvar
+saveBtn.insertAdjacentElement("afterend", statusBtn);
+
+let currentStatus = false; // false = OFFLINE, true = ONLINE
+
+function updateStatusButton() {
+    if (currentStatus) {
+        statusBtn.textContent = "ONLINE";
+        statusBtn.style.background = "#4caf50";
+    } else {
+        statusBtn.textContent = "OFFLINE";
+        statusBtn.style.background = "#e74c3c";
+    }
+}
+
+// Alterna status ao clicar
+statusBtn.addEventListener("click", () => {
+    currentStatus = !currentStatus;
+    updateStatusButton();
+});
 
 // Carrega perfil existente
 auth.onAuthStateChanged(async user => {
@@ -51,6 +82,7 @@ auth.onAuthStateChanged(async user => {
         spotifyInput.value = data.spotify || "";
         musicInput.value = data.music || "";
 
+        // Carrega status manual
         currentStatus = data.isOnline || false;
         updateStatusButton();
     }
@@ -76,8 +108,8 @@ saveBtn.addEventListener("click", async () => {
         twitter: twitterInput.value || "",
         spotify: spotifyInput.value || "",
         music: musicInput.value || "",
-        isOnline: currentStatus
-    }, { merge: false });
+        isOnline: currentStatus // salva status manual
+    }, { merge: true });
 
     alert("Perfil salvo!");
 });
