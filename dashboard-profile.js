@@ -22,7 +22,7 @@ const musicInput = document.getElementById("musicInput");
 const saveBtn = document.getElementById("saveProfile");
 const statusBtn = document.getElementById("statusBtn"); // Seu botão original de online/offline
 
-let currentStatus = false; // status atual
+let currentStatus = true; // status atual
 
 // Carrega perfil existente
 auth.onAuthStateChanged(async user => {
