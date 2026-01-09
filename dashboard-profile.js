@@ -1,9 +1,9 @@
 // dashboard-profile.js
-import { auth, db, rtdb } from "./firebase.js"; // rtdb = Realtime Database
+import { auth, db, rtdb } from "./firebase.js";
 import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { ref as rRef, set, onDisconnect } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { ref as rRef, set, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-// Inputs de perfil
+// Inputs do perfil
 const nameInput = document.getElementById("nameInput");
 const bioInput = document.getElementById("bioInput");
 const avatarInput = document.getElementById("avatarInput");
@@ -22,42 +22,34 @@ const musicInput = document.getElementById("musicInput");
 
 const saveBtn = document.getElementById("saveProfile");
 
-// Botão de alternar ONLINE/OFFLINE
-const toggleOnlineBtn = document.createElement("button");
-toggleOnlineBtn.textContent = "🔴 Offline";
-toggleOnlineBtn.style.marginBottom = "10px";
-toggleOnlineBtn.style.padding = "10px 14px";
-toggleOnlineBtn.style.border = "none";
-toggleOnlineBtn.style.borderRadius = "6px";
-toggleOnlineBtn.style.background = "#ff0000";
-toggleOnlineBtn.style.color = "#fff";
-toggleOnlineBtn.style.cursor = "pointer";
-document.querySelector(".profile-form-container").prepend(toggleOnlineBtn);
+// ===== NOVO: BOTÃO ONLINE/OFFLINE =====
+const toggleStatusBtn = document.createElement("button");
+toggleStatusBtn.id = "toggleStatusBtn";
+toggleStatusBtn.style.marginTop = "10px";
+toggleStatusBtn.style.padding = "8px 14px";
+toggleStatusBtn.style.border = "none";
+toggleStatusBtn.style.borderRadius = "6px";
+toggleStatusBtn.style.background = "#5865f2";
+toggleStatusBtn.style.color = "#fff";
+toggleStatusBtn.style.cursor = "pointer";
+toggleStatusBtn.textContent = "🔴 OFFLINE";
 
-let isOnline = false;
-let userStatusRef;
+document.querySelector(".profile-form-container").appendChild(toggleStatusBtn);
 
-// Carrega perfil existente e configura status online
+let currentStatus = false; // false = offline, true = online
+let userStatusRef; // referência no Realtime Database
+
+// Carrega perfil existente
 auth.onAuthStateChanged(async user => {
     if (!user) {
         window.location.href = "index.html";
         return;
     }
 
-    const profileRef = doc(db, "profiles", user.uid);
-    const profileSnap = await getDoc(profileRef);
-
-    // Realtime Database: referência do status
     userStatusRef = rRef(rtdb, `status/${user.uid}`);
 
-    // Inicializa como ONLINE
-    set(userStatusRef, true);
-    isOnline = true;
-    toggleOnlineBtn.textContent = "🟢 Online";
-    toggleOnlineBtn.style.background = "#4caf50";
-
-    // Configura para ir OFFLINE automaticamente ao desconectar
-    onDisconnect(userStatusRef).set(false);
+    const profileRef = doc(db, "profiles", user.uid);
+    const profileSnap = await getDoc(profileRef);
 
     if (profileSnap.exists()) {
         const data = profileSnap.data();
@@ -77,18 +69,30 @@ auth.onAuthStateChanged(async user => {
         spotifyInput.value = data.spotify || "";
         musicInput.value = data.music || "";
     }
+
+    // Pega status atual do Realtime Database e atualiza botão
+    const snapshot = await get(userStatusRef);
+    currentStatus = snapshot.val() || false;
+    updateStatusButton();
 });
 
-// Alterna ONLINE/OFFLINE manualmente
-toggleOnlineBtn.addEventListener("click", () => {
-    isOnline = !isOnline;
-    set(userStatusRef, isOnline);
-    if (isOnline) {
-        toggleOnlineBtn.textContent = "🟢 Online";
-        toggleOnlineBtn.style.background = "#4caf50";
+// Função para atualizar texto e cor do botão
+function updateStatusButton() {
+    if (currentStatus) {
+        toggleStatusBtn.textContent = "🟢 ONLINE";
+        toggleStatusBtn.style.background = "#4caf50";
     } else {
-        toggleOnlineBtn.textContent = "🔴 Offline";
-        toggleOnlineBtn.style.background = "#ff0000";
+        toggleStatusBtn.textContent = "🔴 OFFLINE";
+        toggleStatusBtn.style.background = "#5865f2";
+    }
+}
+
+// Clicar no botão alterna status
+toggleStatusBtn.addEventListener("click", async () => {
+    currentStatus = !currentStatus;
+    updateStatusButton();
+    if (userStatusRef) {
+        await set(userStatusRef, currentStatus);
     }
 });
 
