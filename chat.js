@@ -1,5 +1,5 @@
 // chat.js
-import { auth, db } from "./firebase.js";
+import { auth, db, rtdb } from "./firebase.js"; // rtdb = Realtime Database
 
 import {
   onAuthStateChanged,
@@ -17,6 +17,12 @@ import {
   doc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+import {
+  ref as rtdbRef,
+  set as rtdbSet,
+  onDisconnect
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
 // ===== ELEMENTOS =====
 const chatDiv = document.getElementById("chat");
 const sendBtn = document.getElementById("sendBtn");
@@ -27,7 +33,7 @@ let username = "";
 let isLuiz = false;
 
 // ===== AUTH =====
-onAuthStateChanged(auth, user => {
+onAuthStateChanged(auth, async user => {
   if (!user) {
     window.location.replace("index.html");
     return;
@@ -35,6 +41,19 @@ onAuthStateChanged(auth, user => {
 
   username = user.email.split("@")[0];
   isLuiz = username === "luiz";
+
+  // ===== MARCAR ONLINE NO REALTIME DATABASE =====
+  const userStatusRef = rtdbRef(rtdb, `status/${user.uid}`);
+  await rtdbSet(userStatusRef, {
+    isOnline: true,
+    lastChanged: Date.now()
+  });
+
+  // Garanta que quando desconectar fique offline
+  onDisconnect(userStatusRef).set({
+    isOnline: false,
+    lastChanged: Date.now()
+  });
 });
 
 // ===== ENVIAR =====
@@ -100,7 +119,17 @@ onSnapshot(q, snapshot => {
 });
 
 // ===== LOGOUT =====
-logoutBtn.addEventListener("click", () => {
+logoutBtn.addEventListener("click", async () => {
+  const user = auth.currentUser;
+  if (user) {
+    // MARCAR OFFLINE ANTES DE DESLOGAR
+    const userStatusRef = rtdbRef(rtdb, `status/${user.uid}`);
+    await rtdbSet(userStatusRef, {
+      isOnline: false,
+      lastChanged: Date.now()
+    });
+  }
+
   signOut(auth).then(() => {
     window.location.replace("index.html");
   });
