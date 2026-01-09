@@ -106,7 +106,7 @@ saveBtn.addEventListener("click", async () => {
         spotify: spotifyInput.value || "",
         music: musicInput.value || "",
         isOnline: currentStatus
-    }, { merge: true });
+    }, { merge: false });
 
     alert("Perfil salvo!");
 });
