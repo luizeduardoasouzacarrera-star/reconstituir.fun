@@ -89,35 +89,28 @@ function createProfileCard(userId, data, container) {
   container.appendChild(card);
 }
 
-// Carrega o perfil do usuário logado
-async function loadMyProfile() {
-  const user = auth.currentUser;
-  if (!user) return;
-
-  const snap = await getDoc(doc(db, "profiles", user.uid));
-  if (!snap.exists()) return;
-
-  createProfileCard(user.uid, snap.data(), myProfileDiv);
-}
-
-// Carrega todos os perfis públicos (exceto "Meu Perfil")
-async function loadProfiles() {
+// Carrega os perfis
+async function loadProfiles(user) {
   profilesContainer.innerHTML = "";
-  const snapshot = await getDocs(collection(db, "profiles"));
-  
-  snapshot.forEach(docSnap => {
-    const data = docSnap.data();
+  myProfileDiv.innerHTML = "";
 
-    if (data.public && docSnap.id !== auth.currentUser.uid) {
-      createProfileCard(docSnap.id, data, profilesContainer);
+  // Primeiro, carrega o perfil do usuário logado
+  const mySnap = await getDoc(doc(db, "profiles", user.uid));
+  if (mySnap.exists()) {
+    createProfileCard(user.uid, mySnap.data(), myProfileDiv);
+  }
+
+  // Depois, carrega os outros perfis públicos
+  const snapshot = await getDocs(collection(db, "profiles"));
+  snapshot.forEach(docSnap => {
+    if (docSnap.id !== user.uid && docSnap.data().public) {
+      createProfileCard(docSnap.id, docSnap.data(), profilesContainer);
     }
   });
 }
 
-// Inicialização
+// Inicializa quando o usuário estiver logado
 auth.onAuthStateChanged(user => {
   if (!user) return;
-
-  loadMyProfile();
-  loadProfiles();
+  loadProfiles(user);
 });
