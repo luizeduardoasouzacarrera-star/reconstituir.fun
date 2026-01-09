@@ -1,115 +1,150 @@
 // profiles.js
 import { db, rtdb } from "./firebase.js"; // db = Firestore, rtdb = Realtime Database
-import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { ref as rtdbRef, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { ref as rRef, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-// ===== ELEMENTO PRINCIPAL =====
+// Elementos
 const profilesContainer = document.getElementById("profiles");
 
-// URLs de ícones de redes sociais
+// URLs padrão de redes sociais
 const socialIcons = {
-            roblox: "https://devforum-uploads.s3.dualstack.us-east-2.amazonaws.com/uploads/original/4X/0/e/e/0eeeb19633422b1241f4306419a0f15f39d58de9.png",
-            instagram: "https://elementos.apresto.com.br/wp-content/uploads/2024/05/icon-Instagram-desenho.svg",
-            tiktok: "https://cdn.worldvectorlogo.com/logos/tiktok-icon-2.svg",
-            valorant: "https://www.svgrepo.com/show/424912/valorant-logo-play-2.svg",
-            steam: "https://img.icons8.com/?size=50&id=pOa8st0SGd5C&format=png",
-            twitter: "https://cdn.freelogovectors.net/wp-content/uploads/2023/07/x-logo-twitter-freelogovectors.net_.png",
-            spotify: "https://upload.wikimedia.org/wikipedia/commons/a/a1/2024_Spotify_logo_without_text_(black).svg"
+  roblox: "https://devforum-uploads.s3.dualstack.us-east-2.amazonaws.com/uploads/original/4X/0/e/e/0eeeb19633422b1241f4306419a0f15f39d58de9.png",
+  instagram: "https://elementos.apresto.com.br/wp-content/uploads/2024/05/icon-Instagram-desenho.svg",
+  tiktok: "https://cdn.worldvectorlogo.com/logos/tiktok-icon-2.svg",
+  valorant: "https://www.svgrepo.com/show/424912/valorant-logo-play-2.svg",
+  steam: "https://img.icons8.com/?size=50&id=pOa8st0SGd5C&format=png",
+  twitter: "https://cdn.freelogovectors.net/wp-content/uploads/2023/07/x-logo-twitter-freelogovectors.net_.png",
+  spotify: "https://upload.wikimedia.org/wikipedia/commons/a/a1/2024_Spotify_logo_without_text_%28black%29.svg"
 };
 
-// ===== FUNÇÃO PRINCIPAL =====
-export async function loadPublicProfiles() {
-    profilesContainer.innerHTML = ""; // limpa antes de carregar
+// Função para criar cada card
+async function createProfileCard(userId, data) {
+  const card = document.createElement("div");
+  card.classList.add("profile-card");
 
-    // Pega todos os perfis públicos do Firestore
-    const profilesCol = collection(db, "profiles");
-    const q = query(profilesCol, where("public", "==", true));
-    const snapshot = await getDocs(q);
+  // Cor do perfil
+  const color = data.color || "#5865f2";
+  card.style.borderTop = `5px solid ${color}`;
 
-    snapshot.forEach(docSnap => {
-        const data = docSnap.data();
+  // Status online/offline
+  const status = document.createElement("div");
+  status.classList.add("status-indicator");
+  status.style.position = "absolute";
+  status.style.top = "10px";
+  status.style.left = "10px";
+  status.style.display = "flex";
+  status.style.alignItems = "center";
+  status.style.gap = "5px";
+  
+  const statusDot = document.createElement("span");
+  statusDot.classList.add("status-bubble", "offline");
+  
+  const statusText = document.createElement("span");
+  statusText.textContent = "OFFLINE";
+  statusText.style.fontSize = "12px";
+  statusText.style.fontWeight = "bold";
 
-        // Cria card do perfil
-        const card = document.createElement("div");
-        card.className = "profile-card";
-        card.style.borderColor = data.color || "#5865f2"; // cor do perfil
+  status.appendChild(statusDot);
+  status.appendChild(statusText);
+  card.appendChild(status);
 
-        // Banner
-        const banner = document.createElement("div");
-        banner.className = "banner";
-        banner.style.backgroundImage = `url(${data.bannerURL || ""})`;
-        card.appendChild(banner);
+  // Atualização do status em tempo real
+  const onlineRef = rRef(rtdb, `status/${userId}`);
+  onValue(onlineRef, (snapshot) => {
+    const isOnline = snapshot.val() || false;
+    if (isOnline) {
+      statusDot.classList.remove("offline");
+      statusDot.classList.add("online");
+      statusText.textContent = "ONLINE";
+    } else {
+      statusDot.classList.remove("online");
+      statusDot.classList.add("offline");
+      statusText.textContent = "OFFLINE";
+    }
+  });
 
-        // Avatar
-        const avatar = document.createElement("img");
-        avatar.className = "avatar";
-        avatar.src = data.avatarURL || "";
-        card.appendChild(avatar);
+  // Banner
+  const banner = document.createElement("div");
+  banner.classList.add("banner");
+  banner.style.backgroundImage = `url('${data.bannerURL || ""}')`;
+  card.appendChild(banner);
 
-        // Nome e bio
-        const nameEl = document.createElement("strong");
-        nameEl.textContent = data.displayName || "Usuário";
-        card.appendChild(nameEl);
+  // Avatar
+  const avatar = document.createElement("img");
+  avatar.classList.add("avatar");
+  avatar.src = data.avatarURL || "";
+  card.appendChild(avatar);
 
-        const bioEl = document.createElement("p");
-        bioEl.textContent = data.bio || "";
-        card.appendChild(bioEl);
+  // Nome e bio
+  const nameEl = document.createElement("strong");
+  nameEl.textContent = data.displayName || userId;
+  card.appendChild(nameEl);
 
-        // Socials
-        const socialsDiv = document.createElement("div");
-        socialsDiv.className = "socials";
-        for (const key of Object.keys(socialIcons)) {
-            if (data[key]) {
-                const a = document.createElement("a");
-                a.href = data[key];
-                a.target = "_blank";
-                const img = document.createElement("img");
-                img.src = socialIcons[key];
-                a.appendChild(img);
-                socialsDiv.appendChild(a);
-            }
-        }
-        card.appendChild(socialsDiv);
+  if (data.bio) {
+    const bioEl = document.createElement("p");
+    bioEl.textContent = data.bio;
+    card.appendChild(bioEl);
+  }
 
-        // Música
-        if (data.music) {
-            const playBtn = document.createElement("button");
-            playBtn.textContent = "▶ Tocar música";
-            playBtn.style.marginTop = "10px";
-            playBtn.onclick = () => {
-                const audio = new Audio(`assets/${data.music}`);
-                audio.play();
-            };
-            card.appendChild(playBtn);
-        }
+  // Redes sociais
+  const socialsDiv = document.createElement("div");
+  socialsDiv.classList.add("socials");
+  Object.keys(socialIcons).forEach(key => {
+    if (data[key]) {
+      const a = document.createElement("a");
+      a.href = data[key];
+      a.target = "_blank";
+      const img = document.createElement("img");
+      img.src = socialIcons[key];
+      a.appendChild(img);
+      socialsDiv.appendChild(a);
+    }
+  });
+  card.appendChild(socialsDiv);
 
-        // Status online/offline
-        const statusDiv = document.createElement("div");
-        statusDiv.className = "status-indicator";
-        statusDiv.style.position = "absolute";
-        statusDiv.style.top = "10px";
-        statusDiv.style.left = "10px";
-        card.appendChild(statusDiv);
+  // Botão de música
+  if (data.music) {
+    const audioBtn = document.createElement("button");
+    audioBtn.textContent = "▶️ Tocar música";
+    audioBtn.style.marginTop = "10px";
+    audioBtn.style.padding = "8px 14px";
+    audioBtn.style.border = "none";
+    audioBtn.style.borderRadius = "6px";
+    audioBtn.style.background = "#1db954";
+    audioBtn.style.color = "#fff";
+    audioBtn.style.cursor = "pointer";
 
-        const statusBubble = document.createElement("span");
-        statusBubble.className = "status-bubble offline";
-        statusDiv.appendChild(statusBubble);
-
-        const statusText = document.createElement("span");
-        statusText.textContent = "OFFLINE";
-        statusDiv.appendChild(statusText);
-
-        // ===== Realtime Database para online/offline =====
-        const rtdbUserRef = rtdbRef(rtdb, `onlineUsers/${docSnap.id}`);
-        onValue(rtdbUserRef, snapshot => {
-            const isOnline = snapshot.val() === true;
-            statusBubble.className = "status-bubble " + (isOnline ? "online" : "offline");
-            statusText.textContent = isOnline ? "ONLINE" : "OFFLINE";
-        });
-
-        profilesContainer.appendChild(card);
+    const audio = new Audio(`assets/${data.music}`);
+    audioBtn.addEventListener("click", () => {
+      if (audio.paused) {
+        audio.play();
+        audioBtn.textContent = "⏸️ Pausar música";
+      } else {
+        audio.pause();
+        audioBtn.textContent = "▶️ Tocar música";
+      }
     });
+
+    card.appendChild(audioBtn);
+  }
+
+  profilesContainer.appendChild(card);
 }
 
-// Chama a função ao carregar
-loadPublicProfiles();
+// Pegar todos os perfis do Firestore
+async function loadProfiles() {
+  profilesContainer.innerHTML = "";
+  const profilesCollection = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js")
+    .then(fs => fs.collection(db, "profiles"));
+
+  const snapshot = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js")
+    .then(fs => fs.getDocs(profilesCollection));
+
+  snapshot.forEach(docSnap => {
+    const data = docSnap.data();
+    createProfileCard(docSnap.id, data);
+  });
+}
+
+// Inicializa
+loadProfiles();
