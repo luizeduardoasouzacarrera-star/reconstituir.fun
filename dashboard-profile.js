@@ -63,26 +63,31 @@ saveBtn.addEventListener("click", async () => {
     const user = auth.currentUser;
     if (!user) return;
 
-    await setDoc(doc(db, "profiles", user.uid), {
-        displayName: nameInput.value || user.email.split("@")[0],
-        bio: bioInput.value || "",
-        bioColor: bioColorInput.value || "#ffffff",
-        avatarURL: avatarInput.value || "",
-        bannerURL: bannerInput.value || "",
-        color: colorInput.value || "#5865f2",
-        public: publicCheckbox.checked,
+    await setDoc(
+        doc(db, "profiles", user.uid),
+        {
+            displayName: nameInput.value || user.email.split("@")[0],
+            bio: bioInput.value || "",
+            bioColor: bioColorInput.value || "#ffffff",
+            avatarURL: avatarInput.value || "",
+            bannerURL: bannerInput.value || "",
+            color: colorInput.value || "#5865f2",
+            public: publicCheckbox.checked,
 
-        roblox: robloxInput.value || "",
-        instagram: instagramInput.value || "",
-        tiktok: tiktokInput.value || "",
-        valorant: valorantInput.value || "",
-        steam: steamInput.value || "",
-        twitter: twitterInput.value || "",
-        spotify: spotifyInput.value || "",
+            roblox: robloxInput.value || "",
+            instagram: instagramInput.value || "",
+            tiktok: tiktokInput.value || "",
+            valorant: valorantInput.value || "",
+            steam: steamInput.value || "",
+            twitter: twitterInput.value || "",
+            spotify: spotifyInput.value || "",
 
-        music: musicInput.value || "",
-        musicBtnColor: musicBtnColorInput.value || "#1db954"
-    });
+            music: musicInput.value || "",
+            musicBtnColor: musicBtnColorInput.value || "#1db954"
+        },
+        { merge: true } // 🔒 ISSO AQUI É A CHAVE
+    );
 
     alert("Perfil salvo!");
 });
+
