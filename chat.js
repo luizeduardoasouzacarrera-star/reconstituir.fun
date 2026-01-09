@@ -1,5 +1,5 @@
 // chat.js
-import { auth, db, rtdb } from "./firebase.js"; // rtdb = Realtime Database
+import { auth, db, rtdb } from "./firebase.js";
 
 import {
   onAuthStateChanged,
@@ -14,7 +14,8 @@ import {
   onSnapshot,
   serverTimestamp,
   deleteDoc,
-  doc
+  doc,
+  getDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 import {
@@ -30,6 +31,7 @@ const messageInput = document.getElementById("message");
 const logoutBtn = document.getElementById("logoutBtn");
 
 let username = "";
+let displayNameWithEmoji = "";
 let isLuiz = false;
 
 // ===== AUTH =====
@@ -42,14 +44,30 @@ onAuthStateChanged(auth, async user => {
   username = user.email.split("@")[0];
   isLuiz = username === "luiz";
 
-  // ===== MARCAR ONLINE NO REALTIME DATABASE =====
+  // ===== BUSCAR PERFIL =====
+  const profileRef = doc(db, "profiles", user.uid);
+  const profileSnap = await getDoc(profileRef);
+
+  let emoji = "";
+  let emojiUnlocked = false;
+
+  if (profileSnap.exists()) {
+    const data = profileSnap.data();
+    emoji = data.emoji || "";
+    emojiUnlocked = data.emojiUnlocked === true;
+  }
+
+  displayNameWithEmoji = emojiUnlocked && emoji
+    ? `${username} ${emoji}`
+    : username;
+
+  // ===== MARCAR ONLINE =====
   const userStatusRef = rtdbRef(rtdb, `status/${user.uid}`);
   await rtdbSet(userStatusRef, {
     isOnline: true,
     lastChanged: Date.now()
   });
 
-  // Garanta que quando desconectar fique offline
   onDisconnect(userStatusRef).set({
     isOnline: false,
     lastChanged: Date.now()
@@ -67,7 +85,7 @@ async function sendMessage() {
   if (!text) return;
 
   await addDoc(collection(db, "messages"), {
-    user: username,
+    user: displayNameWithEmoji,
     text: text,
     timestamp: serverTimestamp()
   });
@@ -96,7 +114,6 @@ onSnapshot(q, snapshot => {
       : "";
 
     const p = document.createElement("p");
-
     p.innerHTML = `<b>${data.user}</b> (${time}): ${data.text}`;
 
     // 👉 APAGAR MSG (SÓ LUIZ)
@@ -122,7 +139,6 @@ onSnapshot(q, snapshot => {
 logoutBtn.addEventListener("click", async () => {
   const user = auth.currentUser;
   if (user) {
-    // MARCAR OFFLINE ANTES DE DESLOGAR
     const userStatusRef = rtdbRef(rtdb, `status/${user.uid}`);
     await rtdbSet(userStatusRef, {
       isOnline: false,
