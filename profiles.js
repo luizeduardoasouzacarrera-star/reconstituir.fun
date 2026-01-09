@@ -21,17 +21,43 @@ onAuthStateChanged(auth, user => {
 const profilesRef = collection(db, "profiles");
 onSnapshot(profilesRef, snapshot => {
   profilesDiv.innerHTML = ""; // limpa antes de recriar
+
   snapshot.forEach(docSnap => {
     const data = docSnap.data();
     const uid = docSnap.id;
 
-    // Só mostrar se público
     if (!data.public) return;
 
     // Criar card
     const card = document.createElement("div");
     card.classList.add("profile-card");
     card.style.borderColor = data.color || "#5865f2"; // COR PERSONALIZADA
+
+    // Status online/offline no canto superior esquerdo
+    const statusDiv = document.createElement("div");
+    statusDiv.style.position = "absolute";
+    statusDiv.style.top = "10px";
+    statusDiv.style.left = "10px";
+    statusDiv.style.display = "flex";
+    statusDiv.style.alignItems = "center";
+    statusDiv.style.gap = "6px";
+
+    const statusDot = document.createElement("span");
+    statusDot.style.width = "10px";
+    statusDot.style.height = "10px";
+    statusDot.style.borderRadius = "50%";
+    statusDot.style.display = "inline-block";
+    statusDot.style.animation = "blink 1s infinite";
+    statusDot.classList.add("offline"); // padrão
+
+    const statusLabel = document.createElement("span");
+    statusLabel.style.color = "#fff";
+    statusLabel.style.fontSize = "12px";
+    statusLabel.textContent = "Offline";
+
+    statusDiv.appendChild(statusDot);
+    statusDiv.appendChild(statusLabel);
+    card.appendChild(statusDiv);
 
     // Banner
     const banner = document.createElement("div");
@@ -79,14 +105,7 @@ onSnapshot(profilesRef, snapshot => {
       twitter: data.twitter,
       spotify: data.spotify
     };
-    for (const [key, link] of Object.entries(socialLinks)) {
-      if (link) {
-        const a = document.createElement("a");
-        a.href = link;
-        a.target = "_blank";
-        const img = document.createElement("img");
-        // URLs das imagens
-        const icons = {
+    const icons = {
             roblox: "https://devforum-uploads.s3.dualstack.us-east-2.amazonaws.com/uploads/original/4X/0/e/e/0eeeb19633422b1241f4306419a0f15f39d58de9.png",
             instagram: "https://elementos.apresto.com.br/wp-content/uploads/2024/05/icon-Instagram-desenho.svg",
             tiktok: "https://cdn.worldvectorlogo.com/logos/tiktok-icon-2.svg",
@@ -94,7 +113,13 @@ onSnapshot(profilesRef, snapshot => {
             steam: "https://img.icons8.com/?size=50&id=pOa8st0SGd5C&format=png",
             twitter: "https://cdn.freelogovectors.net/wp-content/uploads/2023/07/x-logo-twitter-freelogovectors.net_.png",
             spotify: "https://upload.wikimedia.org/wikipedia/commons/a/a1/2024_Spotify_logo_without_text_(black).svg"
-        };
+    };
+    for (const [key, link] of Object.entries(socialLinks)) {
+      if (link) {
+        const a = document.createElement("a");
+        a.href = link;
+        a.target = "_blank";
+        const img = document.createElement("img");
         img.src = icons[key];
         a.appendChild(img);
         socials.appendChild(a);
@@ -102,30 +127,16 @@ onSnapshot(profilesRef, snapshot => {
     }
     card.appendChild(socials);
 
-    // Status (Online/Offline)
-    const status = document.createElement("div");
-    status.classList.add("status-indicator");
-    const dot = document.createElement("span");
-    dot.classList.add("status-bubble");
-    const label = document.createElement("span");
-    label.textContent = "Offline";
-
-    status.appendChild(dot);
-    status.appendChild(label);
-    card.appendChild(status);
-
     // Escutando Realtime Database para status
     const statusRef = ref(rtdb, `status/${uid}`);
     onValue(statusRef, snap => {
       const val = snap.val();
       if (val && val.isOnline) {
-        dot.classList.remove("offline");
-        dot.classList.add("online");
-        label.textContent = "Online";
+        statusDot.style.backgroundColor = "#4caf50"; // verde
+        statusLabel.textContent = "Online";
       } else {
-        dot.classList.remove("online");
-        dot.classList.add("offline");
-        label.textContent = "Offline";
+        statusDot.style.backgroundColor = "#f44336"; // vermelho
+        statusLabel.textContent = "Offline";
       }
     });
 
