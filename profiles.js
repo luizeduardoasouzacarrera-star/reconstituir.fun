@@ -1,5 +1,5 @@
 // profiles.js
-import { auth, db } from "./firebase.js";
+import { db, auth } from "./firebase.js";
 import {
   collection,
   onSnapshot,
@@ -8,16 +8,6 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const profilesContainer = document.getElementById("profiles");
-
-let isLuiz = false;
-
-// 🔐 Detecta se é o Luiz
-auth.onAuthStateChanged(user => {
-  if (user) {
-    const username = user.email.split("@")[0];
-    isLuiz = username === "luiz";
-  }
-});
 
 const socialIcons = {
   roblox: "https://devforum-uploads.s3.dualstack.us-east-2.amazonaws.com/uploads/original/4X/0/e/e/0eeeb19633422b1241f4306419a0f15f39d58de9.png",
@@ -29,35 +19,36 @@ const socialIcons = {
   spotify: "https://upload.wikimedia.org/wikipedia/commons/a/a1/2024_Spotify_logo_without_text_%28black%29.svg"
 };
 
-function createProfileCard(userId, data) {
-  const card = document.createElement("div");
-  card.classList.add("profile-card");
+function createProfileCard(userId, data, isAdmin) {
+  if (!data.public && !isAdmin) return;
 
+  const card = document.createElement("div");
+  card.className = "profile-card";
   card.style.setProperty("--profile-color", data.color || "#5865f2");
 
   const banner = document.createElement("div");
-  banner.classList.add("banner");
+  banner.className = "banner";
   banner.style.backgroundImage = `url('${data.bannerURL || ""}')`;
   card.appendChild(banner);
 
   const avatar = document.createElement("img");
-  avatar.classList.add("avatar");
+  avatar.className = "avatar";
   avatar.src = data.avatarURL || "";
   card.appendChild(avatar);
 
-  const nameEl = document.createElement("strong");
-  nameEl.textContent = data.displayName || userId;
-  card.appendChild(nameEl);
+  const name = document.createElement("strong");
+  name.textContent = `${data.displayName || userId}${data.emoji || ""}`;
+  card.appendChild(name);
 
   if (data.bio) {
-    const bioEl = document.createElement("p");
-    bioEl.textContent = data.bio;
-    bioEl.style.color = data.bioColor || "#ffffff";
-    card.appendChild(bioEl);
+    const bio = document.createElement("p");
+    bio.textContent = data.bio;
+    bio.style.color = data.bioColor || "#fff";
+    card.appendChild(bio);
   }
 
-  const socialsDiv = document.createElement("div");
-  socialsDiv.classList.add("socials");
+  const socials = document.createElement("div");
+  socials.className = "socials";
 
   Object.keys(socialIcons).forEach(key => {
     if (data[key]) {
@@ -67,42 +58,60 @@ function createProfileCard(userId, data) {
       const img = document.createElement("img");
       img.src = socialIcons[key];
       a.appendChild(img);
-      socialsDiv.appendChild(a);
+      socials.appendChild(a);
     }
   });
 
-  card.appendChild(socialsDiv);
+  card.appendChild(socials);
 
-  // 🔥 PODER DE ADMIN (SÓ LUIZ)
-  if (isLuiz && data.public === true) {
-    card.style.cursor = "pointer";
-    card.title = "Clique para remover perfil público";
+  // 🎵 BOTÃO DE MÚSICA (AGORA FUNCIONA)
+  if (data.music && data.music.trim() !== "") {
+    const audio = new Audio(`assets/${data.music}`);
 
-    card.addEventListener("click", async () => {
-      const confirmHide = confirm(
-        `Remover o perfil de ${data.displayName || "usuário"} do público?`
-      );
+    const btn = document.createElement("button");
+    btn.textContent = "▶️ Tocar música";
+    btn.style.background = data.musicBtnColor || "#1db954";
 
-      if (confirmHide) {
-        await updateDoc(doc(db, "profiles", userId), {
-          public: false
-        });
+    btn.onclick = () => {
+      if (audio.paused) {
+        audio.play();
+        btn.textContent = "⏸️ Pausar música";
+      } else {
+        audio.pause();
+        btn.textContent = "▶️ Tocar música";
       }
-    });
+    };
+
+    card.appendChild(btn);
+  }
+
+  // 👑 CONTROLE ADMIN (LUIS)
+  if (isAdmin && userId !== auth.currentUser.uid) {
+    const toggleBtn = document.createElement("button");
+    toggleBtn.textContent = data.public ? "❌ Remover público" : "✅ Tornar público";
+    toggleBtn.style.background = "#e74c3c";
+
+    toggleBtn.onclick = async () => {
+      await updateDoc(doc(db, "profiles", userId), {
+        public: !data.public
+      });
+    };
+
+    card.appendChild(toggleBtn);
   }
 
   profilesContainer.appendChild(card);
 }
 
-// 🔄 REALTIME
-onSnapshot(collection(db, "profiles"), snapshot => {
-  profilesContainer.innerHTML = "";
+auth.onAuthStateChanged(user => {
+  if (!user) return;
 
-  snapshot.forEach(docSnap => {
-    const data = docSnap.data();
+  const isAdmin = user.uid === "EIKx6Iz2hRZuzNUkFlvBc8QefSh1";
 
-    if (data.public === true) {
-      createProfileCard(docSnap.id, data);
-    }
+  onSnapshot(collection(db, "profiles"), snap => {
+    profilesContainer.innerHTML = "";
+    snap.forEach(docSnap => {
+      createProfileCard(docSnap.id, docSnap.data(), isAdmin);
+    });
   });
 });
