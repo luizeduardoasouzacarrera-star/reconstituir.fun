@@ -80,7 +80,7 @@ function createProfileCard(userId, data) {
     btn.style.padding = "8px 14px";
     btn.style.border = "none";
     btn.style.borderRadius = "6px";
-    btn.style.background = "#1db954";
+    btn.style.background = "#850f0f";
     btn.style.color = "#fff";
     btn.style.cursor = "pointer";
 
