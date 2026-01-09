@@ -1,10 +1,7 @@
 // profiles.js
-import { db, rtdb } from "./firebase.js"; // db = Firestore, rtdb = Realtime Database
-import {
-  collection,
-  getDocs
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { ref as rRef, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { db, rtdb, auth } from "./firebase.js"; // db = Firestore, rtdb = Realtime Database
+import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { ref as rRef, onValue, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
 // Elementos
 const profilesContainer = document.getElementById("profiles");
@@ -62,6 +59,28 @@ async function createProfileCard(userId, data) {
       statusDot.classList.remove("online-dot");
       statusDot.classList.add("offline-dot");
       statusText.textContent = "OFFLINE";
+    }
+  });
+
+  // Botão para o próprio usuário alterar status (aparece só para o dono do perfil)
+  auth.onAuthStateChanged(user => {
+    if (user && user.uid === userId) {
+      const toggleBtn = document.createElement("button");
+      toggleBtn.textContent = "Alterar status";
+      toggleBtn.style.marginTop = "10px";
+      toggleBtn.style.padding = "6px 12px";
+      toggleBtn.style.border = "none";
+      toggleBtn.style.borderRadius = "6px";
+      toggleBtn.style.background = "#5865f2";
+      toggleBtn.style.color = "#fff";
+      toggleBtn.style.cursor = "pointer";
+
+      toggleBtn.addEventListener("click", async () => {
+        const currentStatus = statusText.textContent === "ONLINE";
+        await set(rRef(rtdb, `status/${userId}`), !currentStatus);
+      });
+
+      card.appendChild(toggleBtn);
     }
   });
 
