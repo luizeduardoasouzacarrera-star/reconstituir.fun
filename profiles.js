@@ -1,6 +1,9 @@
 // profiles.js
 import { db } from "./firebase.js";
-import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import {
+  collection,
+  onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const profilesContainer = document.getElementById("profiles");
 
@@ -61,13 +64,7 @@ function createProfileCard(userId, data) {
   if (data.music) {
     const audioBtn = document.createElement("button");
     audioBtn.textContent = "▶️ Tocar música";
-    audioBtn.style.marginTop = "10px";
-    audioBtn.style.padding = "8px 14px";
-    audioBtn.style.border = "none";
-    audioBtn.style.borderRadius = "6px";
     audioBtn.style.background = data.musicBtnColor || "#1db954";
-    audioBtn.style.color = "#fff";
-    audioBtn.style.cursor = "pointer";
 
     const audio = new Audio(`assets/${data.music}`);
 
@@ -87,12 +84,16 @@ function createProfileCard(userId, data) {
   profilesContainer.appendChild(card);
 }
 
-async function loadProfiles() {
+// 🔥 REALTIME
+onSnapshot(collection(db, "profiles"), snapshot => {
   profilesContainer.innerHTML = "";
-  const snapshot = await getDocs(collection(db, "profiles"));
-  snapshot.forEach(docSnap => {
-    createProfileCard(docSnap.id, docSnap.data());
-  });
-}
 
-loadProfiles();
+  snapshot.forEach(docSnap => {
+    const data = docSnap.data();
+
+    // 👉 Só perfis públicos
+    if (data.public === true) {
+      createProfileCard(docSnap.id, data);
+    }
+  });
+});
