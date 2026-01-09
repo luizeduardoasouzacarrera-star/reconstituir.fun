@@ -1,6 +1,9 @@
 // profiles.js
 import { db, rtdb } from "./firebase.js"; // db = Firestore, rtdb = Realtime Database
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import {
+  collection,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { ref as rRef, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
 // Elementos
@@ -22,27 +25,26 @@ async function createProfileCard(userId, data) {
   const card = document.createElement("div");
   card.classList.add("profile-card");
 
-  // Cor do perfil
+  // Cor do perfil aplicada como camada de destaque
   const color = data.color || "#5865f2";
-  card.style.borderTop = `5px solid ${color}`;
+  card.style.setProperty("--profile-color", color);
 
   // Status online/offline
   const status = document.createElement("div");
-  status.classList.add("status-indicator");
   status.style.position = "absolute";
   status.style.top = "10px";
   status.style.left = "10px";
   status.style.display = "flex";
   status.style.alignItems = "center";
   status.style.gap = "5px";
-  
+
   const statusDot = document.createElement("span");
-  statusDot.classList.add("status-bubble", "offline");
-  
+  statusDot.classList.add("online-dot"); // default
+
   const statusText = document.createElement("span");
-  statusText.textContent = "OFFLINE";
   statusText.style.fontSize = "12px";
   statusText.style.fontWeight = "bold";
+  statusText.textContent = "OFFLINE";
 
   status.appendChild(statusDot);
   status.appendChild(statusText);
@@ -53,12 +55,12 @@ async function createProfileCard(userId, data) {
   onValue(onlineRef, (snapshot) => {
     const isOnline = snapshot.val() || false;
     if (isOnline) {
-      statusDot.classList.remove("offline");
-      statusDot.classList.add("online");
+      statusDot.classList.remove("offline-dot");
+      statusDot.classList.add("online-dot");
       statusText.textContent = "ONLINE";
     } else {
-      statusDot.classList.remove("online");
-      statusDot.classList.add("offline");
+      statusDot.classList.remove("online-dot");
+      statusDot.classList.add("offline-dot");
       statusText.textContent = "OFFLINE";
     }
   });
@@ -134,11 +136,8 @@ async function createProfileCard(userId, data) {
 // Pegar todos os perfis do Firestore
 async function loadProfiles() {
   profilesContainer.innerHTML = "";
-  const profilesCollection = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js")
-    .then(fs => fs.collection(db, "profiles"));
-
-  const snapshot = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js")
-    .then(fs => fs.getDocs(profilesCollection));
+  const profilesCollection = collection(db, "profiles");
+  const snapshot = await getDocs(profilesCollection);
 
   snapshot.forEach(docSnap => {
     const data = docSnap.data();
