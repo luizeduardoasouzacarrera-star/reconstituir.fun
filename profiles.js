@@ -47,21 +47,6 @@ async function createProfileCard(userId, data) {
   status.appendChild(statusText);
   card.appendChild(status);
 
-  // Atualização do status em tempo real
-  const onlineRef = rRef(rtdb, `status/${userId}`);
-  onValue(onlineRef, (snapshot) => {
-    const isOnline = snapshot.val() || false;
-    if (isOnline) {
-      statusDot.classList.remove("offline-dot");
-      statusDot.classList.add("online-dot");
-      statusText.textContent = "OFFLINE";
-    } else {
-      statusDot.classList.remove("online-dot");
-      statusDot.classList.add("offline-dot");
-      statusText.textContent = "ONLINE";
-    }
-  });
-
   // Botão para o próprio usuário alterar status (aparece só para o dono do perfil)
   auth.onAuthStateChanged(user => {
     if (user && user.uid === userId) {
