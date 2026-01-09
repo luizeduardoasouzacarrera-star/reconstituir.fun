@@ -39,7 +39,7 @@ auth.onAuthStateChanged(async user => {
 
         nameInput.value = data.displayName || "";
         bioInput.value = data.bio || "";
-        bioColorInput.value = data.bioColor || "#cccccc";
+        bioColorInput.value = data.bioColor || "#ffffff";
         avatarInput.value = data.avatarURL || "";
         bannerInput.value = data.bannerURL || "";
         colorInput.value = data.color || "#5865f2";
@@ -66,7 +66,7 @@ saveBtn.addEventListener("click", async () => {
     await setDoc(doc(db, "profiles", user.uid), {
         displayName: nameInput.value || user.email.split("@")[0],
         bio: bioInput.value || "",
-        bioColor: bioColorInput.value || "#cccccc",
+        bioColor: bioColorInput.value || "#ffffff",
         avatarURL: avatarInput.value || "",
         bannerURL: bannerInput.value || "",
         color: colorInput.value || "#5865f2",
