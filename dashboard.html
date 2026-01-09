@@ -13,12 +13,24 @@
         <div id="chat"></div>
         <input id="message" placeholder="Digite sua mensagem">
         <button type="button" id="sendBtn">Enviar</button>
-       <button type="button" id="logoutBtn">Sair</button>
+        <button type="button" id="logoutBtn">Sair</button>
     </div>
 
-    <!-- ===== PERFIL ===== -->
+    <!-- ===== PERFIL DO USUÁRIO (PRIVADO/PÚBLICO) ===== -->
+    <div class="my-profile-section">
+        <h2>Meu Perfil</h2>
+        <div id="myProfile" class="profiles-grid"></div>
+    </div>
+
+    <!-- ===== PERFIS PÚBLICOS ===== -->
+    <div class="profiles-section">
+        <h2>Perfis Públicos</h2>
+        <div id="profiles" class="profiles-grid"></div>
+    </div>
+
+    <!-- ===== FORMULÁRIO DE PERFIL ===== -->
     <div class="profile-form-container">
-        <h2>Seu Perfil</h2>
+        <h2>Editar Perfil</h2>
 
         <input id="nameInput" placeholder="Nome de exibição">
         <input id="bioInput" placeholder="Bio">
@@ -53,12 +65,6 @@
         <input id="musicBtnColorInput" type="color" value="#1db954">
 
        <button type="button" id="saveProfile">Salvar Perfil</button>
-    </div>
-
-    <!-- ===== PERFIS PÚBLICOS ===== -->
-    <div class="profiles-section">
-        <h2>Perfis Públicos</h2>
-        <div id="profiles" class="profiles-grid"></div>
     </div>
 
     <!-- ===== SCRIPTS ===== -->
