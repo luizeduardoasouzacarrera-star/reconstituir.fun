@@ -67,15 +67,15 @@ function createProfileCard(userId, data) {
   if (data.music && data.music.trim() !== "") {
     const audio = new Audio(`assets/${data.music}`);
     const btn = document.createElement("button");
-    btn.textContent = "▶️ Tocar música";
+    btn.textContent = "Tocar música";
     btn.style.background = data.musicBtnColor || "#1db954";
     btn.onclick = () => {
       if (audio.paused) {
         audio.play();
-        btn.textContent = "⏸️ Pausar música";
+        btn.textContent = "Pausar música";
       } else {
         audio.pause();
-        btn.textContent = "▶️ Tocar música";
+        btn.textContent = "Tocar música";
       }
     };
     card.appendChild(btn);
