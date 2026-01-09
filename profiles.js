@@ -26,26 +26,6 @@ async function createProfileCard(userId, data) {
   const color = data.color || "#5865f2";
   card.style.setProperty("--profile-color", color);
 
-  // Status online/offline
-  const status = document.createElement("div");
-  status.style.position = "absolute";
-  status.style.top = "10px";
-  status.style.left = "10px";
-  status.style.display = "flex";
-  status.style.alignItems = "center";
-  status.style.gap = "5px";
-
-  const statusDot = document.createElement("span");
-  statusDot.classList.add("online-dot"); // default
-
-  const statusText = document.createElement("span");
-  statusText.style.fontSize = "12px";
-  statusText.style.fontWeight = "bold";
-  statusText.textContent = "OFFLINE";
-
-  status.appendChild(statusDot);
-  status.appendChild(statusText);
-  card.appendChild(status);
 
   // Botão para o próprio usuário alterar status (aparece só para o dono do perfil)
   auth.onAuthStateChanged(user => {
