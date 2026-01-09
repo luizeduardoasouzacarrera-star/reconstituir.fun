@@ -6,7 +6,8 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- ===== CHAT PRIVADO ===== -->
+
+    <!-- ===== CHAT ===== -->
     <div class="chat-container">
         <h2>Chat privado</h2>
         <div id="chat"></div>
@@ -15,14 +16,22 @@
         <button id="logoutBtn">Sair</button>
     </div>
 
-    <!-- ===== FORMULÁRIO DE PERFIL ABAIXO DO CHAT ===== -->
+    <!-- ===== PERFIL ===== -->
     <div class="profile-form-container">
         <h2>Seu Perfil</h2>
+
         <input id="nameInput" placeholder="Nome de exibição">
         <input id="bioInput" placeholder="Bio">
+
+        <label>Cor da Bio:</label>
+        <input id="bioColorInput" type="color" value="#ffffff">
+
         <input id="avatarInput" placeholder="URL do Avatar">
         <input id="bannerInput" placeholder="URL do Banner">
+
+        <label>Cor do Layout:</label>
         <input id="colorInput" type="color" value="#5865f2">
+
         <label>
             <input type="checkbox" id="publicCheckbox">
             Tornar público
@@ -38,13 +47,13 @@
         <input id="spotifyInput" placeholder="Link Spotify">
 
         <h3>Música</h3>
-        <input id="musicInput" placeholder="Nome da música (ex: musicasite.mp3)">
+        <input id="musicInput" placeholder="Nome da música (ex: musica.mp3)">
         <button id="playMusicBtn">▶️ Tocar Música</button>
 
         <button id="saveProfile">Salvar Perfil</button>
     </div>
 
-    <!-- ===== ÁREA DE PERFIS PÚBLICOS ===== -->
+    <!-- ===== PERFIS PÚBLICOS ===== -->
     <div class="profiles-section">
         <h2>Perfis Públicos</h2>
         <div id="profiles" class="profiles-grid"></div>
@@ -54,5 +63,6 @@
     <script type="module" src="chat.js"></script>
     <script type="module" src="dashboard-profile.js"></script>
     <script type="module" src="profiles.js"></script>
+
 </body>
 </html>
