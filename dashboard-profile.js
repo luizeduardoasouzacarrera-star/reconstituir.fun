@@ -81,7 +81,7 @@ if (statusBtn) {
 
         await setDoc(doc(db, "profiles", user.uid), {
             isOnline: currentStatus
-        }, { merge: true });
+        }, { merge: false });
     });
 }
 
