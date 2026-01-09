@@ -251,28 +251,7 @@ body {
   transform: scale(1.2);
 }
 
-/* ===== STATUS ONLINE/OFFLINE ===== */
-.status-indicator {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
 
-.online-dot, .offline-dot {
-    display: inline-block;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    animation: blink 1s infinite;
-}
-
-.online-dot { background: #f44336; }
-.offline-dot { background: #4caf50; }
-
-@keyframes blink {
-    0%, 50%, 100% { opacity: 1; }
-    25%, 75% { opacity: 0; }
-}
 
 /* ===== BOTÃO DE MÚSICA ===== */
 .profile-card button {
