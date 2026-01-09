@@ -1,10 +1,9 @@
-// profiles.js
-import { auth, db } from "./firebase.js";
-import { collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { db, auth } from "./firebase.js";
+import { collection, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-const myProfileDiv = document.getElementById("myProfile");
 const profilesContainer = document.getElementById("profiles");
 
+// Ícones sociais
 const socialIcons = {
   roblox: "https://devforum-uploads.s3.dualstack.us-east-2.amazonaws.com/uploads/original/4X/0/e/e/0eeeb19633422b1241f4306419a0f15f39d58de9.png",
   instagram: "https://elementos.apresto.com.br/wp-content/uploads/2024/05/icon-Instagram-desenho.svg",
@@ -15,42 +14,42 @@ const socialIcons = {
   spotify: "https://upload.wikimedia.org/wikipedia/commons/a/a1/2024_Spotify_logo_without_text_%28black%29.svg"
 };
 
-// Cria o card de perfil (usado para "Meu Perfil" e Perfis Públicos)
-function createProfileCard(userId, data, container) {
+const isDashboard = !!document.getElementById("sendBtn"); // detecta dashboard
+let currentUserUid = null;
+let isAdmin = false;
+
+// Cria card de perfil
+function createProfileCard(userId, data) {
+  if (!data.public && (!isDashboard || !isAdmin)) return null; // retorna null se não renderiza
+
   const card = document.createElement("div");
-  card.classList.add("profile-card");
+  card.className = "profile-card";
   card.style.setProperty("--profile-color", data.color || "#5865f2");
 
   const banner = document.createElement("div");
-  banner.classList.add("banner");
+  banner.className = "banner";
   banner.style.backgroundImage = `url('${data.bannerURL || ""}')`;
   card.appendChild(banner);
 
   const avatar = document.createElement("img");
-  avatar.classList.add("avatar");
+  avatar.className = "avatar";
   avatar.src = data.avatarURL || "";
   card.appendChild(avatar);
 
-  const nameEl = document.createElement("strong");
-  nameEl.textContent = data.displayName || userId;
-
-  // Adiciona emoji se desbloqueado
-  if (data.emojiUnlocked && data.emoji) {
-    nameEl.textContent += ` ${data.emoji}`;
-  }
-
-  card.appendChild(nameEl);
+  const name = document.createElement("strong");
+  name.textContent = `${data.displayName || userId}${data.emoji || ""}`;
+  card.appendChild(name);
 
   if (data.bio) {
-    const bioEl = document.createElement("p");
-    bioEl.textContent = data.bio;
-    bioEl.style.color = data.bioColor || "#fff";
-    card.appendChild(bioEl);
+    const bio = document.createElement("p");
+    bio.textContent = data.bio;
+    bio.style.color = data.bioColor || "#fff";
+    card.appendChild(bio);
   }
 
-  const socialsDiv = document.createElement("div");
-  socialsDiv.classList.add("socials");
-
+  // Redes sociais
+  const socials = document.createElement("div");
+  socials.className = "socials";
   Object.keys(socialIcons).forEach(key => {
     if (data[key]) {
       const a = document.createElement("a");
@@ -59,58 +58,87 @@ function createProfileCard(userId, data, container) {
       const img = document.createElement("img");
       img.src = socialIcons[key];
       a.appendChild(img);
-      socialsDiv.appendChild(a);
+      socials.appendChild(a);
     }
   });
+  card.appendChild(socials);
 
-  card.appendChild(socialsDiv);
-
-  // Botão de música
-  if (data.music) {
-    const audioBtn = document.createElement("button");
-    audioBtn.textContent = "▶️ Tocar música";
-    audioBtn.style.background = data.musicBtnColor || "#1db954";
-
+  // Música
+  if (data.music && data.music.trim() !== "") {
     const audio = new Audio(`assets/${data.music}`);
-
-    audioBtn.addEventListener("click", () => {
+    const btn = document.createElement("button");
+    btn.textContent = "▶️ Tocar música";
+    btn.style.background = data.musicBtnColor || "#1db954";
+    btn.onclick = () => {
       if (audio.paused) {
         audio.play();
-        audioBtn.textContent = "⏸️ Pausar música";
+        btn.textContent = "⏸️ Pausar música";
       } else {
         audio.pause();
-        audioBtn.textContent = "▶️ Tocar música";
+        btn.textContent = "▶️ Tocar música";
       }
-    });
-
-    card.appendChild(audioBtn);
+    };
+    card.appendChild(btn);
   }
 
-  container.appendChild(card);
+  // Botão admin para alternar público (dashboard apenas)
+  if (isDashboard && isAdmin && userId !== currentUserUid) {
+    const toggleBtn = document.createElement("button");
+    toggleBtn.textContent = data.public ? "❌ Remover público" : "✅ Tornar público";
+    toggleBtn.style.background = "#e74c3c";
+    toggleBtn.onclick = async () => {
+      await updateDoc(doc(db, "profiles", userId), { public: !data.public });
+    };
+    card.appendChild(toggleBtn);
+  }
+
+  return { userId, card }; // retorna o card + userId
 }
 
-// Carrega os perfis
-async function loadProfiles(user) {
+// Observa perfis em tempo real
+onSnapshot(collection(db, "profiles"), snap => {
   profilesContainer.innerHTML = "";
-  myProfileDiv.innerHTML = "";
 
-  // Primeiro, carrega o perfil do usuário logado
-  const mySnap = await getDoc(doc(db, "profiles", user.uid));
-  if (mySnap.exists()) {
-    createProfileCard(user.uid, mySnap.data(), myProfileDiv);
-  }
+  let cards = [];
+  snap.forEach(docSnap => {
+    const result = createProfileCard(docSnap.id, docSnap.data());
+    if (result) cards.push(result);
+  });
 
-  // Depois, carrega os outros perfis públicos
-  const snapshot = await getDocs(collection(db, "profiles"));
-  snapshot.forEach(docSnap => {
-    if (docSnap.id !== user.uid && docSnap.data().public) {
-      createProfileCard(docSnap.id, docSnap.data(), profilesContainer);
-    }
+  // Ordena: perfil do luiz primeiro
+  cards.sort((a, b) => {
+    if (a.userId === "EIKx6Iz2hRZuzNUkFlvBc8QefSh1") return -1;
+    if (b.userId === "EIKx6Iz2hRZuzNUkFlvBc8QefSh1") return 1;
+    return 0;
+  });
+
+  cards.forEach(c => profilesContainer.appendChild(c.card));
+});
+
+// Observa usuário logado para admin (dashboard apenas)
+if (isDashboard) {
+  auth.onAuthStateChanged(user => {
+    if (!user) return;
+    currentUserUid = user.uid;
+    isAdmin = user.uid === "EIKx6Iz2hRZuzNUkFlvBc8QefSh1";
+
+    // Atualiza cards quando muda admin
+    onSnapshot(collection(db, "profiles"), snap => {
+      profilesContainer.innerHTML = "";
+      let cards = [];
+      snap.forEach(docSnap => {
+        const result = createProfileCard(docSnap.id, docSnap.data());
+        if (result) cards.push(result);
+      });
+
+      // Perfil do luiz primeiro
+      cards.sort((a, b) => {
+        if (a.userId === "EIKx6Iz2hRZuzNUkFlvBc8QefSh1") return -1;
+        if (b.userId === "EIKx6Iz2hRZuzNUkFlvBc8QefSh1") return 1;
+        return 0;
+      });
+
+      cards.forEach(c => profilesContainer.appendChild(c.card));
+    });
   });
 }
-
-// Inicializa quando o usuário estiver logado
-auth.onAuthStateChanged(user => {
-  if (!user) return;
-  loadProfiles(user);
-});
