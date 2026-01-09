@@ -5,9 +5,9 @@ auth.onAuthStateChanged(user => {
         const statusRef = ref(rtdb, `status/${user.uid}`);
 
         // Coloca como online
-        set(statusRef, { isOnline: true });
+        set(statusRef, { isOnline: false });
 
         // Quando desconectar, vira offline
-        onDisconnect(statusRef).set({ isOnline: false });
+        onDisconnect(statusRef).set({ isOnline: true });
     }
 });
