@@ -1,11 +1,6 @@
 // profiles.js
 import { db, auth } from "./firebase.js";
-import {
-  collection,
-  onSnapshot,
-  doc,
-  updateDoc
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { collection, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const profilesContainer = document.getElementById("profiles");
 
@@ -20,15 +15,14 @@ const socialIcons = {
   spotify: "https://upload.wikimedia.org/wikipedia/commons/a/a1/2024_Spotify_logo_without_text_%28black%29.svg"
 };
 
-// Detecta se estamos no dashboard ou login
-const isDashboard = !!document.getElementById("sendBtn"); // só existe no dashboard
+const isDashboard = !!document.getElementById("sendBtn"); // detecta dashboard
 let currentUserUid = null;
 let isAdmin = false;
 
-// Cria os cards de perfil
+// Cria card de perfil
 function createProfileCard(userId, data) {
-  // No login: mostrar apenas perfis públicos
-  if (!data.public && !isAdmin) return;
+  // Filtro público: no login só mostra public
+  if (!data.public && (!isDashboard || !isAdmin)) return;
 
   const card = document.createElement("div");
   card.className = "profile-card";
@@ -77,7 +71,6 @@ function createProfileCard(userId, data) {
     const btn = document.createElement("button");
     btn.textContent = "▶️ Tocar música";
     btn.style.background = data.musicBtnColor || "#1db954";
-
     btn.onclick = () => {
       if (audio.paused) {
         audio.play();
@@ -87,7 +80,6 @@ function createProfileCard(userId, data) {
         btn.textContent = "▶️ Tocar música";
       }
     };
-
     card.appendChild(btn);
   }
 
@@ -109,18 +101,27 @@ function createProfileCard(userId, data) {
   profilesContainer.appendChild(card);
 }
 
-// Observa o usuário logado
-auth.onAuthStateChanged(user => {
-  if (!user) return;
-
-  currentUserUid = user.uid;
-  isAdmin = user.uid === "EIKx6Iz2hRZuzNUkFlvBc8QefSh1";
-
-  // Observa em tempo real todos os perfis
-  onSnapshot(collection(db, "profiles"), snap => {
-    profilesContainer.innerHTML = "";
-    snap.forEach(docSnap => {
-      createProfileCard(docSnap.id, docSnap.data());
-    });
+// ===== Observa perfis em tempo real (funciona no login e dashboard) =====
+onSnapshot(collection(db, "profiles"), snap => {
+  profilesContainer.innerHTML = "";
+  snap.forEach(docSnap => {
+    createProfileCard(docSnap.id, docSnap.data());
   });
 });
+
+// ===== Observa usuário logado para admin (dashboard apenas) =====
+if (isDashboard) {
+  auth.onAuthStateChanged(user => {
+    if (!user) return;
+    currentUserUid = user.uid;
+    isAdmin = user.uid === "EIKx6Iz2hRZuzNUkFlvBc8QefSh1";
+
+    // Atualiza cards quando muda admin
+    onSnapshot(collection(db, "profiles"), snap => {
+      profilesContainer.innerHTML = "";
+      snap.forEach(docSnap => {
+        createProfileCard(docSnap.id, docSnap.data());
+      });
+    });
+  });
+}
