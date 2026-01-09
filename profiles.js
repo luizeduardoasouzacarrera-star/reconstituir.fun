@@ -2,8 +2,10 @@
 import { db } from "./firebase.js";
 import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+// Elementos
 const profilesContainer = document.getElementById("profiles");
 
+// URLs padrão de redes sociais
 const socialIcons = {
   roblox: "https://devforum-uploads.s3.dualstack.us-east-2.amazonaws.com/uploads/original/4X/0/e/e/0eeeb19633422b1241f4306419a0f15f39d58de9.png",
   instagram: "https://elementos.apresto.com.br/wp-content/uploads/2024/05/icon-Instagram-desenho.svg",
@@ -14,9 +16,13 @@ const socialIcons = {
   spotify: "https://upload.wikimedia.org/wikipedia/commons/a/a1/2024_Spotify_logo_without_text_%28black%29.svg"
 };
 
+// Função para criar cada card
 async function createProfileCard(userId, data) {
   const card = document.createElement("div");
   card.classList.add("profile-card");
+
+  // Cor do perfil (IGUAL AO SEU)
+  card.style.background = data.color || "#5865f2";
 
   // Banner
   const banner = document.createElement("div");
@@ -30,22 +36,17 @@ async function createProfileCard(userId, data) {
   avatar.src = data.avatarURL || "";
   card.appendChild(avatar);
 
-  // 🔹 CONTAINER INTERNO (AQUI VAI A COR DO PROFILE)
-  const content = document.createElement("div");
-  content.classList.add("profile-content");
-  content.style.background = data.color || "#5865f2";
-
   // Nome
   const nameEl = document.createElement("strong");
   nameEl.textContent = data.displayName || userId;
-  content.appendChild(nameEl);
+  card.appendChild(nameEl);
 
-  // Bio
+  // BIO (ÚNICA MUDANÇA AQUI 👇)
   if (data.bio) {
     const bioEl = document.createElement("p");
     bioEl.textContent = data.bio;
     bioEl.style.color = data.bioColor || "#ffffff"; // ✅ COR DO TEXTO DA BIO
-    content.appendChild(bioEl);
+    card.appendChild(bioEl);
   }
 
   // Redes sociais
@@ -66,9 +67,9 @@ async function createProfileCard(userId, data) {
     }
   });
 
-  content.appendChild(socialsDiv);
+  card.appendChild(socialsDiv);
 
-  // Música
+  // Música (ÚNICA MUDANÇA AQUI 👇)
   if (data.music) {
     const audioBtn = document.createElement("button");
     audioBtn.textContent = "▶️ Tocar música";
@@ -92,13 +93,13 @@ async function createProfileCard(userId, data) {
       }
     });
 
-    content.appendChild(audioBtn);
+    card.appendChild(audioBtn);
   }
 
-  card.appendChild(content);
   profilesContainer.appendChild(card);
 }
 
+// Pegar todos os perfis
 async function loadProfiles() {
   profilesContainer.innerHTML = "";
   const snapshot = await getDocs(collection(db, "profiles"));
