@@ -8,7 +8,7 @@
 
 /* ===== FUNDO GERAL ===== */
 body {
-  background: url('assets/6fcadc1985b190b7099399796d077437.gif') no-repeat center center fixed;
+  background: url('assets/6fcadc1985b190b7099396d077437.gif') no-repeat center center fixed;
   background-size: cover;
   color: #fff;
   min-height: 100vh;
@@ -35,7 +35,7 @@ body {
   border-radius: 8px;
   border: none;
   outline: none;
-  background: rgba(0,0,0,0.4); /* leve transparência para legibilidade */
+  background: rgba(0,0,0,0.4);
   color: #fff;
 }
 
@@ -273,4 +273,34 @@ body {
 
 .profile-card button:hover {
   background: #17a44b;
+}
+
+/* ===== BOTÃO DISCORD FIXO ===== */
+.discord-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #5865F2;
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: bold;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  transition: transform 0.2s, background 0.2s;
+  z-index: 9999;
+}
+
+.discord-btn img {
+  width: 20px;
+  height: 20px;
+  filter: brightness(0) invert(1);
+}
+
+.discord-btn:hover {
+  transform: translateY(-3px);
+  background: #4752c4;
 }
