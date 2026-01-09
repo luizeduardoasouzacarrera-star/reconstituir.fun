@@ -52,7 +52,7 @@ auth.onAuthStateChanged(async user => {
         spotifyInput.value = data.spotify || "";
         musicInput.value = data.music || "";
 
-        currentStatus = data.isOnline || true;
+        currentStatus = data.isOnline || false;
         updateStatusButton();
     }
 });
