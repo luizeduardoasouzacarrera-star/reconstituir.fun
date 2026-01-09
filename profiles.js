@@ -1,9 +1,14 @@
 // profiles.js
 import { db } from "./firebase.js";
-import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import {
+  collection,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+// Elementos
 const profilesContainer = document.getElementById("profiles");
 
+// URLs padrão de redes sociais
 const socialIcons = {
   roblox: "https://devforum-uploads.s3.dualstack.us-east-2.amazonaws.com/uploads/original/4X/0/e/e/0eeeb19633422b1241f4306419a0f15f39d58de9.png",
   instagram: "https://elementos.apresto.com.br/wp-content/uploads/2024/05/icon-Instagram-desenho.svg",
@@ -14,12 +19,14 @@ const socialIcons = {
   spotify: "https://upload.wikimedia.org/wikipedia/commons/a/a1/2024_Spotify_logo_without_text_%28black%29.svg"
 };
 
+// Função para criar cada card
 function createProfileCard(userId, data) {
   const card = document.createElement("div");
   card.classList.add("profile-card");
 
-  // ✅ COR DO PROFILE COMO DESTAQUE (SEM QUEBRAR LAYOUT)
-  card.style.borderLeft = `6px solid ${data.color || "#5865f2"}`;
+  // Cor do profile (como já funcionava antes)
+  const color = data.color || "#5865f2";
+  card.style.setProperty("--profile-color", color);
 
   // Banner
   const banner = document.createElement("div");
@@ -38,7 +45,7 @@ function createProfileCard(userId, data) {
   nameEl.textContent = data.displayName || userId;
   card.appendChild(nameEl);
 
-  // Bio (COR DO TEXTO DA BIO)
+  // Bio (COM COR PERSONALIZADA)
   if (data.bio) {
     const bioEl = document.createElement("p");
     bioEl.textContent = data.bio;
@@ -66,7 +73,7 @@ function createProfileCard(userId, data) {
 
   card.appendChild(socialsDiv);
 
-  // Música (COR DO BOTÃO)
+  // Música
   if (data.music) {
     const audioBtn = document.createElement("button");
     audioBtn.textContent = "▶️ Tocar música";
@@ -74,9 +81,9 @@ function createProfileCard(userId, data) {
     audioBtn.style.padding = "8px 14px";
     audioBtn.style.border = "none";
     audioBtn.style.borderRadius = "6px";
-    audioBtn.style.cursor = "pointer";
+    audioBtn.style.background = "#1db954";
     audioBtn.style.color = "#fff";
-    audioBtn.style.background = data.musicBtnColor || "#1db954";
+    audioBtn.style.cursor = "pointer";
 
     const audio = new Audio(`assets/${data.music}`);
 
@@ -96,13 +103,15 @@ function createProfileCard(userId, data) {
   profilesContainer.appendChild(card);
 }
 
+// Carregar perfis
 async function loadProfiles() {
   profilesContainer.innerHTML = "";
-  const snapshot = await getDocs(collection(db, "profiles"));
 
+  const snapshot = await getDocs(collection(db, "profiles"));
   snapshot.forEach(docSnap => {
     createProfileCard(docSnap.id, docSnap.data());
   });
 }
 
+// Inicializa
 loadProfiles();
