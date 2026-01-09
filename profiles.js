@@ -1,145 +1,145 @@
 // profiles.js
-import { db, auth } from "./firebase.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { collection, doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { auth, db, rtdb } from "./firebase.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { ref as rtdbRef, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-// Elemento que vai receber os perfis
+// Elemento onde os perfis vão aparecer
 const profilesDiv = document.getElementById("profiles");
 
-// Realtime Database para status
-const rtdb = getDatabase();
+// URLs das logos das redes sociais
+const socialIcons = {
+  roblox: "https://devforum-uploads.s3.dualstack.us-east-2.amazonaws.com/uploads/original/4X/0/e/e/0eeeb19633422b1241f4306419a0f15f39d58de9.png",
+  instagram: "https://elementos.apresto.com.br/wp-content/uploads/2024/05/icon-Instagram-desenho.svg",
+  tiktok: "https://cdn.worldvectorlogo.com/logos/tiktok-icon-2.svg",
+  valorant: "https://www.svgrepo.com/show/424912/valorant-logo-play-2.svg",
+  steam: "https://img.icons8.com/?size=50&id=pOa8st0SGd5C&format=png",
+  twitter: "https://img.freepik.com/free-vector/new-twitter-logo-x-icon-black-background_1017-45427.jpg",
+  spotify: "https://upload.wikimedia.org/wikipedia/commons/a/a1/2024_Spotify_logo_without_text_%28black%29.svg"
+};
 
-// Pegando o usuário atual
-let currentUserId = null;
-onAuthStateChanged(auth, user => {
-  if (!user) return;
-  currentUserId = user.uid;
-});
+// Função para carregar todos os perfis
+export async function loadAllProfiles() {
+  // Limpar div
+  profilesDiv.innerHTML = "";
 
-// Escutando os perfis públicos no Firestore
-const profilesRef = collection(db, "profiles");
-onSnapshot(profilesRef, snapshot => {
-  profilesDiv.innerHTML = ""; // limpa antes de recriar
+  // Supondo que você tenha IDs dos usuários no Firestore
+  // Para cada usuário público
+  const users = await getPublicUsers();
 
-  snapshot.forEach(docSnap => {
-    const data = docSnap.data();
-    const uid = docSnap.id;
-
-    if (!data.public) return;
+  users.forEach(async user => {
+    const data = user.data();
 
     // Criar card
     const card = document.createElement("div");
-    card.classList.add("profile-card");
-    card.style.borderColor = data.color || "#5865f2"; // COR PERSONALIZADA
+    card.className = "profile-card";
 
-    // Status online/offline no canto superior esquerdo
-    const statusDiv = document.createElement("div");
-    statusDiv.style.position = "absolute";
-    statusDiv.style.top = "10px";
-    statusDiv.style.left = "10px";
-    statusDiv.style.display = "flex";
-    statusDiv.style.alignItems = "center";
-    statusDiv.style.gap = "6px";
-
-    const statusDot = document.createElement("span");
-    statusDot.style.width = "10px";
-    statusDot.style.height = "10px";
-    statusDot.style.borderRadius = "50%";
-    statusDot.style.display = "inline-block";
-    statusDot.style.animation = "blink 1s infinite";
-    statusDot.classList.add("offline"); // padrão
-
-    const statusLabel = document.createElement("span");
-    statusLabel.style.color = "#fff";
-    statusLabel.style.fontSize = "12px";
-    statusLabel.textContent = "Offline";
-
-    statusDiv.appendChild(statusDot);
-    statusDiv.appendChild(statusLabel);
-    card.appendChild(statusDiv);
+    // Fundo e borda colorida
+    card.style.backgroundColor = data.color || "#141428";
+    card.style.border = `2px solid ${data.color || "#5865f2"}`;
 
     // Banner
     const banner = document.createElement("div");
-    banner.classList.add("banner");
-    banner.style.backgroundImage = `url(${data.bannerURL || "https://via.placeholder.com/300x100"})`;
+    banner.className = "banner";
+    banner.style.backgroundImage = `url(${data.bannerURL || ""})`;
     card.appendChild(banner);
 
     // Avatar
     const avatar = document.createElement("img");
-    avatar.classList.add("avatar");
-    avatar.src = data.avatarURL || "https://via.placeholder.com/70";
+    avatar.className = "avatar";
+    avatar.src = data.avatarURL || "";
     card.appendChild(avatar);
 
     // Nome
-    const name = document.createElement("strong");
-    name.textContent = data.displayName || "Usuário";
-    card.appendChild(name);
+    const nameEl = document.createElement("strong");
+    nameEl.textContent = data.displayName || "Usuário";
+    card.appendChild(nameEl);
 
     // Bio
-    const bio = document.createElement("p");
-    bio.textContent = data.bio || "";
-    card.appendChild(bio);
+    const bioEl = document.createElement("p");
+    bioEl.textContent = data.bio || "";
+    card.appendChild(bioEl);
 
-    // Botão de música
-    if (data.music) {
-      const musicBtn = document.createElement("button");
-      musicBtn.textContent = "▶️ Tocar música";
-      musicBtn.style.marginBottom = "10px";
-      musicBtn.addEventListener("click", () => {
-        const audio = new Audio(`assets/${data.music}`);
-        audio.play();
-      });
-      card.appendChild(musicBtn);
-    }
+    // Status Online/Offline
+    const statusEl = document.createElement("div");
+    statusEl.className = "status-indicator";
 
-    // Redes sociais
-    const socials = document.createElement("div");
-    socials.classList.add("socials");
-    const socialLinks = {
-      roblox: data.roblox,
-      instagram: data.instagram,
-      tiktok: data.tiktok,
-      valorant: data.valorant,
-      steam: data.steam,
-      twitter: data.twitter,
-      spotify: data.spotify
-    };
-    const icons = {
-            roblox: "https://devforum-uploads.s3.dualstack.us-east-2.amazonaws.com/uploads/original/4X/0/e/e/0eeeb19633422b1241f4306419a0f15f39d58de9.png",
-            instagram: "https://elementos.apresto.com.br/wp-content/uploads/2024/05/icon-Instagram-desenho.svg",
-            tiktok: "https://cdn.worldvectorlogo.com/logos/tiktok-icon-2.svg",
-            valorant: "https://www.svgrepo.com/show/424912/valorant-logo-play-2.svg",
-            steam: "https://img.icons8.com/?size=50&id=pOa8st0SGd5C&format=png",
-            twitter: "https://cdn.freelogovectors.net/wp-content/uploads/2023/07/x-logo-twitter-freelogovectors.net_.png",
-            spotify: "https://upload.wikimedia.org/wikipedia/commons/a/a1/2024_Spotify_logo_without_text_(black).svg"
-    };
-    for (const [key, link] of Object.entries(socialLinks)) {
-      if (link) {
-        const a = document.createElement("a");
-        a.href = link;
-        a.target = "_blank";
-        const img = document.createElement("img");
-        img.src = icons[key];
-        a.appendChild(img);
-        socials.appendChild(a);
-      }
-    }
-    card.appendChild(socials);
+    const statusDot = document.createElement("span");
+    statusDot.className = "status-bubble offline"; // inicial como offline
+    const statusText = document.createElement("span");
+    statusText.textContent = "Offline";
 
-    // Escutando Realtime Database para status
-    const statusRef = ref(rtdb, `status/${uid}`);
-    onValue(statusRef, snap => {
-      const val = snap.val();
+    statusEl.appendChild(statusDot);
+    statusEl.appendChild(statusText);
+    card.appendChild(statusEl);
+
+    // Escutar no Realtime Database se o usuário está online
+    const statusRef = rtdbRef(rtdb, `status/${user.id}`);
+    onValue(statusRef, snapshot => {
+      const val = snapshot.val();
       if (val && val.isOnline) {
-        statusDot.style.backgroundColor = "#4caf50"; // verde
-        statusLabel.textContent = "Online";
+        statusDot.className = "status-bubble online";
+        statusText.textContent = "Online";
       } else {
-        statusDot.style.backgroundColor = "#f44336"; // vermelho
-        statusLabel.textContent = "Offline";
+        statusDot.className = "status-bubble offline";
+        statusText.textContent = "Offline";
       }
     });
 
+    // Redes sociais
+    const socialsDiv = document.createElement("div");
+    socialsDiv.className = "socials";
+    Object.keys(socialIcons).forEach(platform => {
+      if (data[platform]) {
+        const a = document.createElement("a");
+        a.href = data[platform];
+        a.target = "_blank";
+        const img = document.createElement("img");
+        img.src = socialIcons[platform];
+        a.appendChild(img);
+        socialsDiv.appendChild(a);
+      }
+    });
+    card.appendChild(socialsDiv);
+
+    // Botão de tocar música
+    if (data.music) {
+      const audio = new Audio(`assets/${data.music}`);
+      const musicBtn = document.createElement("button");
+      musicBtn.textContent = "▶️ Tocar música";
+      musicBtn.style.marginTop = "8px";
+      musicBtn.style.padding = "8px 16px";
+      musicBtn.style.borderRadius = "6px";
+      musicBtn.style.border = "none";
+      musicBtn.style.background = "#1DB954"; // verde Spotify
+      musicBtn.style.color = "white";
+      musicBtn.style.cursor = "pointer";
+
+      musicBtn.addEventListener("click", () => {
+        audio.play();
+      });
+
+      card.appendChild(musicBtn);
+    }
+
     profilesDiv.appendChild(card);
   });
-});
+}
+
+// Função fictícia que retorna todos os usuários públicos do Firestore
+async function getPublicUsers() {
+  // Aqui você precisa do código que busca os usuários públicos no Firestore
+  // Por exemplo, usando collection("profiles") e filtrando public = true
+  // Retorne um array de objetos { id: UID, data: perfil }
+  const usersArray = [];
+
+  const usersSnap = await getDoc(doc(db, "profiles")); // Ajuste conforme sua estrutura
+  // Exemplo fictício, substitua pela query correta
+  if (usersSnap.exists()) {
+    usersArray.push({ id: usersSnap.id, data: usersSnap.data() });
+  }
+
+  return usersArray;
+}
+
+// Chamar para carregar perfis
+loadAllProfiles();
