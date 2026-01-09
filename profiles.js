@@ -14,36 +14,43 @@ const socialIcons = {
   spotify: "https://upload.wikimedia.org/wikipedia/commons/a/a1/2024_Spotify_logo_without_text_%28black%29.svg"
 };
 
-function createProfileCard(userId, data) {
+async function createProfileCard(userId, data) {
   const card = document.createElement("div");
-  card.className = "profile-card";
+  card.classList.add("profile-card");
 
-  // Cor do layout (como antes)
-  card.style.boxShadow = `0 0 0 2px ${data.color || "#5865f2"}`;
-
+  // Banner
   const banner = document.createElement("div");
-  banner.className = "banner";
+  banner.classList.add("banner");
   banner.style.backgroundImage = `url('${data.bannerURL || ""}')`;
   card.appendChild(banner);
 
+  // Avatar
   const avatar = document.createElement("img");
-  avatar.className = "avatar";
+  avatar.classList.add("avatar");
   avatar.src = data.avatarURL || "";
   card.appendChild(avatar);
 
-  const name = document.createElement("strong");
-  name.textContent = data.displayName || userId;
-  card.appendChild(name);
+  // 🔹 CONTAINER INTERNO (AQUI VAI A COR DO PROFILE)
+  const content = document.createElement("div");
+  content.classList.add("profile-content");
+  content.style.background = data.color || "#5865f2";
 
+  // Nome
+  const nameEl = document.createElement("strong");
+  nameEl.textContent = data.displayName || userId;
+  content.appendChild(nameEl);
+
+  // Bio
   if (data.bio) {
-    const bio = document.createElement("p");
-    bio.textContent = data.bio;
-    bio.style.color = data.bioColor || "#cccccc";
-    card.appendChild(bio);
+    const bioEl = document.createElement("p");
+    bioEl.textContent = data.bio;
+    bioEl.style.color = data.bioColor || "#ffffff"; // ✅ COR DO TEXTO DA BIO
+    content.appendChild(bioEl);
   }
 
-  const socials = document.createElement("div");
-  socials.className = "socials";
+  // Redes sociais
+  const socialsDiv = document.createElement("div");
+  socialsDiv.classList.add("socials");
 
   Object.keys(socialIcons).forEach(key => {
     if (data[key]) {
@@ -55,49 +62,49 @@ function createProfileCard(userId, data) {
       img.src = socialIcons[key];
 
       a.appendChild(img);
-      socials.appendChild(a);
+      socialsDiv.appendChild(a);
     }
   });
 
-  card.appendChild(socials);
+  content.appendChild(socialsDiv);
 
+  // Música
   if (data.music) {
-    const btn = document.createElement("button");
-    btn.textContent = "▶️ Tocar música";
-    btn.style.marginTop = "10px";
-    btn.style.background = data.musicBtnColor || "#1db954";
-    btn.style.color = "#fff";
-    btn.style.border = "none";
-    btn.style.borderRadius = "6px";
-    btn.style.padding = "8px 14px";
-    btn.style.cursor = "pointer";
+    const audioBtn = document.createElement("button");
+    audioBtn.textContent = "▶️ Tocar música";
+    audioBtn.style.marginTop = "10px";
+    audioBtn.style.padding = "8px 14px";
+    audioBtn.style.border = "none";
+    audioBtn.style.borderRadius = "6px";
+    audioBtn.style.cursor = "pointer";
+    audioBtn.style.color = "#fff";
+    audioBtn.style.background = data.musicBtnColor || "#1db954"; // ✅ COR DO BOTÃO
 
     const audio = new Audio(`assets/${data.music}`);
 
-    btn.onclick = () => {
+    audioBtn.addEventListener("click", () => {
       if (audio.paused) {
         audio.play();
-        btn.textContent = "⏸️ Pausar música";
+        audioBtn.textContent = "⏸️ Pausar música";
       } else {
         audio.pause();
-        btn.textContent = "▶️ Tocar música";
+        audioBtn.textContent = "▶️ Tocar música";
       }
-    };
+    });
 
-    card.appendChild(btn);
+    content.appendChild(audioBtn);
   }
 
+  card.appendChild(content);
   profilesContainer.appendChild(card);
 }
 
 async function loadProfiles() {
   profilesContainer.innerHTML = "";
-  const snap = await getDocs(collection(db, "profiles"));
+  const snapshot = await getDocs(collection(db, "profiles"));
 
-  snap.forEach(doc => {
-    if (doc.data().public) {
-      createProfileCard(doc.id, doc.data());
-    }
+  snapshot.forEach(docSnap => {
+    createProfileCard(docSnap.id, docSnap.data());
   });
 }
 
