@@ -21,7 +21,7 @@ body {
   display: flex;
   align-items: center;
   gap: 15px;
-  background: linear-gradient(135deg, #1f0002, #1f0002);
+  background: linear-gradient(135deg, #5c5b5b, #5c5b5b);
   box-shadow: 0 4px 20px rgba(0,0,0,0.4);
 }
 
