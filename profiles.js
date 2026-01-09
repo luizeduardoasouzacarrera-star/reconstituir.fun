@@ -1,9 +1,15 @@
-// profiles-login.js
-import { db } from "./firebase.js";
-import { collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+// profiles.js
+import { db, auth } from "./firebase.js";
+import {
+  collection,
+  onSnapshot,
+  doc,
+  updateDoc
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const profilesContainer = document.getElementById("profiles");
 
+// Ícones sociais
 const socialIcons = {
   roblox: "https://devforum-uploads.s3.dualstack.us-east-2.amazonaws.com/uploads/original/4X/0/e/e/0eeeb19633422b1241f4306419a0f15f39d58de9.png",
   instagram: "https://elementos.apresto.com.br/wp-content/uploads/2024/05/icon-Instagram-desenho.svg",
@@ -14,8 +20,15 @@ const socialIcons = {
   spotify: "https://upload.wikimedia.org/wikipedia/commons/a/a1/2024_Spotify_logo_without_text_%28black%29.svg"
 };
 
-function createProfileCard(data) {
-  if (!data.public) return; // Só mostra perfis públicos
+// Detecta se estamos no dashboard ou login
+const isDashboard = !!document.getElementById("sendBtn"); // só existe no dashboard
+let currentUserUid = null;
+let isAdmin = false;
+
+// Cria os cards de perfil
+function createProfileCard(userId, data) {
+  // No login: mostrar apenas perfis públicos
+  if (!data.public && !isAdmin) return;
 
   const card = document.createElement("div");
   card.className = "profile-card";
@@ -32,7 +45,7 @@ function createProfileCard(data) {
   card.appendChild(avatar);
 
   const name = document.createElement("strong");
-  name.textContent = `${data.displayName || ""}${data.emoji || ""}`;
+  name.textContent = `${data.displayName || userId}${data.emoji || ""}`;
   card.appendChild(name);
 
   if (data.bio) {
@@ -42,6 +55,7 @@ function createProfileCard(data) {
     card.appendChild(bio);
   }
 
+  // Redes sociais
   const socials = document.createElement("div");
   socials.className = "socials";
   Object.keys(socialIcons).forEach(key => {
@@ -57,12 +71,13 @@ function createProfileCard(data) {
   });
   card.appendChild(socials);
 
-  // Música (opcional)
+  // Música
   if (data.music && data.music.trim() !== "") {
     const audio = new Audio(`assets/${data.music}`);
     const btn = document.createElement("button");
     btn.textContent = "▶️ Tocar música";
     btn.style.background = data.musicBtnColor || "#1db954";
+
     btn.onclick = () => {
       if (audio.paused) {
         audio.play();
@@ -72,15 +87,40 @@ function createProfileCard(data) {
         btn.textContent = "▶️ Tocar música";
       }
     };
+
     card.appendChild(btn);
+  }
+
+  // Botão admin para alternar público (dashboard apenas)
+  if (isDashboard && isAdmin && userId !== currentUserUid) {
+    const toggleBtn = document.createElement("button");
+    toggleBtn.textContent = data.public ? "❌ Remover público" : "✅ Tornar público";
+    toggleBtn.style.background = "#e74c3c";
+
+    toggleBtn.onclick = async () => {
+      await updateDoc(doc(db, "profiles", userId), {
+        public: !data.public
+      });
+    };
+
+    card.appendChild(toggleBtn);
   }
 
   profilesContainer.appendChild(card);
 }
 
-onSnapshot(collection(db, "profiles"), snap => {
-  profilesContainer.innerHTML = "";
-  snap.forEach(docSnap => {
-    createProfileCard(docSnap.data());
+// Observa o usuário logado
+auth.onAuthStateChanged(user => {
+  if (!user) return;
+
+  currentUserUid = user.uid;
+  isAdmin = user.uid === "EIKx6Iz2hRZuzNUkFlvBc8QefSh1";
+
+  // Observa em tempo real todos os perfis
+  onSnapshot(collection(db, "profiles"), snap => {
+    profilesContainer.innerHTML = "";
+    snap.forEach(docSnap => {
+      createProfileCard(docSnap.id, docSnap.data());
+    });
   });
 });
