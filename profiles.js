@@ -1,11 +1,23 @@
 // profiles.js
-import { db } from "./firebase.js";
+import { auth, db } from "./firebase.js";
 import {
   collection,
-  onSnapshot
+  onSnapshot,
+  doc,
+  updateDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const profilesContainer = document.getElementById("profiles");
+
+let isLuiz = false;
+
+// 🔐 Detecta se é o Luiz
+auth.onAuthStateChanged(user => {
+  if (user) {
+    const username = user.email.split("@")[0];
+    isLuiz = username === "luiz";
+  }
+});
 
 const socialIcons = {
   roblox: "https://devforum-uploads.s3.dualstack.us-east-2.amazonaws.com/uploads/original/4X/0/e/e/0eeeb19633422b1241f4306419a0f15f39d58de9.png",
@@ -61,37 +73,34 @@ function createProfileCard(userId, data) {
 
   card.appendChild(socialsDiv);
 
-  if (data.music) {
-    const audioBtn = document.createElement("button");
-    audioBtn.textContent = "▶️ Tocar música";
-    audioBtn.style.background = data.musicBtnColor || "#1db954";
+  // 🔥 PODER DE ADMIN (SÓ LUIZ)
+  if (isLuiz && data.public === true) {
+    card.style.cursor = "pointer";
+    card.title = "Clique para remover perfil público";
 
-    const audio = new Audio(`assets/${data.music}`);
+    card.addEventListener("click", async () => {
+      const confirmHide = confirm(
+        `Remover o perfil de ${data.displayName || "usuário"} do público?`
+      );
 
-    audioBtn.addEventListener("click", () => {
-      if (audio.paused) {
-        audio.play();
-        audioBtn.textContent = "⏸️ Pausar música";
-      } else {
-        audio.pause();
-        audioBtn.textContent = "▶️ Tocar música";
+      if (confirmHide) {
+        await updateDoc(doc(db, "profiles", userId), {
+          public: false
+        });
       }
     });
-
-    card.appendChild(audioBtn);
   }
 
   profilesContainer.appendChild(card);
 }
 
-// 🔥 REALTIME
+// 🔄 REALTIME
 onSnapshot(collection(db, "profiles"), snapshot => {
   profilesContainer.innerHTML = "";
 
   snapshot.forEach(docSnap => {
     const data = docSnap.data();
 
-    // 👉 Só perfis públicos
     if (data.public === true) {
       createProfileCard(docSnap.id, data);
     }
