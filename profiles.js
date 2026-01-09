@@ -1,7 +1,9 @@
 // profiles.js
-import { db, rtdb, auth } from "./firebase.js"; // db = Firestore, rtdb = Realtime Database
-import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { ref as rRef, onValue, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { db } from "./firebase.js";
+import {
+  collection,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // Elementos
 const profilesContainer = document.getElementById("profiles");
@@ -18,71 +20,13 @@ const socialIcons = {
 };
 
 // Função para criar cada card
-async function createProfileCard(userId, data) {
+function createProfileCard(userId, data) {
   const card = document.createElement("div");
   card.classList.add("profile-card");
 
-  // Cor do perfil aplicada como camada de destaque
+  // Cor do profile (como já funcionava antes)
   const color = data.color || "#5865f2";
   card.style.setProperty("--profile-color", color);
-
-  // Status online/offline
-  const status = document.createElement("div");
-  status.style.position = "absolute";
-  status.style.top = "10px";
-  status.style.left = "10px";
-  status.style.display = "flex";
-  status.style.alignItems = "center";
-  status.style.gap = "5px";
-
-  const statusDot = document.createElement("span");
-  statusDot.classList.add("online-dot"); // default
-
-  const statusText = document.createElement("span");
-  statusText.style.fontSize = "12px";
-  statusText.style.fontWeight = "bold";
-  statusText.textContent = "OFFLINE";
-
-  status.appendChild(statusDot);
-  status.appendChild(statusText);
-  card.appendChild(status);
-
-  // Atualização do status em tempo real
-  const onlineRef = rRef(rtdb, `status/${userId}`);
-  onValue(onlineRef, (snapshot) => {
-    const isOnline = snapshot.val() || false;
-    if (isOnline) {
-      statusDot.classList.remove("offline-dot");
-      statusDot.classList.add("online-dot");
-      statusText.textContent = "ONLINE";
-    } else {
-      statusDot.classList.remove("online-dot");
-      statusDot.classList.add("offline-dot");
-      statusText.textContent = "OFFLINE";
-    }
-  });
-
-  // Botão para o próprio usuário alterar status (aparece só para o dono do perfil)
-  auth.onAuthStateChanged(user => {
-    if (user && user.uid === userId) {
-      const toggleBtn = document.createElement("button");
-      toggleBtn.textContent = "Alterar status";
-      toggleBtn.style.marginTop = "10px";
-      toggleBtn.style.padding = "6px 12px";
-      toggleBtn.style.border = "none";
-      toggleBtn.style.borderRadius = "6px";
-      toggleBtn.style.background = "#5865f2";
-      toggleBtn.style.color = "#fff";
-      toggleBtn.style.cursor = "pointer";
-
-      toggleBtn.addEventListener("click", async () => {
-        const currentStatus = statusText.textContent === "ONLINE";
-        await set(rRef(rtdb, `status/${userId}`), !currentStatus);
-      });
-
-      card.appendChild(toggleBtn);
-    }
-  });
 
   // Banner
   const banner = document.createElement("div");
@@ -96,34 +40,40 @@ async function createProfileCard(userId, data) {
   avatar.src = data.avatarURL || "";
   card.appendChild(avatar);
 
-  // Nome e bio
+  // Nome
   const nameEl = document.createElement("strong");
   nameEl.textContent = data.displayName || userId;
   card.appendChild(nameEl);
 
+  // Bio (COM COR PERSONALIZADA)
   if (data.bio) {
     const bioEl = document.createElement("p");
     bioEl.textContent = data.bio;
+    bioEl.style.color = data.bioColor || "#ffffff";
     card.appendChild(bioEl);
   }
 
   // Redes sociais
   const socialsDiv = document.createElement("div");
   socialsDiv.classList.add("socials");
+
   Object.keys(socialIcons).forEach(key => {
     if (data[key]) {
       const a = document.createElement("a");
       a.href = data[key];
       a.target = "_blank";
+
       const img = document.createElement("img");
       img.src = socialIcons[key];
+
       a.appendChild(img);
       socialsDiv.appendChild(a);
     }
   });
+
   card.appendChild(socialsDiv);
 
-  // Botão de música
+  // Música
   if (data.music) {
     const audioBtn = document.createElement("button");
     audioBtn.textContent = "▶️ Tocar música";
@@ -136,6 +86,7 @@ async function createProfileCard(userId, data) {
     audioBtn.style.cursor = "pointer";
 
     const audio = new Audio(`assets/${data.music}`);
+
     audioBtn.addEventListener("click", () => {
       if (audio.paused) {
         audio.play();
@@ -152,15 +103,13 @@ async function createProfileCard(userId, data) {
   profilesContainer.appendChild(card);
 }
 
-// Pegar todos os perfis do Firestore
+// Carregar perfis
 async function loadProfiles() {
   profilesContainer.innerHTML = "";
-  const profilesCollection = collection(db, "profiles");
-  const snapshot = await getDocs(profilesCollection);
 
+  const snapshot = await getDocs(collection(db, "profiles"));
   snapshot.forEach(docSnap => {
-    const data = docSnap.data();
-    createProfileCard(docSnap.id, data);
+    createProfileCard(docSnap.id, docSnap.data());
   });
 }
 
