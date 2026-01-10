@@ -23,9 +23,11 @@ const isDashboard = !!document.getElementById("sendBtn");
 let currentUserUid = null;
 let isAdmin = false;
 
+/* 🔊 CONTROLE GLOBAL DE ÁUDIO (UMA MÚSICA POR VEZ) */
+let currentAudio = null;
+
 /**
  * 🔑 FUNÇÃO PRINCIPAL DE CARD
- * (AGORA EXPORTADA PARA SER USADA EM OUTRAS PÁGINAS)
  */
 export function createProfileCard(userId, data) {
   if (!data.public && (!isDashboard || !isAdmin)) return null;
@@ -75,7 +77,7 @@ export function createProfileCard(userId, data) {
 
   card.appendChild(socials);
 
-  // Música
+  // 🎵 Música (CORRIGIDA + CONTROLE GLOBAL)
   if (data.music && data.music.trim() !== "") {
     const audio = new Audio(`/assets/${data.music}`);
     const btn = document.createElement("button");
@@ -84,9 +86,14 @@ export function createProfileCard(userId, data) {
     btn.style.background = data.musicBtnColor || "#1db954";
 
     btn.onclick = () => {
+      if (currentAudio && currentAudio !== audio) {
+        currentAudio.pause();
+      }
+
       if (audio.paused) {
         audio.play();
         btn.textContent = "Pausar música";
+        currentAudio = audio;
       } else {
         audio.pause();
         btn.textContent = "Tocar música";
@@ -118,7 +125,7 @@ export function createProfileCard(userId, data) {
   return { userId, card };
 }
 
-/* ===== LISTA DE PERFIS (APENAS SE EXISTIR #profiles) ===== */
+/* ===== LISTA DE PERFIS (SE EXISTIR #profiles) ===== */
 if (profilesContainer) {
   onSnapshot(collection(db, "profiles"), snap => {
     profilesContainer.innerHTML = "";
