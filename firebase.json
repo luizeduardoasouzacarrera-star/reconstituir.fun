@@ -1,11 +1,13 @@
 {
   "hosting": {
-    "public": ".",
+    "site": "reconstituir-b35a3",
+    "public": "./",
     "ignore": [
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
     ],
+    "cleanUrls": true,
     "rewrites": [
       {
         "source": "/user-profile/**",
