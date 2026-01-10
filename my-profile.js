@@ -1,6 +1,6 @@
 import { auth, db } from "./firebase.js";
 import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { createProfileCard } from "./profile.js";
+import { createProfileCard } from "./profiles.js";
 
 const container = document.getElementById("myProfile");
 
