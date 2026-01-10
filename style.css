@@ -304,3 +304,19 @@ body {
   transform: translateY(-3px);
   background: #4752c4;
 }
+
+/* ===== MEU PERFIL CENTRAL ===== */
+.my-profile-section {
+  max-width: 900px;
+  margin: 60px auto;
+  text-align: center;
+}
+
+.my-profile-section .profile-card {
+  scale: 1.2;
+}
+
+.my-profile-section .profile-card:hover {
+  transform: none;
+}
+
