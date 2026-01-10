@@ -354,3 +354,45 @@ body {
   transform: none;
 }
 
+/* ===== PERFIL ÚNICO (DESTAQUE) ===== */
+.profile-single-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-single-page .profile-card {
+  transform: none;
+  width: 420px;
+  min-height: 480px;
+  padding: 25px;
+}
+
+.profile-single-page .profile-card:hover {
+  transform: none;
+}
+
+.profile-single-page .profile-card .banner {
+  height: 160px;
+}
+
+.profile-single-page .profile-card .avatar {
+  width: 110px;
+  height: 110px;
+  margin-top: -55px;
+}
+
+.profile-single-page .profile-card strong {
+  font-size: 24px;
+}
+
+.profile-single-page .profile-card p {
+  font-size: 16px;
+}
+
+.profile-single-page .profile-card .socials img {
+  width: 32px;
+  height: 32px;
+}
+
