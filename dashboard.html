@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
     <!-- ===== BOTÃO DISCORD FIXO NO CANTO SUPERIOR DIREITO ===== -->
     <a href="https://discord.gg/sygFUUK2" target="_blank" class="discord-btn">
         <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/discord.svg" alt="Discord">
@@ -21,17 +22,28 @@
         <button type="button" id="logoutBtn">Sair</button>
     </div>
 
-    <!-- ===== PERFIL ===== -->
+    <!-- ===== MEU PERFIL (CENTRAL E GRANDE) ===== -->
+    <div class="my-profile-section">
+        <h2>Meu Perfil</h2>
+        <div id="myProfile"></div>
+    </div>
+
+    <!-- ===== PERFIL (EDIÇÃO) ===== -->
     <div class="profile-form-container">
         <h2>Seu Perfil</h2>
+
         <input id="nameInput" placeholder="Nome de exibição">
         <input id="bioInput" placeholder="Bio">
+
         <label>Cor do texto da bio:</label>
         <input id="bioColorInput" type="color" value="#ffffff">
+
         <input id="avatarInput" placeholder="URL do Avatar">
         <input id="bannerInput" placeholder="URL do Banner">
+
         <label>Cor do perfil:</label>
         <input id="colorInput" type="color" value="#5865f2">
+
         <label>
             <input type="checkbox" id="publicCheckbox">
             Tornar público
@@ -48,6 +60,7 @@
 
         <h3>Música</h3>
         <input id="musicInput" placeholder="Nome do arquivo (ex: musica.mp3)">
+
         <label>Cor do botão da música:</label>
         <input id="musicBtnColorInput" type="color" value="#1db954">
 
@@ -63,6 +76,8 @@
     <!-- ===== SCRIPTS ===== -->
     <script type="module" src="chat.js"></script>
     <script type="module" src="dashboard-profile.js"></script>
-    <script type="module" src="profiles.js"></script>
+    <script type="module" src="profile.js"></script>
+    <script type="module" src="my-profile.js"></script>
+
 </body>
 </html>
