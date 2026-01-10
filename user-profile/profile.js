@@ -1,25 +1,34 @@
 import { db } from "../firebase.js";
-import { doc, getDoc } from
-  "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import {
+  collection,
+  query,
+  where,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-import { createProfileCard } from "../profiles.js";
+import { createProfileCard } from "../profile.js";
 
 const container = document.getElementById("profile-single");
 
-// pega UID da URL
 const params = new URLSearchParams(window.location.search);
-const uid = params.get("uid");
+const username = params.get("user");
 
-if (!uid) {
+if (!username) {
   container.innerHTML = "<p>Perfil não encontrado.</p>";
 } else {
-  const ref = doc(db, "profiles", uid);
-  const snap = await getDoc(ref);
+  const q = query(
+    collection(db, "profiles"),
+    where("username", "==", username.toLowerCase())
+  );
 
-  if (!snap.exists()) {
+  const snap = await getDocs(q);
+
+  if (snap.empty) {
     container.innerHTML = "<p>Perfil não existe.</p>";
   } else {
-    const result = createProfileCard(uid, snap.data());
-    if (result) container.appendChild(result.card);
+    snap.forEach(docSnap => {
+      const result = createProfileCard(docSnap.id, docSnap.data());
+      if (result) container.appendChild(result.card);
+    });
   }
 }
