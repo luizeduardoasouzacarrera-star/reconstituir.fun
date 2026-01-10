@@ -77,7 +77,7 @@ export function createProfileCard(userId, data) {
 
   // Música
   if (data.music && data.music.trim() !== "") {
-    const audio = new Audio(`assets/${data.music}`);
+    const audio = new Audio(`/assets/${data.music}`);
     const btn = document.createElement("button");
 
     btn.textContent = "Tocar música";
