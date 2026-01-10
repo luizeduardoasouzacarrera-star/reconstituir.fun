@@ -10,25 +10,35 @@ import { createProfileCard } from "../profile.js";
 
 const container = document.getElementById("profile-single");
 
+// pega ?user=luiz
 const params = new URLSearchParams(window.location.search);
 const username = params.get("user");
 
 if (!username) {
   container.innerHTML = "<p>Perfil não encontrado.</p>";
+  throw new Error("Username não informado");
+}
+
+// busca perfil pelo username
+const q = query(
+  collection(db, "profiles"),
+  where("username", "==", username.toLowerCase())
+);
+
+const snap = await getDocs(q);
+
+if (snap.empty) {
+  container.innerHTML = "<p>Perfil não existe.</p>";
 } else {
-  const q = query(
-    collection(db, "profiles"),
-    where("username", "==", username.toLowerCase())
-  );
+  snap.forEach(docSnap => {
+    const data = docSnap.data();
 
-  const snap = await getDocs(q);
+    // 🔥 FORÇA exibir o perfil mesmo se não for público
+    data.public = true;
 
-  if (snap.empty) {
-    container.innerHTML = "<p>Perfil não existe.</p>";
-  } else {
-    snap.forEach(docSnap => {
-      const result = createProfileCard(docSnap.id, docSnap.data());
-      if (result) container.appendChild(result.card);
-    });
-  }
+    const result = createProfileCard(docSnap.id, data);
+    if (result) {
+      container.appendChild(result.card);
+    }
+  });
 }
