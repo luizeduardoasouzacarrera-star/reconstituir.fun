@@ -10,19 +10,21 @@ import { createProfileCard } from "../profile.js";
 
 const container = document.getElementById("profile-single");
 
-// pega ?user=luiz
 const params = new URLSearchParams(window.location.search);
 const username = params.get("user");
 
 if (!username) {
   container.innerHTML = "<p>Perfil não encontrado.</p>";
-  throw new Error("Username não informado");
+  throw new Error("User não informado");
 }
 
-// busca perfil pelo username
+// normaliza
+const name = username.toLowerCase();
+
+// 🔥 BUSCA PELO DISPLAY NAME
 const q = query(
   collection(db, "profiles"),
-  where("username", "==", username.toLowerCase())
+  where("displayName", "==", name)
 );
 
 const snap = await getDocs(q);
@@ -33,12 +35,10 @@ if (snap.empty) {
   snap.forEach(docSnap => {
     const data = docSnap.data();
 
-    // 🔥 FORÇA exibir o perfil mesmo se não for público
+    // força renderização
     data.public = true;
 
     const result = createProfileCard(docSnap.id, data);
-    if (result) {
-      container.appendChild(result.card);
-    }
+    if (result) container.appendChild(result.card);
   });
 }
