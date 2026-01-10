@@ -14,13 +14,13 @@ const socialIcons = {
   spotify: "https://upload.wikimedia.org/wikipedia/commons/a/a1/2024_Spotify_logo_without_text_%28black%29.svg"
 };
 
-const isDashboard = !!document.getElementById("sendBtn"); // detecta dashboard
+const isDashboard = !!document.getElementById("sendBtn");
 let currentUserUid = null;
 let isAdmin = false;
 
-// Cria card de perfil
-function createProfileCard(userId, data) {
-  if (!data.public && (!isDashboard || !isAdmin)) return null; // retorna null se não renderiza
+// ✅ EXPORTADO
+export function createProfileCard(userId, data) {
+  if (!data.public && (!isDashboard || !isAdmin)) return null;
 
   const card = document.createElement("div");
   card.className = "profile-card";
@@ -47,7 +47,6 @@ function createProfileCard(userId, data) {
     card.appendChild(bio);
   }
 
-  // Redes sociais
   const socials = document.createElement("div");
   socials.className = "socials";
   Object.keys(socialIcons).forEach(key => {
@@ -63,7 +62,6 @@ function createProfileCard(userId, data) {
   });
   card.appendChild(socials);
 
-  // Música
   if (data.music && data.music.trim() !== "") {
     const audio = new Audio(`assets/${data.music}`);
     const btn = document.createElement("button");
@@ -81,7 +79,6 @@ function createProfileCard(userId, data) {
     card.appendChild(btn);
   }
 
-  // Botão admin para alternar público (dashboard apenas)
   if (isDashboard && isAdmin && userId !== currentUserUid) {
     const toggleBtn = document.createElement("button");
     toggleBtn.textContent = data.public ? "❌ Remover público" : "✅ Tornar público";
@@ -92,53 +89,35 @@ function createProfileCard(userId, data) {
     card.appendChild(toggleBtn);
   }
 
-  return { userId, card }; // retorna o card + userId
+  return { userId, card };
 }
 
-// Observa perfis em tempo real
-onSnapshot(collection(db, "profiles"), snap => {
-  profilesContainer.innerHTML = "";
+// ===== LISTA NORMAL DE PERFIS =====
+if (profilesContainer) {
+  onSnapshot(collection(db, "profiles"), snap => {
+    profilesContainer.innerHTML = "";
+    let cards = [];
 
-  let cards = [];
-  snap.forEach(docSnap => {
-    const result = createProfileCard(docSnap.id, docSnap.data());
-    if (result) cards.push(result);
+    snap.forEach(docSnap => {
+      const result = createProfileCard(docSnap.id, docSnap.data());
+      if (result) cards.push(result);
+    });
+
+    cards.sort((a, b) => {
+      if (a.userId === "EIKx6Iz2hRZuzNUkFlvBc8QefSh1") return -1;
+      if (b.userId === "EIKx6Iz2hRZuzNUkFlvBc8QefSh1") return 1;
+      return 0;
+    });
+
+    cards.forEach(c => profilesContainer.appendChild(c.card));
   });
+}
 
-  // Ordena: perfil do luiz primeiro
-  cards.sort((a, b) => {
-    if (a.userId === "EIKx6Iz2hRZuzNUkFlvBc8QefSh1") return -1;
-    if (b.userId === "EIKx6Iz2hRZuzNUkFlvBc8QefSh1") return 1;
-    return 0;
-  });
-
-  cards.forEach(c => profilesContainer.appendChild(c.card));
-});
-
-// Observa usuário logado para admin (dashboard apenas)
+// ===== ADMIN =====
 if (isDashboard) {
   auth.onAuthStateChanged(user => {
     if (!user) return;
     currentUserUid = user.uid;
     isAdmin = user.uid === "EIKx6Iz2hRZuzNUkFlvBc8QefSh1";
-
-    // Atualiza cards quando muda admin
-    onSnapshot(collection(db, "profiles"), snap => {
-      profilesContainer.innerHTML = "";
-      let cards = [];
-      snap.forEach(docSnap => {
-        const result = createProfileCard(docSnap.id, docSnap.data());
-        if (result) cards.push(result);
-      });
-
-      // Perfil do luiz primeiro
-      cards.sort((a, b) => {
-        if (a.userId === "EIKx6Iz2hRZuzNUkFlvBc8QefSh1") return -1;
-        if (b.userId === "EIKx6Iz2hRZuzNUkFlvBc8QefSh1") return 1;
-        return 0;
-      });
-
-      cards.forEach(c => profilesContainer.appendChild(c.card));
-    });
   });
 }
