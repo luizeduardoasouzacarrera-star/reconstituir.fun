@@ -1,5 +1,10 @@
 import { db, auth } from "./firebase.js";
-import { collection, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import {
+  collection,
+  onSnapshot,
+  doc,
+  updateDoc
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const profilesContainer = document.getElementById("profiles");
 
@@ -18,7 +23,10 @@ const isDashboard = !!document.getElementById("sendBtn");
 let currentUserUid = null;
 let isAdmin = false;
 
-// ✅ EXPORTADO
+/**
+ * 🔑 FUNÇÃO PRINCIPAL DE CARD
+ * (AGORA EXPORTADA PARA SER USADA EM OUTRAS PÁGINAS)
+ */
 export function createProfileCard(userId, data) {
   if (!data.public && (!isDashboard || !isAdmin)) return null;
 
@@ -47,26 +55,34 @@ export function createProfileCard(userId, data) {
     card.appendChild(bio);
   }
 
+  // Redes sociais
   const socials = document.createElement("div");
   socials.className = "socials";
+
   Object.keys(socialIcons).forEach(key => {
     if (data[key]) {
       const a = document.createElement("a");
       a.href = data[key];
       a.target = "_blank";
+
       const img = document.createElement("img");
       img.src = socialIcons[key];
+
       a.appendChild(img);
       socials.appendChild(a);
     }
   });
+
   card.appendChild(socials);
 
+  // Música
   if (data.music && data.music.trim() !== "") {
     const audio = new Audio(`assets/${data.music}`);
     const btn = document.createElement("button");
+
     btn.textContent = "Tocar música";
     btn.style.background = data.musicBtnColor || "#1db954";
+
     btn.onclick = () => {
       if (audio.paused) {
         audio.play();
@@ -76,26 +92,37 @@ export function createProfileCard(userId, data) {
         btn.textContent = "Tocar música";
       }
     };
+
     card.appendChild(btn);
   }
 
+  // Botão admin (somente dashboard)
   if (isDashboard && isAdmin && userId !== currentUserUid) {
     const toggleBtn = document.createElement("button");
-    toggleBtn.textContent = data.public ? "❌ Remover público" : "✅ Tornar público";
+
+    toggleBtn.textContent = data.public
+      ? "❌ Remover público"
+      : "✅ Tornar público";
+
     toggleBtn.style.background = "#e74c3c";
+
     toggleBtn.onclick = async () => {
-      await updateDoc(doc(db, "profiles", userId), { public: !data.public });
+      await updateDoc(doc(db, "profiles", userId), {
+        public: !data.public
+      });
     };
+
     card.appendChild(toggleBtn);
   }
 
   return { userId, card };
 }
 
-// ===== LISTA NORMAL DE PERFIS =====
+/* ===== LISTA DE PERFIS (APENAS SE EXISTIR #profiles) ===== */
 if (profilesContainer) {
   onSnapshot(collection(db, "profiles"), snap => {
     profilesContainer.innerHTML = "";
+
     let cards = [];
 
     snap.forEach(docSnap => {
@@ -103,6 +130,7 @@ if (profilesContainer) {
       if (result) cards.push(result);
     });
 
+    // Perfil do Luiz sempre primeiro
     cards.sort((a, b) => {
       if (a.userId === "EIKx6Iz2hRZuzNUkFlvBc8QefSh1") return -1;
       if (b.userId === "EIKx6Iz2hRZuzNUkFlvBc8QefSh1") return 1;
@@ -113,10 +141,11 @@ if (profilesContainer) {
   });
 }
 
-// ===== ADMIN =====
+/* ===== CONTROLE DE ADMIN (SÓ NO DASHBOARD) ===== */
 if (isDashboard) {
   auth.onAuthStateChanged(user => {
     if (!user) return;
+
     currentUserUid = user.uid;
     isAdmin = user.uid === "EIKx6Iz2hRZuzNUkFlvBc8QefSh1";
   });
