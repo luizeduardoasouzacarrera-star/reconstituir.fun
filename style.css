@@ -337,3 +337,20 @@ body {
   transform: none;
 }
 
+/* ===== PERFIL PÚBLICO INDIVIDUAL ===== */
+.user-profile-page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.user-profile-page .profile-card {
+  width: 420px;
+  scale: 1.3;
+}
+
+.user-profile-page .profile-card:hover {
+  transform: none;
+}
+
