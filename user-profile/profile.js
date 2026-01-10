@@ -10,18 +10,18 @@ import { createProfileCard } from "../profiles.js";
 
 const container = document.getElementById("profile-single");
 
-const params = new URLSearchParams(window.location.search);
-const username = params.get("user");
+// 🔥 pega o nome direto da URL: /user-profile/banna
+const pathParts = window.location.pathname.split("/");
+const username = pathParts[pathParts.length - 1];
 
-if (!username) {
+if (!username || username === "user-profile") {
   container.innerHTML = "<p>Perfil não encontrado.</p>";
-  throw new Error("User não informado");
+  throw new Error("Username não informado");
 }
 
-// normaliza
 const name = username.toLowerCase();
 
-// 🔥 BUSCA PELO DISPLAY NAME
+// busca pelo displayName
 const q = query(
   collection(db, "profiles"),
   where("displayName", "==", name)
@@ -35,7 +35,7 @@ if (snap.empty) {
   snap.forEach(docSnap => {
     const data = docSnap.data();
 
-    // força renderização
+    // força renderização no perfil único
     data.public = true;
 
     const result = createProfileCard(docSnap.id, data);
