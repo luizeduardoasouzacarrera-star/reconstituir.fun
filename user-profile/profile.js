@@ -1,14 +1,16 @@
 import { db } from "../firebase.js";
 import {
-  doc,
-  getDoc
+  collection,
+  query,
+  where,
+  getDocs
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 import { createProfileCard } from "../profiles.js";
 
 const container = document.getElementById("profile-single");
 
-// pega ?user=banna
+// 🔑 PEGA ?user=banna DA URL
 const params = new URLSearchParams(window.location.search);
 const username = params.get("user");
 
@@ -17,17 +19,27 @@ if (!username) {
   throw new Error("Username não informado");
 }
 
-const ref = doc(db, "profiles", username.toLowerCase());
-const snap = await getDoc(ref);
+// normaliza
+const name = username.toLowerCase();
 
-if (!snap.exists()) {
+// 🔥 BUSCA PELO CAMPO CORRETO
+const q = query(
+  collection(db, "profiles"),
+  where("username", "==", name)
+);
+
+const snap = await getDocs(q);
+
+if (snap.empty) {
   container.innerHTML = "<p>Perfil não existe.</p>";
 } else {
-  const data = snap.data();
+  snap.forEach(docSnap => {
+    const data = docSnap.data();
 
-  // força público no perfil individual
-  data.public = true;
+    // força exibição no perfil público
+    data.public = true;
 
-  const result = createProfileCard(username, data);
-  if (result) container.appendChild(result.card);
+    const result = createProfileCard(docSnap.id, data);
+    if (result) container.appendChild(result.card);
+  });
 }
