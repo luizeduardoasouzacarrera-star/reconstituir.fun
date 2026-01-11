@@ -7,15 +7,16 @@ import {
 
 async function logVisit() {
   try {
+    // evita duplicar na mesma sessão
     if (sessionStorage.getItem("visit_logged")) return;
     sessionStorage.setItem("visit_logged", "1");
 
-    // 🔥 IP REAL (sem CORS, sem token)
+    // 👉 AQUI entra o ipify
     const ipRes = await fetch("https://api.ipify.org?format=json");
     const ipData = await ipRes.json();
 
     await addDoc(collection(db, "visits"), {
-      ip: ipData.ip,
+      ip: ipData.ip, // IP REAL (se não estiver em VPN)
       userAgent: navigator.userAgent,
       page: window.location.pathname,
       createdAt: serverTimestamp()
