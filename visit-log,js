@@ -1,3 +1,5 @@
+console.log("visit-log.js EXECUTOU");
+
 import { db } from "./firebase.js";
 import {
   collection,
