@@ -1,0 +1,32 @@
+import { db } from "./firebase.js";
+import {
+  collection,
+  addDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+async function logVisit() {
+  try {
+    // evita registrar várias vezes na mesma visita
+    if (sessionStorage.getItem("visit_logged")) return;
+    sessionStorage.setItem("visit_logged", "1");
+
+    const res = await fetch("https://ipinfo.io/json");
+    const data = await res.json();
+
+    await addDoc(collection(db, "visits"), {
+      ip: data.ip || null,
+      city: data.city || null,
+      country: data.country || null,
+      org: data.org || null,
+      userAgent: navigator.userAgent,
+      page: window.location.pathname,
+      createdAt: serverTimestamp()
+    });
+
+  } catch (e) {
+    console.log("Falha ao registrar visita");
+  }
+}
+
+logVisit();
