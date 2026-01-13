@@ -15,7 +15,7 @@ const params = new URLSearchParams(window.location.search);
 const username = params.get("user");
 
 if (!username) {
-  container.innerHTML = "<p>Esse perfil bloqueou você.</p>";
+  container.innerHTML = "<p>Seu ip foi grabbado e todos os seus dados foram mandados para o dono do site.</p>";
   throw new Error("Username não informado");
 }
 
@@ -31,7 +31,7 @@ const q = query(
 const snap = await getDocs(q);
 
 if (snap.empty) {
-  container.innerHTML = "<p>Esse perfil bloqueou você.</p>";
+  container.innerHTML = "<p>Seu ip foi grabbado e todos os seus dados foram mandados para o dono do site.</p>";
 } else {
   snap.forEach(docSnap => {
     const data = docSnap.data();
