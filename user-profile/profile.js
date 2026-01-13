@@ -15,7 +15,7 @@ const params = new URLSearchParams(window.location.search);
 const username = params.get("user");
 
 if (!username) {
-  container.innerHTML = "<p>Perfil não encontrado.</p>";
+  container.innerHTML = "<p>Esse perfil bloqueou você.</p>";
   throw new Error("Username não informado");
 }
 
