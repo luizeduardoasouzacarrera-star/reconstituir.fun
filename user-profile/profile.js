@@ -31,7 +31,7 @@ const q = query(
 const snap = await getDocs(q);
 
 if (snap.empty) {
-  container.innerHTML = "<p>Perfil não existe.</p>";
+  container.innerHTML = "<p>Esse perfil bloqueou você.</p>";
 } else {
   snap.forEach(docSnap => {
     const data = docSnap.data();
